@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <assert.h>
 #include <string.h>
+
 #include "errors.h"
 #include "scaner.h"
 
@@ -118,6 +119,7 @@ int main(int arc, char **argv)
         fprintf(stderr, "Error in opening file %s\n", argv[0]);
         return ERR_OTHER;
     }
+
     /* Lexer */
     token_ptr ptr;
     	scaner(str, ptr);
