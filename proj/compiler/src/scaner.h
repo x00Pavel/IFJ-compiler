@@ -26,7 +26,7 @@ typedef enum {
     // Numbers
     TOKEN_INT,       // integer int
     TOKEN_FLOAT,     // float 
-    TOKEN_STRING,    // char 
+    TOKEN_STRING,    // string 
 
     // Operators
     TOKEN_SUM,       // +
@@ -70,6 +70,6 @@ struct token{
 
 typedef struct token* token_ptr;
 
-
+void scanner (FILE *file ,token_ptr token);
 
 #endif //_SCANNER_H
