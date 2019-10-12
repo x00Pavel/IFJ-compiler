@@ -1,6 +1,6 @@
 /**
  * \file src/scanner.h
- * \author Pavel Yadlouski
+ * \author Pavel Yadlouski (xyadlo00@stud.fit.vutbr.cz)
  * \brief Implementation of scanner
  * \date 2019
 */
@@ -11,14 +11,16 @@
  * Enumeration of avaliable key words
 */
 typedef enum {
-    _DEF_,
-    _ELSE_,
-    _IF_,
-    _NONE_,
+    _DEF_ = 0, 
+    _ELSE_, 
+    _IF_,  
+    _NONE_, 
     _PASS_,
     _RETURN_,
     _WHILE_
 } key_word_t;
+
+char *key_word_arr[] = {"def", "else", "if", "none", "pass", "return", "while"};
 
 typedef enum {
     // Numbers
@@ -66,6 +68,7 @@ struct token{
     attribute_t attribute; 
 };
 
+typedef struct token* token_ptr;
 
 
 
