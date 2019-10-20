@@ -7,6 +7,7 @@
 #ifndef _SCANNER_H
 #define _SCANNER_H
 
+
 /**
  * Enumeration of avaliable key words
 */
@@ -20,45 +21,47 @@ typedef enum {
     _WHILE_
 } key_word_t;
 
-char *key_word_arr[] = {"def", "else", "if", "none", "pass", "return", "while"};
+
 
 typedef enum {
     // Numbers
-    TOKEN_INT,       // integer int
-    TOKEN_FLOAT,     // float 
-    TOKEN_STRING,    // string 
+    TOKEN_INT = 0,       // integer int
+    TOKEN_FLOAT = 1,     // float 
+    TOKEN_STRING = 2,    // string 
 
     // Operators
-    TOKEN_SUM,       // +
-    TOKEN_ASSIGN,    // =
-    TOKEN_MULTIPLY,  // *
-    TOKEN_DIVISION,  // /
+    TOKEN_SUM = 3,       // +
+    TOKEN_ASSIGN = 4,    // =
+    TOKEN_MULTIPLY = 5,  // *
+    TOKEN_DIVISION = 6,  // /
 
     // Relation operators
-    TOKEN_EQUAL,     // ==
-    TOKEN_NOT_EQUAL, // !=
-    TOKEN_GREATER,   // >
-    TOKEN_LESS,      // <
-    TOKEN_GREATER_EQ,// >= 
-    TOKEN_LESS_EQ,   // <=
+    TOKEN_EQUAL = 7,     // ==
+    TOKEN_NOT_EQUAL = 8, // !=
+    TOKEN_GREATER = 9,   // >
+    TOKEN_LESS = 10,      // <
+    TOKEN_GREATER_EQ = 11,// >= 
+    TOKEN_LESS_EQ = 12,   // <=
 
     // Special tokens
-    TOKEN_EOL,      // end of line \n
-    TOKEN_EOF,      // end of file 
-    TOKEN_KEY_WORD, // key_word_t
-    TOKEN_EMPTY,     // "white" symbols
+    TOKEN_EOL = 13,      // end of line \n
+    TOKEN_EOF = 14,      // end of file 
+    TOKEN_KEY_WORD = 15, // key_word_t
+    TOKEN_EMPTY = 16,     // "white" symbols
 
     // Punctuations
-    TOKEN_L_BRACKET, // (
-    TOKEN_R_BRACKET, // )
-    TOKEN_DOT,       // .
-    TOKEN_COMA,      // ,
-    TOKEN_SEMICOLON, // ;  
+    TOKEN_L_BRACKET = 17, // (
+    TOKEN_R_BRACKET = 18, // )
+    TOKEN_DOT = 19,       // .
+    TOKEN_COMA = 20,      // ,
+    TOKEN_SEMICOLON = 21, // ;  
+    TOKEN_ID   = 22,
+    TOKEN_HEX = 23
 } token_t;
 
 typedef union {
     int int_val;
-    float float_val;
+    double float_val;
     char  *string;
     key_word_t key_word;
 } attribute_t;
@@ -70,6 +73,6 @@ struct token{
 
 typedef struct token* token_ptr;
 
-void scanner (FILE *file ,token_ptr token);
+int scanner (FILE *file ,token_ptr token);
 
 #endif //_SCANNER_H
