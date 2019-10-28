@@ -1,3 +1,7 @@
+#ifndef _ERROR_H
+#define _ERROR_H
+
+
 /* Error in lexical analyzer                */
 #define ERR_LEXER  1
 /* Error in syntax analyzer                 */
@@ -14,3 +18,5 @@
 #define ERR_DEV_ZERO 9
 /* Internal errors (in malloc etc.)         */
 #define ERR_INTERNAL 99
+
+#endif // _ERROR_H
