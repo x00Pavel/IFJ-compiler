@@ -26,6 +26,17 @@
 #define SCANNER_WHITE_SPACE 24
 #define SCANNER_EOF 100 // Scanner read last token
 
+#define FREE_ALL(...)                                      \
+    do                                                     \
+    {                                                      \
+        unsigned int i = 0;                                         \
+        void *pta[] = {__VA_ARGS__};                       \
+        for (i = 0; i < sizeof(pta) / sizeof(void *); i++) \
+        {                                                  \
+            free(pta[i]);                                  \
+        }                                                  \
+    } while (0)
+
 // void make_token(char *str, token_s *ptr);
 
 char *key_word_arr[] = {"def", "else", "if", "none", "pass", "return", "while"};
@@ -90,6 +101,7 @@ int get_token(FILE *file, struct token_s* token)
                 if(!first_token){
                     token->type = TOKEN_EOL;
                     state = TOKEN_READY;
+                    FREE_ALL(str->str, str);
                     return OK;
                 }
                 else{
@@ -163,6 +175,7 @@ int get_token(FILE *file, struct token_s* token)
                 }
                 else{
                     fprintf(stdout,"ERROR. In the begining of number cant be more then one\n");
+                    FREE_ALL(str->str, str);
                     return ERR_LEXER;
                 }
             }            
@@ -186,19 +199,49 @@ int get_token(FILE *file, struct token_s* token)
             else{
                 ungetc(c,file);
                 int num = atoi(str->str);
-                if(num == NULL){
-                    fprintf(stdout, "ERROR. Can not convert string to integer value\n");
-                    return ERR_INTERNAL;
-                }
+                // проверка на правильность выполнения перевода на инт
+                // if(num ==){
+                //     fprintf(stdout, "ERROR. Can not convert string to integer value\n");
+                //     FREE_ALL(str->str, str);
+                //     return ERR_INTERNAL;
+                // }
                 token->attribute.int_val = num;
-                token->type = TOKEN_INT;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       
+                token->type = TOKEN_INT;
+                FREE_ALL(str->str, str);
                 return OK;
             }
             break;
         case SCANNER_FLOAT:
-            // break;
+            if (isdigit(c)){
+                add_char_to_str(str, c);
+            }
+            else if((c == 'e') || (c == 'E')){
+                add_char_to_str(str, c);
+                state = SCANNER_EXP;
+            }
+            else{
+                ungetc(c, file);
+                token->attribute.float_val = strtof(str->str, NULL);
+                token->type = TOKEN_FLOAT;
+                FREE_ALL(str->str, str);
+                return OK;
+            }
+            break;
         case SCANNER_EXP:
-            // break;
+            if((c == '-') || (c == '+')){
+                add_char_to_str(str, c);
+            }
+            else if(isdigit(c)){
+                add_char_to_str(str, c);
+            }
+            else{
+                ungetc(c, file);
+                token->attribute.float_val = strtof(str->str, NULL);
+                token->type = TOKEN_FLOAT;
+                FREE_ALL(str->str, str);
+                return OK;
+            }
+            break;
         case SCANNER_WHITE_SPACE:
             if(c == '\n'){
                 state =SCANNER_START;
@@ -220,8 +263,7 @@ int get_token(FILE *file, struct token_s* token)
     }
 
     // printf("HERE\n");
-    free(str->str);
-    free(str);
+    FREE_ALL(str->str, str);
     return -1;
 }
 /*
