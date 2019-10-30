@@ -8,20 +8,23 @@
 #include "dynamic_string.h"
 #include "scaner.h"
 
-#define TOKEN_READY 0      // Read sucsessful
-#define SCANNER_START 10  // Scaner begin to work
-#define SCANER_STOP 11    // Scaner read one token
+#define TOKEN_READY 0      // Read successful
+#define SCANNER_START 10  // Scanner begin to work
+#define SCANNER_STOP 11    // Scanner read one token
 #define SCANNER_STRING 12 // Begining of string
 #define SCANNER_EOL 13    // Reade end of line
-#define SCANNER_ID 14     // It is a identifire or keyword
+#define SCANNER_ID 14     // It is a identifier or keyword
 #define SCANNER_INT_OR_FLOAT 15
 #define SCANNER_BLOCK_STRING_BEGIN 16
 #define SCANNER_BLOCK_STRING_START 17
 #define SCANNER_OUT_BLOCK_1 18
 #define SCANNER_OUT_BLOCK_2 19
-#define SCANNER_HEX_OR_FLOAT 20
-#define SCANNER_COMMENT 21
-#define SCANNER_EOF 100 // Scaner readed last token
+#define SCANNER_FLOAT 20
+#define SCANNER_EXP 21
+#define SCANNER_COMMENT 22
+#define SCANNER_INT 23 
+#define SCANNER_WHITE_SPACE 24
+#define SCANNER_EOF 100 // Scanner read last token
 
 // void make_token(char *str, token_s *ptr);
 
@@ -36,7 +39,7 @@ int get_token(FILE *file, struct token_s* token)
         return ERR_INTERNAL;
     }
 
-    // string to wretting down attribute
+    // string to writing down attribute
     struct dynamic_string *str;
     str = (dynamic_string_ptr)malloc(sizeof(struct dynamic_string));
     if (str == NULL)
@@ -55,35 +58,52 @@ int get_token(FILE *file, struct token_s* token)
     str->len = 0;
 
     int state = SCANNER_START;
-
+    bool first_token = true;
     int c;
     while (state != SCANNER_EOF)
     {
         c = getc(file);
 
-        if (feof(file))
-        {
+        if (feof(file)){
             printf("EOF\n");
             // token->type = TOKEN_EOF;        
             state = SCANNER_EOF;
         }
         switch (state){
-        case SCANNER_START:
-            if (c == '#')
-            {
+        case SCANNER_START: case TOKEN_READY:
+            if (c == '#'){
                 printf("comment\n");
+                first_token = false;
             }
-            else if (isalpha(c))
-            {
+            else if (isalpha(c)){
                 add_char_to_str(str, c);
                 state = SCANNER_ID;
+                first_token = false;
             }
-            else if (isdigit(c))
-            {
+            else if (isdigit(c)){
                 printf("is digit\n");
-                add_char_to_str(str, c);
                 state = SCANNER_INT_OR_FLOAT;
                 ungetc(c, file);
+                first_token = false;
+            }
+            else if(c == '\n'){
+                if(!first_token){
+                    token->type = TOKEN_EOL;
+                    state = TOKEN_READY;
+                    return OK;
+                }
+                else{
+                    state = SCANNER_START;
+                }
+            }
+            else if(c == ' '){
+                if(first_token){
+                    // наверное надо заполнить в табулку с одсазеним??
+                    state = SCANNER_WHITE_SPACE;
+                }
+                else{
+                    state = SCANNER_START;
+                }
             }
             break;
         case SCANNER_ID:
@@ -91,6 +111,7 @@ int get_token(FILE *file, struct token_s* token)
                 add_char_to_str(str, c);
             }
             else{
+                ungetc(c, file);
                 printf("%s\n", str->str);
                 if (strcmp(str->str, "while") == 0){
                     token->type = TOKEN_KEY_WORD;
@@ -127,29 +148,71 @@ int get_token(FILE *file, struct token_s* token)
             }
             break;
         case SCANNER_INT_OR_FLOAT:
-            /*
-            
-            ДОДЕЛАТЬ ОБРАБОТКУ ЧИСЕЛ. ОСОБЕННО ПОДУМАТЬ НАД FLOAT ЧИСЛАМИ
-            
-            */
-            // if zero, then it can be only float number
+            // if zero, then it can be only float number, or 0 as integer
             if(c == '0'){
                 c = getc(file);
-                if(c == '0'){
-                    printf("ERROR. In the begining of number cant be more then one\n");
+                if (c == '.'){
+                    add_char_to_str(str, '0');
+                    add_char_to_str(str, c);
+                    state = SCANNER_FLOAT;
+                }
+                else if ((c == 'E') || (c == 'e')){
+                    add_char_to_str(str, '0');
+                    add_char_to_str(str, c);
+                    state = SCANNER_EXP;
+                }
+                else{
+                    fprintf(stdout,"ERROR. In the begining of number cant be more then one\n");
                     return ERR_LEXER;
                 }
-                else if ((c == '.') || (c == 'E') || (c == 'e') ){
-                    add_char_to_str(str, c);
-                }
-            //
-            else{
-
-            }
-                
             }            
+            else{
+                add_char_to_str(str, c);
+                state = SCANNER_INT;
+            }
+            break;
+        case SCANNER_INT:
+            if(isdigit(c)){
+                add_char_to_str(str,c);
+            }
+            else if (c == '.'){
+                add_char_to_str(str, c);
+                state = SCANNER_FLOAT;
+            }
+            else if ((c == 'E') || (c == 'e')){
+                add_char_to_str(str,c);
+                state = SCANNER_EXP;
+            }
+            else{
+                ungetc(c,file);
+                int num = atoi(str->str);
+                if(num == NULL){
+                    fprintf(stdout, "ERROR. Can not convert string to integer value\n");
+                    return ERR_INTERNAL;
+                }
+                token->attribute.int_val = num;
+                token->type = TOKEN_INT;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       
+                return OK;
+            }
+            break;
+        case SCANNER_FLOAT:
+            // break;
+        case SCANNER_EXP:
+            // break;
+        case SCANNER_WHITE_SPACE:
+            if(c == '\n'){
+                state =SCANNER_START;
+            }
+            else if(c == ' '){
+                state = SCANNER_WHITE_SPACE;
+            }
+            else{
+                // INDENT OR DEDEND
+                first_token = false;
+            }
             break;
         default:
+            state = SCANNER_START;
             break;
         }
         
