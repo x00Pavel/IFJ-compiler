@@ -26,6 +26,7 @@
 #define SCANNER_WHITE_SPACE 24
 #define SCANNER_EOF 100 // Scanner read last token
 
+/* Macros for freeing resources*/
 #define FREE_ALL(...)                                      \
     do                                                     \
     {                                                      \
@@ -37,17 +38,22 @@
         }                                                  \
     } while (0)
 
-// void make_token(char *str, token_s *ptr);
-
 char *key_word_arr[] = {"def", "else", "if", "none", "pass", "return", "while"};
+
+/* Macros for log*/
+#define SLOG(msg, ret_code) \
+    _log(stdout, __FILE__, __LINE__, msg);\
+    return ret_code
+
+inline void _log(FILE *fd, char *file, int line, char *msg){
+    fprintf(fd, "%s:%d %s\n", file, line, msg);
+}
 
 int get_token(FILE *file, struct token_s* token)
 {
 
-    if (!file)
-    {
-        fprintf(stdout, "---------------------------------------\nThere is no input file. Rerun with file\n ---------------------------------------\n");
-        return ERR_INTERNAL;
+    if (!file){
+        SLOG("There is no input file.Rerun with file", ERR_INTERNAL);
     }
 
     // string to writing down attribute
@@ -55,15 +61,14 @@ int get_token(FILE *file, struct token_s* token)
     str = (dynamic_string_ptr)malloc(sizeof(struct dynamic_string));
     if (str == NULL)
     {
-        fprintf(stdout, "---------------------------\nError in allocating memory!\n---------------------------\n");
-        return ERR_INTERNAL;
+        SLOG("Error in allocating memory!", ERR_INTERNAL);
     }
 
     str->str = (string)malloc(DEF_STR_SIZE);
     if (!str->str)
     {
-        fprintf(stdout, "---------------------------\nError in allocating memory!\n---------------------------\n");
-        return ERR_INTERNAL;
+        FREE_ALL(str);
+        SLOG("Error in allocating memory!", ERR_INTERNAL);
     }
     str->size = DEF_STR_SIZE;
     str->len = 0;
@@ -77,7 +82,7 @@ int get_token(FILE *file, struct token_s* token)
 
         if (feof(file)){
             printf("EOF\n");
-            // token->type = TOKEN_EOF;        
+            token->type = TOKEN_EOF;        
             state = SCANNER_EOF;
         }
         switch (state){
@@ -154,8 +159,7 @@ int get_token(FILE *file, struct token_s* token)
                     token->attribute.string = (char *)malloc(str->size);
                     strncpy(token->attribute.string, str->str, str->size);
                 }
-                free(str->str);
-                free(str);
+                FREE_ALL(str->str, str);
                 return TOKEN_READY;
             }
             break;
@@ -174,9 +178,10 @@ int get_token(FILE *file, struct token_s* token)
                     state = SCANNER_EXP;
                 }
                 else{
-                    fprintf(stdout,"ERROR. In the begining of number cant be more then one\n");
+                    // fprintf(stdout,"ERROR. In the begining of number cant be more then one\n");
                     FREE_ALL(str->str, str);
-                    return ERR_LEXER;
+                    SLOG("ERROR. In the begining of number cant be more then one", ERR_LEXER);
+                    // return ERR_LEXER;
                 }
             }            
             else{
@@ -266,45 +271,3 @@ int get_token(FILE *file, struct token_s* token)
     FREE_ALL(str->str, str);
     return -1;
 }
-/*
-void check_kw_or_id(char *str, token_ptr token){
-    if (strcmp(str, "define"))
-    {
-        token->attribute.key_word = _DEF_;
-        token->type = TOKEN_KEY_WORD;
-    }
-    else if (strcmp(str, "else"))
-    {
-        token->attribute.key_word = _ELSE_;
-        token->type = TOKEN_KEY_WORD;
-    }
-    else if (strcmp(str, "if"))
-    {
-        token->attribute.key_word = _IF_;
-        token->type = TOKEN_KEY_WORD;
-    }
-    else if (strcmp(str, "none"))
-    {
-        token->attribute.key_word = _NONE_;
-        token->type = TOKEN_KEY_WORD;
-    }
-    else if (strcmp(str, "pass"))
-    {
-        token->attribute.key_word = _PASS_;
-        token->type = TOKEN_KEY_WORD;
-    }
-    else if (strcmp(str, "return"))
-    {
-        token->attribute.key_word = _RETURN_;
-        token->type = TOKEN_KEY_WORD;
-    }
-    else if (strcmp(str, "while"))
-    {
-        token->attribute.key_word = _WHILE_;
-        token->type = TOKEN_KEY_WORD;
-    }
-    else {
-        token->type = TOKEN_ID;
-        token->attribute.string = str;
-    }
-}*/
