@@ -1,7 +1,8 @@
 #ifndef _ERROR_H
 #define _ERROR_H
 
-
+/* If everthing ok*/
+#define OK 0
 /* Error in lexical analyzer                */
 #define ERR_LEXER  1
 /* Error in syntax analyzer                 */
