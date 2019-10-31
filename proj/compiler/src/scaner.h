@@ -1,5 +1,5 @@
 /**
- * \file src/scanner.h
+ * \file src/scanner/scanner.h
  * \author Pavel Yadlouski (xyadlo00@stud.fit.vutbr.cz)
  * \brief Implementation of scanner
  * \date 2019
@@ -8,7 +8,7 @@
 #define _SCANNER_H
 
 /**
- * Enumeration of avaliable key words
+ * \brief Enumeration of avaliable key words
 */
 typedef enum {
     _DEF_ = 0, 
@@ -20,56 +20,64 @@ typedef enum {
     _WHILE_
 } key_word_t;
 
-char *key_word_arr[] = {"def", "else", "if", "none", "pass", "return", "while"};
-
+/**
+ * \brief Enumeration with types of tokens
+*/
 typedef enum {
     // Numbers
-    TOKEN_INT,       // integer int
-    TOKEN_FLOAT,     // float 
-    TOKEN_STRING,    // char 
+    TOKEN_INT = 0,       // integer int
+    TOKEN_FLOAT = 1,     // float 
+    TOKEN_STRING = 2,    // string 
 
     // Operators
-    TOKEN_SUM,       // +
-    TOKEN_ASSIGN,    // =
-    TOKEN_MULTIPLY,  // *
-    TOKEN_DIVISION,  // /
+    TOKEN_SUM = 3,       // +
+    TOKEN_MINUS = 4,     // -
+    TOKEN_ASSIGN = 5,    // =
+    TOKEN_MULTIPLY = 6,  // *
+    TOKEN_DIVISION = 7,  // /
 
     // Relation operators
-    TOKEN_EQUAL,     // ==
-    TOKEN_NOT_EQUAL, // !=
-    TOKEN_GREATER,   // >
-    TOKEN_LESS,      // <
-    TOKEN_GREATER_EQ,// >= 
-    TOKEN_LESS_EQ,   // <=
+    TOKEN_EQUAL = 8,     // ==
+    TOKEN_NOT_EQUAL = 9, // !=
+    TOKEN_GREATER = 10,   // >
+    TOKEN_LESS = 11,      // <
+    TOKEN_GREATER_EQ = 12,// >= 
+    TOKEN_LESS_EQ = 13,   // <=
 
     // Special tokens
-    TOKEN_EOL,      // end of line \n
-    TOKEN_EOF,      // end of file 
-    TOKEN_KEY_WORD, // key_word_t
-    TOKEN_EMPTY,     // "white" symbols
+    TOKEN_EOL = 14,      // end of line \n
+    TOKEN_EOF = 15,      // end of file 
+    TOKEN_KEY_WORD = 16, // key_word_t
+    TOKEN_EMPTY = 17,     // "white" symbols
 
     // Punctuations
-    TOKEN_L_BRACKET, // (
-    TOKEN_R_BRACKET, // )
-    TOKEN_DOT,       // .
-    TOKEN_COMA,      // ,
-    TOKEN_SEMICOLON, // ;  
+    TOKEN_L_BRACKET = 18, // (
+    TOKEN_R_BRACKET = 19, // )
+    TOKEN_DOT = 20,       // .
+    TOKEN_COMA = 21,      // ,
+    TOKEN_SEMICOLON = 22, // ;
+    TOKEN_DDOT = 23,      // :  
+    TOKEN_ID   = 24,
+    TOKEN_HEX = 25
 } token_t;
 
+/**
+ * \brief Union with atrributes
+*/
 typedef union {
-    int int_val;
-    float float_val;
+    int int_val;        /*< For integer value*/
+    double float_val;   /*< For */
     char  *string;
     key_word_t key_word;
 } attribute_t;
 
-struct token{
+struct token_s{
     token_t type;
     attribute_t attribute; 
 };
 
 typedef struct token* token_ptr;
 
-
+int get_token(FILE *file, struct token_s *token);
 
 #endif //_SCANNER_H
