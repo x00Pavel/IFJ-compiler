@@ -6,6 +6,7 @@
 
 #include "errors.h"
 #include "scaner.h"
+#include "./stack/c202.h"
 
 // je nutne udelat v headeru prototipy
 
@@ -23,8 +24,12 @@ int main(int arc, char **argv){
     // int ret_code = scanner(file, token);
     
     // printf("%d\n", scanner(file, token));
-    
-    int ret_code = get_token(file, token);
+
+    tStack *stack;
+    stackInit(stack);
+    stackPush(stack, 0);
+
+    int ret_code = get_token(file, token, stack);
     if(ret_code != 0){
         return -1;
     }
