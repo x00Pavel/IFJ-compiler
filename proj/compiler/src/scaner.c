@@ -81,8 +81,8 @@ int get_token(FILE *file, struct token_s* token)
 
     int state = SCANNER_START;
     static bool first_token = true;
-    static int i = 0;
-    static int j = 0;
+    static int double_quot = 0;
+    static int count_of_quot = 0;
     int c;
     while (state != SCANNER_EOF)
     {
@@ -335,19 +335,19 @@ int get_token(FILE *file, struct token_s* token)
             }
             break;
         case SCANNER_BLOCK_STRING_BEGIN:
-            if (c == '"' && i < 3 && j < 2 ){
-                i++;
-                if(i == 3){
-                    j++;
+            if (c == '"' && double_quot < 3 && count_of_quot < 2 ){
+                double_quot++;
+                if(double_quot == 3){
+                    count_of_quot++;
                 }
             }
-            else if(c != '"' && (i == 3 || i == 0)){  
-                i = 0;
-                if(j < 2){
+            else if(c != '"' && (double_quot == 3 || double_quot == 0)){  
+                double_quot = 0;
+                if(count_of_quot < 2){
                     if(c != 13 && c != 10)
                         add_char_to_str(str, c);
                 }else{
-                    j = 0;
+                    count_of_quot = 0;
                     ungetc(c,file);
                     token->type = TOKEN_STRING;
                     printf("token attribute: %s\n", str->str);
