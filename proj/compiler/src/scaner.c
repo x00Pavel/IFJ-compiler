@@ -145,11 +145,9 @@ int get_token(FILE *file, struct token_s* token)
             }
             else if(c == '='){
                 state = SCANNER_ASSIGN;
-                add_char_to_str(str, c);
             }
             else if(c == '+' || c == '-' || c == '*' || c == '/' || c == ':'){
                 state = SCANNER_SUM_MINUS_MULTIPLY_DIVISION_DDOT;
-                add_char_to_str(str, c);
                 if(c == '+')
                 token->type = TOKEN_SUM;
                 if(c == '-')
@@ -397,18 +395,16 @@ int get_token(FILE *file, struct token_s* token)
             if(c == ' '){
                 ungetc(c,file);
                 token->type = TOKEN_ASSIGN;
+                printf("token attribute: ASSIGN\n");
             }
             else if(c == '='){
                 state = SCANNER_EQUAL;
-                add_char_to_str(str, c);
+                printf("token attribute: EQUAL\n");
             }
             else{
                 FREE_ALL(str->str, str);
                 SLOG("ERROR. After '=' can be only '=' or ' ' !", ERR_LEXER);
             }
-            printf("token attribute: %s\n", str->str);
-            token->attribute.string = (char *)malloc(str->size);
-            strncpy(token->attribute.string, str->str, str->size);
             FREE_ALL(str->str, str);
             state = SCANNER_START;
             return TOKEN_READY; 
@@ -430,12 +426,10 @@ int get_token(FILE *file, struct token_s* token)
             break;
         case SCANNER_SUM_MINUS_MULTIPLY_DIVISION_DDOT:
             if((c == ' ') || (c == 13) || (c == 10)){
-                printf("token attribute: %s\n", str->str);
-                token->attribute.string = (char *)malloc(str->size);
-                strncpy(token->attribute.string, str->str, str->size);
+                printf("token attribute: SUM_MINUS_MULTIPLY_DIVISION_DDOT\n");
                 FREE_ALL(str->str, str);
                 state = SCANNER_START;
-                return TOKEN_READY; 
+                return TOKEN_READY;
             }
             else{
                 SLOG("ERROR. After '+,-,*,/,:' can be only ' ' !", ERR_LEXER);
@@ -467,14 +461,12 @@ int get_token(FILE *file, struct token_s* token)
         case SCANNER_BRACKET:
             if(c == '('){
                 token->type = TOKEN_L_BRACKET;
+                printf("token attribute: L_BRACKET\n");
             }
             else{
                 token->type = TOKEN_R_BRACKET;
+                printf("token attribute: R_BRACKET\n");
             }
-            add_char_to_str(str, c);
-            printf("token attribute: %s\n", str->str);
-            token->attribute.string = (char *)malloc(str->size);
-            strncpy(token->attribute.string, str->str, str->size);
             FREE_ALL(str->str, str);
             state = SCANNER_START;
             return TOKEN_READY; 
