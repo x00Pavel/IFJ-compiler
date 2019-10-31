@@ -7,8 +7,9 @@
 #include "errors.h"
 #include "dynamic_string.h"
 #include "scaner.h"
+#include "./stack/c202.h"
 
-#define TOKEN_READY 0      // Read successful
+
 #define SCANNER_START 10  // Scanner begin to work
 #define SCANNER_STOP 11    // Scanner read one token
 #define SCANNER_STRING 12 // Begining of string
@@ -30,7 +31,7 @@
 #define FREE_ALL(...)                                      \
     do                                                     \
     {                                                      \
-        unsigned int i = 0;                                         \
+        unsigned int i = 0;                                \
         void *pta[] = {__VA_ARGS__};                       \
         for (i = 0; i < sizeof(pta) / sizeof(void *); i++) \
         {                                                  \
@@ -49,7 +50,7 @@ inline void _log(FILE *fd, char *file, int line, char *msg){
     fprintf(fd, "%s:%d %s\n", file, line, msg);
 }
 
-int get_token(FILE *file, struct token_s* token)
+int get_token(FILE *file, struct token_s* token, tStack *stack)
 {
 
     if (!file){
@@ -73,9 +74,11 @@ int get_token(FILE *file, struct token_s* token)
     str->size = DEF_STR_SIZE;
     str->len = 0;
 
-    int state = SCANNER_START;
+    int state = SCANNER_START; 
     bool first_token = true;
-    int c;
+    int c; // for symbol
+    int space_cnt = 0;
+     
     while (state != SCANNER_EOF)
     {
         c = getc(file);
@@ -86,7 +89,7 @@ int get_token(FILE *file, struct token_s* token)
             state = SCANNER_EOF;
         }
         switch (state){
-        case SCANNER_START: case TOKEN_READY:
+        case SCANNER_START:
             if (c == '#'){
                 printf("comment\n");
                 first_token = false;
@@ -105,7 +108,7 @@ int get_token(FILE *file, struct token_s* token)
             else if(c == '\n'){
                 if(!first_token){
                     token->type = TOKEN_EOL;
-                    state = TOKEN_READY;
+                    state = SCANNER_START;
                     FREE_ALL(str->str, str);
                     return OK;
                 }
@@ -121,6 +124,9 @@ int get_token(FILE *file, struct token_s* token)
                 else{
                     state = SCANNER_START;
                 }
+            }
+            else if(c == '('){
+                
             }
             break;
         case SCANNER_ID:
@@ -160,7 +166,7 @@ int get_token(FILE *file, struct token_s* token)
                     strncpy(token->attribute.string, str->str, str->size);
                 }
                 FREE_ALL(str->str, str);
-                return TOKEN_READY;
+                return OK;
             }
             break;
         case SCANNER_INT_OR_FLOAT:
@@ -177,11 +183,9 @@ int get_token(FILE *file, struct token_s* token)
                     add_char_to_str(str, c);
                     state = SCANNER_EXP;
                 }
-                else{
-                    // fprintf(stdout,"ERROR. In the begining of number cant be more then one\n");
+                else if (c == '0'){
                     FREE_ALL(str->str, str);
                     SLOG("ERROR. In the begining of number cant be more then one", ERR_LEXER);
-                    // return ERR_LEXER;
                 }
             }            
             else{
@@ -205,11 +209,6 @@ int get_token(FILE *file, struct token_s* token)
                 ungetc(c,file);
                 int num = atoi(str->str);
                 // проверка на правильность выполнения перевода на инт
-                // if(num ==){
-                //     fprintf(stdout, "ERROR. Can not convert string to integer value\n");
-                //     FREE_ALL(str->str, str);
-                //     return ERR_INTERNAL;
-                // }
                 token->attribute.int_val = num;
                 token->type = TOKEN_INT;
                 FREE_ALL(str->str, str);
@@ -249,14 +248,37 @@ int get_token(FILE *file, struct token_s* token)
             break;
         case SCANNER_WHITE_SPACE:
             if(c == '\n'){
-                state =SCANNER_START;
+                state = SCANNER_START;
             }
             else if(c == ' '){
+                space_cnt++;
                 state = SCANNER_WHITE_SPACE;
             }
             else{
                 // INDENT OR DEDEND
                 first_token = false;
+                if(space_cnt > stackTop(stack)){
+                    // INDEND
+                    stackPush(stackPush, space_cnt);
+                    // token->type = TOKEN_INDEND;
+
+                }
+                else if (space_cnt < stackTop(stack)){
+                    // DEDEND
+                    while (stackTop(stack) != 0){
+                        stackPop(stack);
+                        if(stackTop(stack) == space_cnt){
+                            // we found same level 
+                            token->type = TOKEN_DEDEND;
+                            state = SCANNER_START;
+                            break; // or return?
+                        }
+                    }
+                    // in case if there is now same offset
+                    FREE_ALL(str->str, str);
+                    SLOG("Error. Wrong count of spaces!", ERR_SYNTAX);
+                }
+                state = SCANNER_START;
             }
             break;
         default:

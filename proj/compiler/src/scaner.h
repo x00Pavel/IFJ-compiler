@@ -56,7 +56,9 @@ typedef enum {
     TOKEN_COMA = 20,      // ,
     TOKEN_SEMICOLON = 21, // ;  
     TOKEN_ID   = 22,
-    TOKEN_HEX = 23
+    TOKEN_HEX = 23,
+    TOKEN_INDEND,
+    TOKEN_DEDEND
 } token_t;
 
 /**
@@ -76,6 +78,6 @@ struct token_s{
 
 typedef struct token* token_ptr;
 
-int get_token(FILE *file, struct token_s *token);
+int get_token(FILE *file, struct token_s *token, tStack *stack);
 
 #endif //_SCANNER_H
