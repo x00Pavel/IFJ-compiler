@@ -101,7 +101,7 @@ int get_token(FILE *file, struct token_s* token)
         case SCANNER_START: case TOKEN_READY:
             if (c == '#'){
                 printf("comment skipped\n\n");
-                first_token = false;
+                //first_token = false;
                 state = SCANNER_COMMENT;
             }
             else if (isalpha(c)){
@@ -371,22 +371,22 @@ int get_token(FILE *file, struct token_s* token)
             add_char_to_str(str, c);
             if (c == '>'){
                 token->type = TOKEN_GREATER;
+                printf("token attribute: MORE\n");
             }else{
                 token->type = TOKEN_LESS;
+                printf("token attribute: LESS\n");
             }
             c = getc(file);
             if (c == '='){
-                add_char_to_str(str, c);
                 token->type += 2;
+                printf("token attribute: MORE/LESS_OR_EQUAL\n");
             }else if (c == ' '){
                 ungetc(c, file);
             }else{
                 FREE_ALL(str->str, str);
                 SLOG("ERROR. Can be only '<' or '<=' !", ERR_LEXER);
             }
-            printf("token attribute: %s\n", str->str);
-            token->attribute.string = (char *)malloc(str->size);
-            strncpy(token->attribute.string, str->str, str->size);
+            
             FREE_ALL(str->str, str);
             state = SCANNER_START;
             return TOKEN_READY;

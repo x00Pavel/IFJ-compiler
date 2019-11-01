@@ -26,11 +26,13 @@ int main(int arc, char **argv){
         
         int ret_code = get_token(file, token);
         if(ret_code != 0){
+            free(token);
+            fclose(file);
             return -1;
         }
         printf("token type: %d\n\n", token->type);
 
-        if(token->type == TOKEN_ID){
+        if(token->type == TOKEN_ID || token->type == TOKEN_STRING){
             free(token->attribute.string);
         }
         free(token);
