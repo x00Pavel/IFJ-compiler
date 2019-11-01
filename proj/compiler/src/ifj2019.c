@@ -8,7 +8,6 @@
 #include "scaner.h"
 #include "./stack/c202.h"
 
-// je nutne udelat v headeru prototipy
 
 int main(int arc, char **argv){
     (void)arc;
@@ -25,7 +24,7 @@ int main(int arc, char **argv){
     
     // printf("%d\n", scanner(file, token));
 
-    tStack *stack;
+    tStack *stack = (tStack*) malloc(sizeof(tStack));
     stackInit(stack);
     stackPush(stack, 0);
 
@@ -38,6 +37,7 @@ int main(int arc, char **argv){
     if(token->type == TOKEN_ID){
         free(token->attribute.string);
     }
+    free(stack);
     free(token);
     fclose(file);
 
