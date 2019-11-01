@@ -50,6 +50,8 @@ inline void _log(FILE *fd, char *file, int line, char *msg){
     fprintf(fd, "%s:%d %s\n", file, line, msg);
 }
 
+typedef struct stack tStack;
+
 int get_token(FILE *file, struct token_s* token, tStack *stack)
 {
 
@@ -160,6 +162,10 @@ int get_token(FILE *file, struct token_s* token, tStack *stack)
                     token->type = TOKEN_KEY_WORD;
                     token->attribute.key_word = _RETURN_;
                 }
+                else if(strcmp(str->str, "if") == 0){
+                    token->type = TOKEN_KEY_WORD;
+                    token->attribute.key_word = _IF_;
+                }
                 else{
                     token->type = TOKEN_ID;
                     token->attribute.string = (char *)malloc(str->size);
@@ -259,8 +265,8 @@ int get_token(FILE *file, struct token_s* token, tStack *stack)
                 first_token = false;
                 if(space_cnt > stackTop(stack)){
                     // INDEND
-                    stackPush(stackPush, space_cnt);
-                    // token->type = TOKEN_INDEND;
+                    stackPush(stack, space_cnt);
+                    token->type = TOKEN_INDEND;
 
                 }
                 else if (space_cnt < stackTop(stack)){
@@ -271,7 +277,8 @@ int get_token(FILE *file, struct token_s* token, tStack *stack)
                             // we found same level 
                             token->type = TOKEN_DEDEND;
                             state = SCANNER_START;
-                            break; // or return?
+                            FREE_ALL(str->str, str);
+                            return OK;
                         }
                     }
                     // in case if there is now same offset

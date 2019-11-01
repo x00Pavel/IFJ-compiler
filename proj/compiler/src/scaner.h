@@ -7,6 +7,8 @@
 #ifndef _SCANNER_H
 #define _SCANNER_H
 
+#include "./stack/c202.h"
+
 /**
  * \brief Enumeration of avaliable key words
 */
