@@ -18,6 +18,7 @@ int main(int arc, char **argv){
         fprintf(stderr, "Error in opening file %s\n", argv[0]);
         return ERR_OTHER;
     }
+<<<<<<< Updated upstream
     while(1){
         struct token_s *token = (struct token_s *)malloc(sizeof(struct token_s));
         // int ret_code = scanner(file, token);
@@ -27,6 +28,19 @@ int main(int arc, char **argv){
         int ret_code = get_token(file, token);
         if(ret_code != 0){
             free(token);
+=======
+    tStack *stack = (tStack*) malloc(sizeof(tStack));
+    stackInit(stack);
+    stackPush(stack, 0);
+    
+    while(1){
+        struct token_s *token = (struct token_s *)malloc(sizeof(struct token_s));
+        
+        int ret_code = get_token(file, token, stack);
+        if(ret_code != 0){
+            free(token);
+            free(stack);
+>>>>>>> Stashed changes
             fclose(file);
             return -1;
         }
@@ -37,6 +51,10 @@ int main(int arc, char **argv){
         }
         free(token);
     }
+<<<<<<< Updated upstream
+=======
+    free(stack);
+>>>>>>> Stashed changes
     fclose(file);
 
     return 0;

@@ -7,6 +7,10 @@
 #ifndef _SCANNER_H
 #define _SCANNER_H
 
+<<<<<<< Updated upstream
+=======
+#include "./stack/c202.h"
+>>>>>>> Stashed changes
 /**
  * \brief Enumeration of avaliable key words
 */
@@ -58,7 +62,13 @@ typedef enum {
     TOKEN_SEMICOLON = 22, // ;
     TOKEN_DDOT = 23,      // :  
     TOKEN_ID   = 24,
+<<<<<<< Updated upstream
     TOKEN_HEX = 25
+=======
+    TOKEN_HEX = 25,
+    TOKEN_INDEND = 26, // indend
+    TOKEN_DEDEND = 27 // dedend
+>>>>>>> Stashed changes
 } token_t;
 
 /**
