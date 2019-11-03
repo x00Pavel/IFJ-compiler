@@ -13,7 +13,7 @@ int main(int arc, char **argv){
     (void)arc;
     /* Input file */
     FILE *file;
-    file = fopen(argv[1], "r");
+    file = fopen("test.txt", "r");
     if (!file){
         fprintf(stderr, "Error in opening file %s\n", argv[0]);
         return ERR_OTHER;
@@ -43,3 +43,4 @@ int main(int arc, char **argv){
 
     return 0;
 }
+
