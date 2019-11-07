@@ -26,7 +26,7 @@ typedef char *string;
  * \return 0 on success
  * \return #ERR_INTERNAL in case of memory allocation error  
 */
-int realloc_string(dynamic_string_ptr str);
+int realloc_string(dynamic_string_ptr *str);
 
 /**
  * \brief Function for adding one character to string 
@@ -52,7 +52,7 @@ void str_clean(dynamic_string_ptr str);
  * 
  * \return Pointer to allocated string;
 */
-void str_init(dynamic_string_ptr str);
+void str_init(dynamic_string_ptr *str);
 
 /**
  * \brief Inline function for compating string DST with SRC
