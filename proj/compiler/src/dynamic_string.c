@@ -14,26 +14,26 @@
 #define DEF_STR_SIZE 8
 
 void str_clean(dynamic_string_ptr str){
-    assert(str != NULL);
+    // assert(str != NULL);
 
     if(str->str != NULL){
         free(str->str);
     }
-
-    str->len = 0;
-    str->size = 0;
+    if(str != NULL){
+        free(str);
+    }
 }
 
-int realloc_string(dynamic_string_ptr str){
+int realloc_string(dynamic_string_ptr *str){
     assert(str != NULL);
 
-    str->str = (string)realloc(str->str, str->size + DEF_STR_SIZE);
-    if(str->str == NULL){
-        str_clean(str);
+    (*str)->str = (string)realloc((*str)->str, (*str)->size + DEF_STR_SIZE);
+    if((*str)->str == NULL){
+        str_clean(*str);
         return 99;
     }
 
-    str->size += DEF_STR_SIZE;
+    (*str)->size += DEF_STR_SIZE;
 
     return 0;
 }
@@ -43,7 +43,7 @@ bool add_char_to_str(dynamic_string_ptr dst, int src){
     assert(dst);
 
     if(dst->len + 1 >= dst->size){
-        if(realloc_string(dst) != 0){
+        if(realloc_string(&dst) != 0){
             return false;
         }
     }
@@ -54,17 +54,17 @@ bool add_char_to_str(dynamic_string_ptr dst, int src){
     return true;
 }
 
-void str_init(dynamic_string_ptr str){
-    str = (dynamic_string_ptr)malloc(sizeof(struct dynamic_string));
+void str_init(dynamic_string_ptr *str){
+    *str = (dynamic_string_ptr)malloc(sizeof(struct dynamic_string));
     if(!str){
         return ;
     }
     
-    str->str = (string)malloc(DEF_STR_SIZE);
-    if(!str->str){
+    (*str)->str = (string)malloc(DEF_STR_SIZE);
+    if(!(*str)->str){
         return;
     }
-    str->size = DEF_STR_SIZE;
-    str->len = 0;
+    (*str)->size = DEF_STR_SIZE;
+    (*str)->len = 0;
 }
 
