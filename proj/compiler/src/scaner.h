@@ -25,44 +25,45 @@ typedef enum {
 /**
  * \brief Enumeration with types of tokens
 */
-typedef enum {
+typedef enum{
     // Numbers
-    TOKEN_INT = 0,       // integer int
-    TOKEN_FLOAT = 1,     // float 
-    TOKEN_STRING = 2,    // string 
+    TOKEN_INT = 0,    // integer int
+    TOKEN_FLOAT = 1,  // float
+    TOKEN_STRING = 2, // string
 
     // Operators
-    TOKEN_SUM = 3,       // +
-    TOKEN_ASSIGN = 4,    // =
-    TOKEN_MULTIPLY = 5,  // *
-    TOKEN_DIVISION = 6,  // /
+    TOKEN_SUM = 3,      // +
+    TOKEN_MINUS = 4,    // -
+    TOKEN_ASSIGN = 5,   // =
+    TOKEN_MULTIPLY = 6, // *
+    TOKEN_DIVISION = 7, // /
 
     // Relation operators
-    TOKEN_EQUAL = 7,     // ==
-    TOKEN_NOT_EQUAL = 8, // !=
-    TOKEN_GREATER = 9,   // >
-    TOKEN_LESS = 10,      // <
-    TOKEN_GREATER_EQ = 11,// >= 
-    TOKEN_LESS_EQ = 12,   // <=
+    TOKEN_EQUAL = 8,       // ==
+    TOKEN_NOT_EQUAL = 9,   // !=
+    TOKEN_GREATER = 10,    // >
+    TOKEN_LESS = 11,       // <
+    TOKEN_GREATER_EQ = 12, // >=
+    TOKEN_LESS_EQ = 13,    // <=
 
     // Special tokens
-    TOKEN_EOL = 13,      // end of line \n
-    TOKEN_EOF = 14,      // end of file 
-    TOKEN_KEY_WORD = 15, // key_word_t
-    TOKEN_EMPTY = 16,     // "white" symbols
+    TOKEN_EOL = 14,      // end of line \n
+    TOKEN_EOF = 15,      // end of file
+    TOKEN_KEY_WORD = 16, // key_word_t
+    TOKEN_EMPTY = 17,    // "white" symbols
 
     // Punctuations
-    TOKEN_L_BRACKET = 17, // (
-    TOKEN_R_BRACKET = 18, // )
-    TOKEN_DOT = 19,       // .
-    TOKEN_COMA = 20,      // ,
-    TOKEN_SEMICOLON = 21, // ;  
-    TOKEN_ID   = 22,
-    TOKEN_HEX = 23,
-    TOKEN_INDEND,
-    TOKEN_DEDEND
+    TOKEN_L_BRACKET = 18, // (
+    TOKEN_R_BRACKET = 19, // )
+    TOKEN_DOT = 20,       // .
+    TOKEN_COMA = 21,      // ,
+    TOKEN_SEMICOLON = 22, // ;
+    TOKEN_DDOT = 23,      // :
+    TOKEN_ID = 24,
+    TOKEN_HEX = 25,
+    TOKEN_INDEND = 26, // indend
+    TOKEN_DEDEND = 27  // dedend
 } token_t;
-
 /**
  * \brief Union with atrributes
 */
@@ -80,6 +81,6 @@ struct token_s{
 
 typedef struct token* token_ptr;
 
-int get_token(FILE *file, struct token_s *token, tStack *stack);
+int get_token(FILE *file, struct token_s **token, tStack *stack);
 
 #endif //_SCANNER_H
