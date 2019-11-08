@@ -62,7 +62,9 @@ typedef enum{
     TOKEN_ID = 24,
     TOKEN_HEX = 25,
     TOKEN_INDEND = 26, // indend
-    TOKEN_DEDEND = 27  // dedend
+    TOKEN_DEDEND = 27, // dedend
+    // TOKEN_COMENT
+    TOKEN_FNC = 28
 } token_t;
 /**
  * \brief Union with atrributes
