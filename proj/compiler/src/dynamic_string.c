@@ -14,8 +14,6 @@
 #define DEF_STR_SIZE 8
 
 void str_clean(dynamic_string_ptr str){
-    // assert(str != NULL);
-
     if(str->str != NULL){
         free(str->str);
     }
