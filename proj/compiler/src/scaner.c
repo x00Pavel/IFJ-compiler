@@ -77,11 +77,11 @@ int get_token(FILE *file, struct token_s **token, tStack *stack)
     while (state != SCANNER_EOF)
     {
         c = getc(file);
+        // printf("%c\n", c);
 
         if (feof(file)){
                 (*token)->type = TOKEN_EOF;
                 state = SCANNER_EOF;
-            
         }
 
         switch (state){
@@ -98,6 +98,10 @@ int get_token(FILE *file, struct token_s **token, tStack *stack)
             }
             else if (first_token){
                 /* If it is a new line and previous was INDEND*/
+                if(c == '#'){
+                    state = SCANNER_COMMENT;
+                    break;    
+                }
                 if((stackTop(stack) != 0) && (c != '\n' && c != '\r')){
                     ungetc(c, file);
                     stackPop(stack);
@@ -109,6 +113,7 @@ int get_token(FILE *file, struct token_s **token, tStack *stack)
 
             if (c == '#'){
                 state = SCANNER_COMMENT;
+                break;
             }
             else if (isalpha(c)){
                 add_char_to_str(str, c);
@@ -175,6 +180,7 @@ int get_token(FILE *file, struct token_s **token, tStack *stack)
             }
             else if (c == ':'){
                 (*token)->type = TOKEN_DDOT;
+                // first_token = true;
                 str_clean(str);
                 return OK;
             }
@@ -202,7 +208,7 @@ int get_token(FILE *file, struct token_s **token, tStack *stack)
                     (*token)->type = TOKEN_KEY_WORD;
                     (*token)->attribute.key_word = _WHILE_;
                 }
-                else if (strcmp(str->str, "define") == 0){
+                else if (strcmp(str->str, "def") == 0){
                     (*token)->type = TOKEN_KEY_WORD;
                     (*token)->attribute.key_word = _DEF_;
                 }
@@ -227,7 +233,20 @@ int get_token(FILE *file, struct token_s **token, tStack *stack)
                     (*token)->attribute.key_word = _IF_;
                 }
                 else{
-                    (*token)->type = TOKEN_ID;
+                    for(;;c = getc(file)){ 
+                        if(c == ' '){
+                            continue;
+                        }
+                        else if(c == '('){
+                            (*token)->type = TOKEN_FNC;
+                            break;
+                        }
+                        else{
+                            ungetc(c, file);
+                            (*token)->type = TOKEN_ID;
+                            break;
+                        }
+                    }
                     (*token)->attribute.string = (char *)malloc(str->size);
                     strncpy((*token)->attribute.string, str->str, str->size);
                 }
@@ -252,7 +271,7 @@ int get_token(FILE *file, struct token_s **token, tStack *stack)
                     state = SCANNER_EXP;
                 }
                 else if (isdigit(c)){
-                    FREE_ALL(str->str, str);
+                    str_clean(str);;
                     SLOG("ERROR. In the begining of number cant be more then one", ERR_LEXER);
                 }
                 else{
@@ -283,7 +302,7 @@ int get_token(FILE *file, struct token_s **token, tStack *stack)
                 int num = atoi(str->str);
                 (*token)->attribute.int_val = num;
                 (*token)->type = TOKEN_INT;
-                FREE_ALL(str->str, str);
+                str_clean(str);;
                 return OK;
             }
             break;
@@ -299,7 +318,7 @@ int get_token(FILE *file, struct token_s **token, tStack *stack)
                 ungetc(c, file);
                 (*token)->attribute.float_val = strtof(str->str, NULL);
                 (*token)->type = TOKEN_FLOAT;
-                FREE_ALL(str->str, str);
+                str_clean(str);;
                 return OK;
             }
             break;
@@ -314,7 +333,7 @@ int get_token(FILE *file, struct token_s **token, tStack *stack)
                 ungetc(c, file);
                 (*token)->attribute.float_val = strtof(str->str, NULL);
                 (*token)->type = TOKEN_FLOAT;
-                FREE_ALL(str->str, str);
+                str_clean(str);;
                 return OK;
             }
             break;
@@ -335,7 +354,6 @@ int get_token(FILE *file, struct token_s **token, tStack *stack)
                 first_token = false;
                 if(space_cnt > stackTop(stack)){
                     // INDEND
-                    // printf("TOKEN INDEND\n");
                     stackPush(stack, space_cnt);
                     (*token)->type = TOKEN_INDEND;
                     state = SCANNER_START;
@@ -344,11 +362,18 @@ int get_token(FILE *file, struct token_s **token, tStack *stack)
                 }
                 else if (space_cnt < stackTop(stack)){
                     // DEDEND
+                    c = getc(file);
+                    //  If it is a commnet line, so just skip it without DEDEND
+                    if(c == '#'){
+                        state = SCANNER_COMMENT;
+                    }
+                    else{
+                        ungetc(c, file);
+                    }
                     bool found =  false;
                     while (stackTop(stack) != 0){
                         stackPop(stack); 
                         if(stackTop(stack) == space_cnt){
-                            printf("TOKEN DEDEND\n");
                             // we found same level 
                             (*token)->type = TOKEN_DEDEND;
                             state = SCANNER_START;
@@ -407,9 +432,7 @@ int get_token(FILE *file, struct token_s **token, tStack *stack)
                     count_of_quot = 0;
                     ungetc(c,file);
                     (*token)->type = TOKEN_STRING;
-                    // printf("%s\n", str->str);
                     (*token)->attribute.string = (char *)malloc(str->size);
-                    // printf("%s\n", (*token)->attribute.string);
                     strncpy((*token)->attribute.string, str->str, str->size);
                     str_clean(str);
                     state = SCANNER_START;
@@ -417,7 +440,7 @@ int get_token(FILE *file, struct token_s **token, tStack *stack)
                 }
             }
             else{
-                FREE_ALL(str->str, str);
+                str_clean(str);;
                 SLOG("ERROR. Block string must start from '\"\"\"' !", ERR_LEXER);
             }
             break;
@@ -425,6 +448,7 @@ int get_token(FILE *file, struct token_s **token, tStack *stack)
             if (c == '\n'){
                 first_token = true;
                 state = SCANNER_START;
+                break;
             }
             break;
         case SCANNER_LESS_GREATER:
@@ -454,7 +478,7 @@ int get_token(FILE *file, struct token_s **token, tStack *stack)
                 ungetc(c,file);
                 (*token)->type = TOKEN_ASSIGN;
             }
-            FREE_ALL(str->str, str);
+            str_clean(str);
             state = SCANNER_START;
             return OK; 
             break;
@@ -462,7 +486,7 @@ int get_token(FILE *file, struct token_s **token, tStack *stack)
             if(c == '='){
                 (*token)->type = TOKEN_NOT_EQUAL;
                 if(str->str != NULL){
-                    FREE_ALL(str->str, str);
+                    str_clean(str);;
                 } 
                 else{
                     FREE_ALL(str);
@@ -471,7 +495,7 @@ int get_token(FILE *file, struct token_s **token, tStack *stack)
                 return OK; 
             }
             else{
-                FREE_ALL(str->str, str);
+                str_clean(str);;
                 SLOG("ERROR. After '!' can be only '=' !", ERR_LEXER);
             }
             break;
@@ -484,7 +508,7 @@ int get_token(FILE *file, struct token_s **token, tStack *stack)
             }
             
             if(str->str != NULL){
-                FREE_ALL(str->str, str);
+                str_clean(str);;
             } 
             else{
                 FREE_ALL(str);
@@ -500,6 +524,6 @@ int get_token(FILE *file, struct token_s **token, tStack *stack)
         }
     }
 
-    FREE_ALL(str->str, str);
+    str_clean(str);;
     return -1;
 }
