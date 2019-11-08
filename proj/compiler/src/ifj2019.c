@@ -8,22 +8,23 @@
 #include "scaner.h"
 #include "./stack/c202.h"
 
+#ifdef DEBUG
 char *types[] = {
 
     "TOKEN_INT",    // integer int
-    "TOKEN_FLOAT ",  // float
+    "TOKEN_FLOAT ", // float
     "TOKEN_STRING", // string
 
     // Operators
-    "TOKEN_SUM ",      // +
+    "TOKEN_SUM ",     // +
     "TOKEN_MINUS",    // -
     "TOKEN_ASSIGN",   // =
     "TOKEN_MULTIPLY", // *
     "TOKEN_DIVISION", // /
 
     // Relation operators
-    "TOKEN_EQUAL",       // ==
-    "TOKEN_NOT_EQUAL",   // !=
+    "TOKEN_EQUAL",      // ==
+    "TOKEN_NOT_EQUAL",  // !=
     "TOKEN_GREATER",    // >
     "TOKEN_LESS",       // <
     "TOKEN_GREATER_EQ", // >=
@@ -45,10 +46,26 @@ char *types[] = {
     "TOKEN_ID",
     "TOKEN_HEX",
     "TOKEN_INDEND", // indend
-    "TOKEN_DEDEND"  // dedend
+    "TOKEN_DEDEND", // dedend
+    // "TOKEN_COMENT"
+    "TOKEN_FNC"
 };
 
-int main(int arc, char **argv){
+char *kw[] = {
+    "_DEF_",
+    "_ELSE_",
+    "_IF_",
+    "_NONE_",
+    "_PASS_",
+    "_RETURN_",
+    "_WHILE_"
+};
+
+#endif
+
+int
+main(int arc, char **argv)
+{
 
     (void)arc;
     /* Input file */
@@ -69,18 +86,33 @@ int main(int arc, char **argv){
     int ret_code = 0;
     while (ret_code != -1){
         ret_code = get_token(file, &token, stack);
+
         if (ret_code != OK){
             if (token->type == TOKEN_ID || token->type == TOKEN_STRING){
                 free(token->attribute.string);
             }
             break;
         }
-        printf("type: %s\n", types[token->type]);
+#ifdef DEBUG
+        if((token->type ==  TOKEN_KEY_WORD) || (token->type ==  TOKEN_FNC)){
+            printf("%s -- %s\n", types[token->type], (token->type == TOKEN_FNC) ? token->attribute.string : kw[token->attribute.key_word]);
+            if (token->type == TOKEN_FNC){
+                free(token->attribute.string);
+            }
+        }
+        else{
+            printf("%s\n", types[token->type]);
+        }
 
         if(token->type == TOKEN_ID || token->type == TOKEN_STRING){
-            printf("--------- token ID: %s\n", token->attribute.string);
+            printf("--------- attribute: %s\n", token->attribute.string);
             free(token->attribute.string);
         }
+#else
+        if ((token->type == TOKEN_FNC) || (token->type == TOKEN_STRING) || (token->type == TOKEN_ID)){
+            free(token->attribute.string);
+        }
+#endif
         
     }
 
