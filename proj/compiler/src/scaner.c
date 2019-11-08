@@ -242,7 +242,12 @@ int get_token(FILE *file, struct token_s **token, tStack *stack)
                             break;
                         }
                         else{
-                            ungetc(c, file);
+                            // ungetc(c, file);
+                            /* I dont know why, but if without this IF it 
+                            doesnt generate TOKEN_ASSIGN type*/ 
+                            if(c == '='){
+                                ungetc(c, file);
+                            }
                             (*token)->type = TOKEN_ID;
                             break;
                         }
