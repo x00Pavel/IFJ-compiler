@@ -1,49 +1,28 @@
-<prog_start> -> <prog> <prog_start> ---------- NO NEED
-<prog_start> -> EOL <prog_start> ------------- NO NEED
-<prog_start> -> e ---------------------------- NO NEED
-<prog_start> -> EOF -------------------------- NO NEED
 <prog> -> EOF
-<prog> -> ID = <value/func/oper> <prog>
-<prog> -> <func> <prog>
-<prog> -> KW <cond_mb> <prog>
+<prog> -> ID = <value/func/expr> <prog>
+<prog> -> FNC ( <arg> <arg_mb> ) <prog>
+<prog> -> if <cond_mb> : INDENT <prog> DEDENT <prog>
+<prog> -> return <mb_ret> EOL
+<prog> -> while ( <expr> ) : INDENT <prog> DEDENT <prog>
+<prog> -> else : INDENT <prog> DEDENT <prog>
+<prog> -> def FNC ( <arg> <arg_mb> ) : INDENT <prog> DEDENT <prog>
 <prog> -> EOL <prog>
 <prog> -> e
 <prog> -> e <prog> ---------------------------- for token "pass"
-<prog> -> INDENT <prog> DEDENT <prog>
-<cond_mb> -> ( <cond> ) :
-<cond_mb> -> ID <e/cond> :
-<cond_mb> -> <func> :
-<cond_mb> -> e
-<cond_mb> -> e :
-<e/id/i/f/s> -> e
-<e/id/i/f/s> -> <i/f/s>
-<e/id/i/f/s> -> ID
-<e/id/i/f/s_mb> -> ,<e/id/i/f/s> <e/id/i/f/s_mb>
-<e/id/i/f/s_mb> -> e
-<cond> -> NOT_EQUAL
-<cond> -> EQUAL
-<cond> -> GREATER
-<cond> -> LESS
-<cond> -> LESS_EQ
-<cond> -> GREATER_EQ
-<value/func/oper> -> ( <value/func/oper> ) <some_oper> --------------- MATIKA
-<value/func/oper> -> ID <some_oper>
-<value/func/oper> -> <i/f/s> <some_oper>
-<value/func/oper> -> <func> <some_oper>
-<some_oper> -> <oper> <value/func/oper>
-<some_oper> -> e
-<oper> -> +
-<oper> -> /
-<oper> -> -
-<oper> -> *
-<id/i/f/s> -> ID
-<id/i/f/s> -> <i/f/s>  ----------------------------------------------- END MATIKA
+<cond_mb> -> ( <cond_mb> )
+<cond_mb> -> <func/expr>
+<mb_ret> -> None
+<mb_ret> -> <func/expr>
+<func/expr> -> FNC ( <arg> <arg_mb> )
+<func/expr> -> <expr>
+<value/func/expr> -> <expr>
+<value/func/expr> -> FNC ( <arg> <arg_mb> )
+<value/func/expr> -> None
 <i/f/s> -> int
 <i/f/s> -> float
 <i/f/s> -> string
-<func> -> FNC ( <e/id/i/f/s> <e/id/i/f/s_mb> )
-<e/cond> -> <cond> <id_or_i/f>
-<e/cond> -> e
-<id_or_i/f> -> id
-<id_or_i/f> -> int
-<id_of_i/f> -> float
+<arg> -> e
+<arg> -> ID
+<arg> -> <i/f/s>
+<arg_mb> -> ,<arg> <arg_mb>
+<arg_mb> -> e
