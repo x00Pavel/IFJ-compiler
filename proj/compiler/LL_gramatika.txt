@@ -1,11 +1,11 @@
 <prog> -> EOF
 <prog> -> ID = <value/func/expr> <prog>
 <prog> -> FNC ( <arg> <arg_mb> ) <prog>
-<prog> -> if <cond_mb> : INDENT <prog> DEDENT <prog>
+<prog> -> if <cond_mb> : EOL INDENT <prog> DEDENT <prog>
 <prog> -> return <mb_ret> EOL
-<prog> -> while ( <expr> ) : INDENT <prog> DEDENT <prog>
-<prog> -> else : INDENT <prog> DEDENT <prog>
-<prog> -> def FNC ( <arg> <arg_mb> ) : INDENT <prog> DEDENT <prog>
+<prog> -> while <cond_mb> : EOL INDENT <prog> DEDENT <prog>
+<prog> -> else : EOL INDENT <prog> DEDENT <prog>
+<prog> -> def FNC ( <arg> <arg_mb> ) : EOL INDENT <prog> DEDENT <prog>
 <prog> -> EOL <prog>
 <prog> -> e
 <prog> -> e <prog> ---------------------------- for token "pass"
