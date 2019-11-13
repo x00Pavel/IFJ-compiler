@@ -32,7 +32,7 @@
 #define SCANNER_EOF 100 // Scanner read last token
 
 /* Macros for freeing resources*/
-#define FREE_ALL(...)                                      \
+/*#define FREE_ALL(...)                                      \
     do                                                     \
     {                                                      \
         unsigned int i = 0;                                \
@@ -41,9 +41,8 @@
         {                                                  \
             free(pta[i]);                                  \
         }                                                  \
-    } while (0)
+    } while (0)*/
 
-char *key_word_arr[] = {"def", "else", "if", "none", "pass", "return", "while"};
 
 /* Macros for log*/
 #define SLOG(msg, ret_code) \
@@ -423,21 +422,59 @@ int get_token(FILE *file, struct token_s **token, tStack *stack)
                 return OK;
             }
             else if (c == '\\'){
+                c = getc(file);
                 // Hexadecimal value
-                char tmp[3];
-                tmp[0] = '\\';
-                // add_char_to_str(str, c);
-                // add_char_to_str(str, 'x');
-                for (int i = 1; i < 4; i++){
-                    c = getc(file);
-                    if(isdigit(c)){
-                        tmp[i] = (char)c;
+                if((c == 'x') || (c == 'X')){
+                    char tmp[4];
+                    tmp[0] = '0';
+                    tmp[1] = (char)c;
+                    for(int i = 2; i < 4; i++){
+                        c = getc(file);
+                        if (isdigit(c) ||
+                            (c == 'A') ||
+                            (c == 'a') ||
+                            (c == 'B') ||
+                            (c == 'b') ||
+                            (c == 'C') ||
+                            (c == 'c') ||
+                            (c == 'D') ||
+                            (c == 'd') ||
+                            (c == 'E') ||
+                            (c == 'e') ||
+                            (c == 'F') ||
+                            (c == 'f'))
+                        {
+                            tmp[i] = (char)c;
+                        }
+                        else{
+                            SLOG("Hexadecimal value in string must be in format '\\xAB, where A and B are integer numbers", ERR_LEXER);
+                        }
                     }
-                    else{
-                        SLOG("Hexadecimal value in string must be in format '\\abc, where abc are integer numbers", ERR_SYNTAX);
-                    }
+
+                    char hex;
+                    // Convert to hex value
+                    sscanf(tmp, "%hhx", &hex);
+                    add_char_to_str(str, hex);
                 }
-                
+                else if (c == 'n' ){
+                    add_char_to_str(str, '\n');
+                }
+                else if (c == 't'){
+                    add_char_to_str(str, '\t');
+                }
+                else if (c == '\\'){
+                    add_char_to_str(str, '\\');
+                }
+                else if (c == '\''){
+                    add_char_to_str(str, '\\');
+                }
+                else if (c == '\"'){
+                    add_char_to_str(str, '\"');
+                }
+                else{
+                    add_char_to_str(str,'\\');
+                    add_char_to_str(str, c);
+                }
             }
             else if (c == '\n'){
                 str_clean(str);
@@ -458,8 +495,66 @@ int get_token(FILE *file, struct token_s **token, tStack *stack)
             else if(c != '"' && (double_quot == 3 || double_quot == 0)){  
                 double_quot = 0;
                 if(count_of_quot < 2){
-                    if(c != '\n' && c != '\r')
+                    if (c == '\\'){
+                        c = getc(file);
+                        // Hexadecimal value
+                        if((c == 'x') || (c == 'X')){
+                            char tmp[4];
+                            tmp[0] = '0';
+                            tmp[1] = (char)c;
+                            for(int i = 2; i < 4; i++){
+                                c = getc(file);
+                                if (isdigit(c) ||
+                                (c == 'A') ||
+                                (c == 'a') ||
+                                (c == 'B') ||
+                                (c == 'b') ||
+                                (c == 'C') ||
+                                (c == 'c') ||
+                                (c == 'D') ||
+                                (c == 'd') ||
+                                (c == 'E') ||
+                                (c == 'e') ||
+                                (c == 'F') ||
+                                (c == 'f'))
+                                {
+                                    tmp[i] = (char)c;
+                                }
+                                else{
+                                    SLOG("Hexadecimal value in string must be in format '\\xAB, where A and B are integer numbers", ERR_LEXER);
+                                }
+                            }
+                            char hex;
+                            // Convert to hex value
+                            sscanf(tmp, "%hhx", &hex);
+                            add_char_to_str(str, hex);
+                        }
+                        else if (c == 'n' ){
+                            add_char_to_str(str, '\n');
+                        }
+                        else if (c == 't'){
+                            add_char_to_str(str, '\t');
+                        }
+                        else if (c == '\\'){
+                            add_char_to_str(str, '\\');
+                        }
+                        else if (c == '\''){
+                            add_char_to_str(str, '\\');
+                        }
+                        else if (c == '\"'){
+                            add_char_to_str(str, '\"');
+                        }
+                        else{
+                            add_char_to_str(str,'\\');
+                            add_char_to_str(str, c);
+                        }
+                    }
+                    else if (c == '\n' || c == '\r'){
+                        add_char_to_str(str, ' ');
+                    }
+                    else{
                         add_char_to_str(str, c);
+                    }
                 }
                 else{
                     count_of_quot = 0;
@@ -522,7 +617,7 @@ int get_token(FILE *file, struct token_s **token, tStack *stack)
                     str_clean(str);
                 } 
                 else{
-                    FREE_ALL(str);
+                    str_clean(str);
                 }
                 state = SCANNER_START;
                 return OK; 
