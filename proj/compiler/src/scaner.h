@@ -70,19 +70,36 @@ typedef enum{
  * \brief Union with atrributes
 */
 typedef union {
-    int int_val;        /*< For integer value*/
-    double float_val;   /*< For */
-    char  *string;
-    key_word_t key_word;
+    int int_val;        /*< For integer value */
+    double float_val;   /*< For float values  */
+    char  *string;      /*< For string        */
+    key_word_t key_word; /*< For typed of Key Word*/
 } attribute_t;
 
+/**
+ * \brief Representation of token 
+ */
 struct token_s{
-    token_t type;
-    attribute_t attribute; 
+    token_t type;          /*< Type of token      */
+    attribute_t attribute; /*< Attribute of token */
 };
+
 
 typedef struct token* token_ptr;
 
+/**
+ * \brief Function for generating next token
+ * 
+ * Read symbol by symbol while whole token would be ready
+ * 
+ * \param[in] file  Source file
+ * \param[out] token Generated token
+ * \param[in] stack Pointer to stack for INDEND/DEDEND 
+ * 
+ * \return #OK in case of success
+ * \return #ERR_INTERNAL in case of error as malloc etc.
+ * \return #ERR_LEXER in case of lexical error 
+*/
 int get_token(FILE *file, struct token_s **token, tStack *stack);
 
 #endif //_SCANNER_H
