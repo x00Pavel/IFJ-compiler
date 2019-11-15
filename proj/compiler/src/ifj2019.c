@@ -7,6 +7,7 @@
 #include "errors.h"
 #include "scaner.h"
 #include "./stack/c202.h"
+#include "./hash_table/c016.h"
 
 #ifdef DEBUG
 char *types[] = {
@@ -60,7 +61,6 @@ char *kw[] = {
     "_RETURN_",
     "_WHILE_"
 };
-
 #endif
 
 int
@@ -71,6 +71,7 @@ main(int arc, char **argv)
     /* Input file */
     FILE *file;
     file = fopen(argv[1], "r");
+    
     if (!file){
         fprintf(stderr, "Error in opening file %s\n", argv[0]);
         return ERR_OTHER;
@@ -82,7 +83,10 @@ main(int arc, char **argv)
 
     stackInit(stack);
     stackPush(stack, 0);
-    
+    tHTable *hash_table =  (tHTable *) malloc(sizeof(tHTable));
+
+    htInit(hash_table);
+
     int ret_code = 0;
     while (ret_code != -1){
         ret_code = get_token(file, &token, stack);
