@@ -11,9 +11,10 @@ jobs:
     runs-on: ubuntu-18.04
     
     steps:
-    - uses: actions/checkout@v1
+    - working-directory: IFJ/proj/compiler/src/
     - name: make
       run: make
+    
     - name: make t1
       run: make t1
    
