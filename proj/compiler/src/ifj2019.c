@@ -9,7 +9,6 @@
 #include "./stack/c202.h"
 #include "./hash_table/c016.h"
 
-#ifdef DEBUG
 char *types[] = {
 
     "TOKEN_INT",    // integer int
@@ -48,8 +47,8 @@ char *types[] = {
     "TOKEN_HEX",
     "TOKEN_INDEND", // indend
     "TOKEN_DEDEND", // dedend
-    // "TOKEN_COMENT"
-    "TOKEN_FNC"
+    "TOKEN_FNC",
+    "TOKEN_DIV_INT"
 };
 
 char *kw[] = {
@@ -61,7 +60,7 @@ char *kw[] = {
     "_RETURN_",
     "_WHILE_"
 };
-#endif
+
 
 int
 main(int arc, char **argv)
@@ -78,24 +77,35 @@ main(int arc, char **argv)
     }
 
     struct token_s *token = (struct token_s *)malloc(sizeof(struct token_s));
-
+    
+    // Initialization stack for INDEND/DEDEND
     tStack *stack = (tStack*) malloc(sizeof(tStack));
-
+    if(!stack){
+        return ERR_INTERNAL;
+    }
     stackInit(stack);
     stackPush(stack, 0);
+    
+    // Initialization of hash table for global frame
     tHTable *hash_table =  (tHTable *) malloc(sizeof(tHTable));
-
+    if(!hash_table){
+        return ERR_INTERNAL;
+    }
     htInit(hash_table);
-
     int ret_code = 0;
+
+    ret_code = get_token(file, token, stack);
+    htInsert(hash_table, types[token->type], *token);
+
+
     while (ret_code != -1){
-        ret_code = get_token(file, &token, stack);
+        ret_code = get_token(file, token, stack);
         
         if (ret_code != OK){
             if (token->type == TOKEN_ID || token->type == TOKEN_STRING || (token->type ==  TOKEN_FNC)){
                 free(token->attribute.string);
             }
-            break;
+            return ret_code;
         }
 
         if(token->type == TOKEN_EOF){
@@ -129,7 +139,7 @@ main(int arc, char **argv)
 #endif
         
     }
-
+    free(hash_table);
     free(stack);
     free(token);
     fclose(file);
