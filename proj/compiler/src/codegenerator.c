@@ -11,7 +11,7 @@
 #include "codegenerator.h"
 #include "./stack/c202.h"
 
-void define_variable(struct token_s *token)//typ id // attriubute a// int 10
+void define_variable(struct token_s *token)//typ id // attriubute a// int 1
 {
     //printf("SRABOTAL DEFVAR %s \n", token->attribute.string);
     fprintf(stdout, "DEFVAR GF@%s\n", token->attribute.string);
@@ -26,18 +26,21 @@ void id_is_equal_to(struct token_s *token_old ,struct token_s *token)//a 10
         
         case TOKEN_INT:
             //printf("SRABOTAL INT \n"); // type: int , attribute.int_val: 10
-            fprintf(stdout, "DEFVAR GF @%s\nMOVE GF@%s int@%d\n",token->attribute.string,token_old->attribute.string, token->attribute.int_val);
+            fprintf(stdout, "DEFVAR GF @%s\nMOVE GF@%s int@%d\n",token_old->attribute.string,token_old->attribute.string, token->attribute.int_val);
             break;
 
         case TOKEN_FLOAT:
         
-            fprintf(stdout, "DEFVAR GF @%s\nMOVE GF@%s float@%f\n",token->attribute.string,token_old->attribute.string, token->attribute.float_val);
+            fprintf(stdout, "DEFVAR GF @%s\nMOVE GF@%s float@%f\n",token_old->attribute.string,token_old->attribute.string, token->attribute.float_val);
             break;
 
         case TOKEN_STRING:
 
-            fprintf(stdout, "DEFVAR GF @%s\nMOVE GF@%s string@%s\n",token->attribute.string,token_old->attribute.string, token->attribute.string);
+            fprintf(stdout, "DEFVAR GF @%s\nMOVE GF@%s string@%s\n",token_old->attribute.string,token_old->attribute.string, token->attribute.string);
             break;
+        case TOKEN_NONE:
+            
+            fprintf(stdout, "DEFVAR GF @%s\nMOVE GF@%s none@None\n", token_old->attribute.string,token_old->attribute.string);
 
         default:
 
@@ -46,7 +49,7 @@ void id_is_equal_to(struct token_s *token_old ,struct token_s *token)//a 10
 }            
 
 
-bool token_return (struct token_s *token)
+void token_return (struct token_s *token)
 {
     switch (token->type)
     {
@@ -68,24 +71,57 @@ bool token_return (struct token_s *token)
     }
 }
 
-bool token_function(struct token_s *token, int counter)//TOKEN_FUNC
-{
+void token_function_begin(struct token_s *token){
 
-    fprintf(stdout, "LABEL $%s\n PUSHFRAME", token->attribute.string);
-    sprintf(stdout, "CREATEFRAME\nPUSHFRAME\n");
-    sprintf(stdout,)
-    for(int i = 0; i < counter;i++)
-    {   
-        
+    fprintf(stdout, "LABEL $$main\n PUSHFRAME");
+    fprintf(stdout, "CREATEFRAME\nPUSHFRAME\n");
+    fprintf(stdout, "DEFVAR LF@%s\n CREATEFRAME\n",token->attribute.string);
 
-    }
      
 }
+void token_functin_body(struct token_s *token, int counter)
+{
+    for(int i = 0; i<counter; i++)
+    {
+        frintf(stdout, "DEFVAR TF@%d\n", i);
+        fprintf(stdout, "MOVE TF@%%d int@%d",i, token->attribute.int_val);
+    }   
+        switch (token->type)
+        {
+            case TOKEN_INT:
+                for(int i = 0; i<counter; i++)
+                {
+                    frintf(stdout, "DEFVAR TF@%d\n", i);
+                    fprintf(stdout, "MOVE TF@%%d int@%d",i, token->attribute.int_val);
+                } 
+                break;
+            case TOKEN_FLOAT:
+                for(int i = 0; i<counter; i++)
+                {
+                    fprintf(stdout, "DEFVAR TF@%d\n", i);
+                    fprintf(stdout, "MOVE TF@%%d float@%f",i, token->attribute.float_val);
+                } 
+                break;
+            case TOKEN_STRING:
+                for(int i = 0; i<counter; i++)
+                {
+                    fprintf(stdout, "DEFVAR TF@%d\n", i);
+                    fprintf(stdout, "MOVE TF@%%d int@%d",i, token->attribute.int_val);
+                } 
+                break;
+            default:
+                break;
+    }
+}
+
+
+
     /*LABEL $$main # main body
     CREATEFRAME  # no main-body vars
     PUSHFRAME
     DEFVAR LF@y
     CREATEFRAME
+
     DEFVAR TF@%1
     MOVE TF@%1 int@10
     DEFVAR TF@%2
