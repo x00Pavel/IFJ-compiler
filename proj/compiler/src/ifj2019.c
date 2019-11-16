@@ -48,6 +48,7 @@ char *types[] = {
     "TOKEN_INDEND", // indend
     "TOKEN_DEDEND", // dedend
     "TOKEN_FNC",
+    "TOKEN_NONE",
     "TOKEN_DIV_INT"
 };
 
@@ -87,15 +88,15 @@ main(int arc, char **argv)
     stackPush(stack, 0);
     
     // Initialization of hash table for global frame
-    tHTable *hash_table =  (tHTable *) malloc(sizeof(tHTable));
-    if(!hash_table){
-        return ERR_INTERNAL;
-    }
-    htInit(hash_table);
+    // tHTable *hash_table =  (tHTable *) malloc(sizeof(tHTable));
+    // if(!hash_table){
+    //     return ERR_INTERNAL;
+    // }
+    // htInit(hash_table);
     int ret_code = 0;
 
-    ret_code = get_token(file, token, stack);
-    htInsert(hash_table, types[token->type], *token);
+    // ret_code = get_token(file, token, stack);
+    // htInsert(hash_table, types[token->type], *token);
 
 
     while (ret_code != -1){
@@ -139,7 +140,7 @@ main(int arc, char **argv)
 #endif
         
     }
-    free(hash_table);
+    // free(hash_table);
     free(stack);
     free(token);
     fclose(file);
