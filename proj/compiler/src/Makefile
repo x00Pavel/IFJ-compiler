@@ -7,7 +7,7 @@ CFLAGS= -Wconversion -Wunreachable-code -Wextra -Wall -O -g
 
 
 main: ${PROJ}.c 
-	gcc ${CFLAGS} -D DEBUG -o ${PROJ} ${PROJ}.c ${SCANNER} ${STRING} ${SCTACK} ${TABLE}
+	gcc ${CFLAGS} -D DEBUG -o ${PROJ} ${PROJ}.c ${SCANNER} ${STRING} ${SCTACK}  ${TABLE}
 
 rel: ${PROJ}.c
 	gcc ${CFLAGS} -o ${PROJ} ${PROJ}.c ${SCANNER} ${STRING} ${SCTACK}
