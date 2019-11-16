@@ -54,7 +54,7 @@ inline void _log(FILE *fd, char *file, int line, char *msg){
 
 typedef struct stack tStack;
 
-int get_token(FILE *file, struct token_s **token, tStack *stack)
+int get_token(FILE *file, struct token_s *token, tStack *stack)
 {
 
     if (!file){
@@ -78,9 +78,9 @@ int get_token(FILE *file, struct token_s **token, tStack *stack)
         // printf("%c\n", c);
 
         if (feof(file)){
-                (*token)->type = TOKEN_EOF;
+                token->type = TOKEN_EOF;
                 if(stackTop(stack)){
-                    (*token)->type = TOKEN_DEDEND;
+                    token->type = TOKEN_DEDEND;
                     stackPop(stack);
                     str_clean(str);
                     return OK;
@@ -111,7 +111,7 @@ int get_token(FILE *file, struct token_s **token, tStack *stack)
                 if((stackTop(stack) != 0) && (c != '\n' && c != '\r')){
                     ungetc(c, file);
                     stackPop(stack);
-                    (*token)->type = TOKEN_DEDEND;
+                    token->type = TOKEN_DEDEND;
                     str_clean(str);
                     return OK;
                 }
@@ -134,13 +134,13 @@ int get_token(FILE *file, struct token_s **token, tStack *stack)
                 break;
             }
             else if(c == ','){
-                (*token)->type = TOKEN_COMA;
+                token->type = TOKEN_COMA;
                 str_clean(str);
                 return OK;
             }
             else if((c == '\n') || (c == '\r') ){
                 if(!first_token){
-                    (*token)->type = TOKEN_EOL;
+                    token->type = TOKEN_EOL;
                     state = SCANNER_START;
                     first_token = true;
                     str_clean(str);
@@ -170,27 +170,34 @@ int get_token(FILE *file, struct token_s **token, tStack *stack)
                 break;
             }
             else if (c == '+'){
-                (*token)->type = TOKEN_SUM;
+                token->type = TOKEN_SUM;
                 str_clean(str);
                 return OK;
             }
             else if (c == '-'){
-                (*token)->type = TOKEN_MINUS;
+                token->type = TOKEN_MINUS;
                 str_clean(str);
                 return OK;
             }
             else if (c == '*') {
-                (*token)->type = TOKEN_MULTIPLY;
+                token->type = TOKEN_MULTIPLY;
                 str_clean(str);
                 return OK;
             }
             else if (c == '/'){
-                (*token)->type = TOKEN_DIVISION;
+                c = getc(file);
+                if(c == '/'){
+                    token->type = TOKEN_DIV_INT;
+                }
+                else{
+                    ungetc(c, file);
+                    token->type = TOKEN_DIVISION;
+                }
                 str_clean(str);
                 return OK;
             }
             else if (c == ':'){
-                (*token)->type = TOKEN_DDOT;
+                token->type = TOKEN_DDOT;
                 // first_token = true;
                 str_clean(str);
                 return OK;
@@ -214,32 +221,32 @@ int get_token(FILE *file, struct token_s **token, tStack *stack)
             else{
                 ungetc(c, file);
                 if (strcmp(str->str, "while") == 0){
-                    (*token)->type = TOKEN_KEY_WORD;
-                    (*token)->attribute.key_word = _WHILE_;
+                    token->type = TOKEN_KEY_WORD;
+                    token->attribute.key_word = _WHILE_;
                 }
                 else if (strcmp(str->str, "def") == 0){
-                    (*token)->type = TOKEN_KEY_WORD;
-                    (*token)->attribute.key_word = _DEF_;
+                    token->type = TOKEN_KEY_WORD;
+                    token->attribute.key_word = _DEF_;
                 }
                 else if (strcmp(str->str, "else") == 0){
-                    (*token)->type = TOKEN_KEY_WORD;
-                    (*token)->attribute.key_word = _ELSE_;
+                    token->type = TOKEN_KEY_WORD;
+                    token->attribute.key_word = _ELSE_;
                 }
                 else if(strcmp(str->str, "none") == 0){
-                    (*token)->type = TOKEN_NONE;
-                    // (*token)->attribute.key_word = _NONE_;
+                    token->type = TOKEN_NONE;
+                    // token->attribute.key_word = _NONE_;
                 }
                 else if(strcmp(str->str, "pass") == 0){
-                    (*token)->type = TOKEN_KEY_WORD;
-                    (*token)->attribute.key_word = _PASS_;
+                    token->type = TOKEN_KEY_WORD;
+                    token->attribute.key_word = _PASS_;
                 }
                 else if(strcmp(str->str, "return") == 0){
-                    (*token)->type = TOKEN_KEY_WORD;
-                    (*token)->attribute.key_word = _RETURN_;
+                    token->type = TOKEN_KEY_WORD;
+                    token->attribute.key_word = _RETURN_;
                 }
                 else if(strcmp(str->str, "if") == 0){
-                    (*token)->type = TOKEN_KEY_WORD;
-                    (*token)->attribute.key_word = _IF_;
+                    token->type = TOKEN_KEY_WORD;
+                    token->attribute.key_word = _IF_;
                 }
                 else{
                     for(;;c = getc(file)){ 
@@ -247,7 +254,7 @@ int get_token(FILE *file, struct token_s **token, tStack *stack)
                             continue;
                         }
                         else if(c == '('){
-                            (*token)->type = TOKEN_FNC;
+                            token->type = TOKEN_FNC;
                             break;
                         }
                         else{
@@ -256,12 +263,12 @@ int get_token(FILE *file, struct token_s **token, tStack *stack)
                             if(c == '='){
                                 ungetc(c, file);
                             }
-                            (*token)->type = TOKEN_ID;
+                            token->type = TOKEN_ID;
                             break;
                         }
                     }
-                    (*token)->attribute.string = (char *)malloc(str->size);
-                    strncpy((*token)->attribute.string, str->str, str->size);
+                    token->attribute.string = (char *)malloc(str->size);
+                    strncpy(token->attribute.string, str->str, str->size);
                 }
                 
                 str_clean(str);
@@ -321,8 +328,8 @@ int get_token(FILE *file, struct token_s **token, tStack *stack)
                 }
                 ungetc(c,file);
                 int num = atoi(str->str);
-                (*token)->attribute.int_val = num;
-                (*token)->type = TOKEN_INT;
+                token->attribute.int_val = num;
+                token->type = TOKEN_INT;
                 str_clean(str);
                 return OK;
             }
@@ -342,8 +349,8 @@ int get_token(FILE *file, struct token_s **token, tStack *stack)
                 }
 
                 ungetc(c, file);
-                (*token)->attribute.float_val = strtof(str->str, NULL);
-                (*token)->type = TOKEN_FLOAT;
+                token->attribute.float_val = strtof(str->str, NULL);
+                token->type = TOKEN_FLOAT;
                 str_clean(str);
                 return OK;
             }
@@ -362,8 +369,8 @@ int get_token(FILE *file, struct token_s **token, tStack *stack)
                 }
 
                 ungetc(c, file);
-                (*token)->attribute.float_val = strtof(str->str, NULL);
-                (*token)->type = TOKEN_FLOAT;
+                token->attribute.float_val = strtof(str->str, NULL);
+                token->type = TOKEN_FLOAT;
                 str_clean(str);
                 return OK;
             }
@@ -390,7 +397,7 @@ int get_token(FILE *file, struct token_s **token, tStack *stack)
                 if(space_cnt > stackTop(stack)){
                     // INDEND
                     stackPush(stack, space_cnt);
-                    (*token)->type = TOKEN_INDEND;
+                    token->type = TOKEN_INDEND;
                     state = SCANNER_START;
                     str_clean(str);
                     return OK;
@@ -411,7 +418,7 @@ int get_token(FILE *file, struct token_s **token, tStack *stack)
                         stackPop(stack); 
                         if(stackTop(stack) == space_cnt){
                             // we found same level 
-                            (*token)->type = TOKEN_DEDEND;
+                            token->type = TOKEN_DEDEND;
                             state = SCANNER_START;
                             found = true;
                             break;
@@ -435,9 +442,9 @@ int get_token(FILE *file, struct token_s **token, tStack *stack)
             break;   
         case SCANNER_STRING:
             if (c == '\''){
-                (*token)->type = TOKEN_STRING;
-                (*token)->attribute.string = (char *)malloc(str->size);
-                strncpy((*token)->attribute.string, str->str, str->size);
+                token->type = TOKEN_STRING;
+                token->attribute.string = (char *)malloc(str->size);
+                strncpy(token->attribute.string, str->str, str->size);
                 str_clean(str);
                 state = SCANNER_START;
                 return OK;
@@ -581,9 +588,9 @@ int get_token(FILE *file, struct token_s **token, tStack *stack)
                 else{
                     count_of_quot = 0;
                     ungetc(c,file);
-                    (*token)->type = TOKEN_STRING;
-                    (*token)->attribute.string = (char *)malloc(str->size);
-                    strncpy((*token)->attribute.string, str->str, str->size);
+                    token->type = TOKEN_STRING;
+                    token->attribute.string = (char *)malloc(str->size);
+                    strncpy(token->attribute.string, str->str, str->size);
                     str_clean(str);
                     state = SCANNER_START;
                     return OK;
@@ -603,14 +610,14 @@ int get_token(FILE *file, struct token_s **token, tStack *stack)
             break;
         case SCANNER_LESS_GREATER:
             if (c == '>'){
-                (*token)->type = TOKEN_GREATER;
+                token->type = TOKEN_GREATER;
             }
             else{
-                (*token)->type = TOKEN_LESS;
+                token->type = TOKEN_LESS;
             }
             c = getc(file);
             if (c == '='){
-                (*token)->type += 2; // look to scaner.h
+                token->type += 2; // look to scaner.h
             }
             else{
                 ungetc(c, file);
@@ -622,11 +629,11 @@ int get_token(FILE *file, struct token_s **token, tStack *stack)
             break;
         case SCANNER_ASSIGN:
             if(c == '='){
-                (*token)->type = TOKEN_EQUAL;
+                token->type = TOKEN_EQUAL;
             }
             else{
                 ungetc(c,file);
-                (*token)->type = TOKEN_ASSIGN;
+                token->type = TOKEN_ASSIGN;
             }
             str_clean(str);
             state = SCANNER_START;
@@ -634,7 +641,7 @@ int get_token(FILE *file, struct token_s **token, tStack *stack)
             break;
         case SCANNER_NOT:
             if(c == '='){
-                (*token)->type = TOKEN_NOT_EQUAL;
+                token->type = TOKEN_NOT_EQUAL;
                 if(str->str != NULL){
                     str_clean(str);
                 } 
@@ -651,10 +658,10 @@ int get_token(FILE *file, struct token_s **token, tStack *stack)
             break;
         case SCANNER_BRACKET:
             if(c == '('){
-                (*token)->type = TOKEN_L_BRACKET;
+                token->type = TOKEN_L_BRACKET;
             }
             else if (c == ')'){
-                (*token)->type = TOKEN_R_BRACKET;
+                token->type = TOKEN_R_BRACKET;
             }
             
             str_clean(str);
