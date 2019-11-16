@@ -159,8 +159,64 @@ void htClearAll ( tHTable* ptrht ) {
         while(item){
             delet_item = item;
             item = item->ptrnext;
-            free(delet_item);
+            if (delet_item->data.type == TOKEN_STRING ||
+                delet_item->data.type == TOKEN_ID ||
+                delet_item->data.type == TOKEN_FNC){
+                free(delet_item);
+                }
+                free(delet_item);
         }
         (*ptrht)[i] = NULL;
     }
 }
+
+#ifdef DEBUG
+/* tiskne tData ze struktury */
+void htPrintData(tData *ptrdata)
+{
+    if (ptrdata)
+        printf("%.2f\n", *ptrdata);
+    else
+        printf("NULL\n");
+}
+
+/* tiskne tItem ze struktury */
+void htPrintItem(tHTItem *ptritem)
+{
+    if (ptritem)
+        printf("%s - %.2f\n", ptritem->key, ptritem->data);
+    else
+        printf("NULL\n");
+}
+
+/* tiskne celou tabulku */
+void htPrintTable(tHTable *ptrht)
+{
+    int maxlen = 0;
+    int sumcnt = 0;
+
+    printf("------------HASH TABLE--------------\n");
+    for (int i = 0; i < HTSIZE; i++)
+    {
+        printf("%i:", i);
+        int cnt = 0;
+        tHTItem *ptr = (*ptrht)[i];
+        while (ptr != NULL)
+        {
+            printf(" (%s,%.2f)", ptr->key, ptr->data);
+            if (ptr != UNDEFPTR)
+                cnt++;
+            ptr = ptr->ptrnext;
+        }
+        printf("\n");
+
+        if (cnt > maxlen)
+            maxlen = cnt;
+        sumcnt += cnt;
+    }
+
+    printf("------------------------------------\n");
+    printf("Items count %i   The longest list %i\n", sumcnt, maxlen);
+    printf("------------------------------------\n");
+}
+#endif
