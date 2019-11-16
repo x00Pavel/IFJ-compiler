@@ -64,7 +64,9 @@ typedef enum{
     TOKEN_INDEND = 26, // indend
     TOKEN_DEDEND = 27, // dedend
     // TOKEN_COMENT
-    TOKEN_FNC = 28
+    TOKEN_FNC = 28,
+    TOKEN_NONE,
+    TOKEN_DIV_INT
 } token_t;
 /**
  * \brief Union with atrributes
@@ -100,6 +102,6 @@ typedef struct token* token_ptr;
  * \return #ERR_INTERNAL in case of error as malloc etc.
  * \return #ERR_LEXER in case of lexical error 
 */
-int get_token(FILE *file, struct token_s **token, tStack *stack);
+int get_token(FILE *file, struct token_s *token, tStack *stack);
 
 #endif //_SCANNER_H

@@ -1,13 +1,13 @@
+ 
 PROJ=ifj2019
 SCANNER=scaner.c
 STRING=dynamic_string.c
 SCTACK=./stack/c202.c
-TABLE=./hash_table/c016.c
 CFLAGS= -Wconversion -Wunreachable-code -Wextra -Wall -O -g   
 
 
 main: ${PROJ}.c 
-	gcc ${CFLAGS} -D DEBUG -o ${PROJ} ${PROJ}.c ${SCANNER} ${STRING} ${SCTACK} ${TABLE}
+	gcc ${CFLAGS} -D DEBUG -o ${PROJ} ${PROJ}.c ${SCANNER} ${STRING} ${SCTACK} 
 
 rel: ${PROJ}.c
 	gcc ${CFLAGS} -o ${PROJ} ${PROJ}.c ${SCANNER} ${STRING} ${SCTACK}
@@ -25,5 +25,4 @@ t2:
 	./${PROJ} test2.txt
 t3: 
 	./${PROJ} test3.txt
-
 

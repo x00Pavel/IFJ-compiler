@@ -1,0 +1,19 @@
+name: C/C++ CI
+
+on: 
+  push:
+    branches: 
+      - master
+
+jobs:
+  build:
+
+    runs-on: ubuntu-18.04
+    
+    steps:
+    - working-directory: IFJ/proj/compiler/src/
+    - run: make
+    
+    - name: make t1
+      run: make t1
+   

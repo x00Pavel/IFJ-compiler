@@ -57,7 +57,7 @@ void str_init(dynamic_string_ptr *str){
     if(!str){
         return ;
     }
-    
+        
     (*str)->str = (string)malloc(DEF_STR_SIZE);
     if(!(*str)->str){
         return;
