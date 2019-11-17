@@ -6,11 +6,70 @@
 
 #include "errors.h"
 #include "scaner.h"
+#include "parser.h"
+#include "./stack/c202.h"
 
-// je nutne udelat v headeru prototipy
+// #ifdef DEBUG
+// char *types[] = {
+
+//     "TOKEN_INT",    // integer int
+//     "TOKEN_FLOAT ", // float
+//     "TOKEN_STRING", // string
+
+//     // Operators
+//     "TOKEN_SUM ",     // +
+//     "TOKEN_MINUS",    // -
+//     "TOKEN_ASSIGN",   // =
+//     "TOKEN_MULTIPLY", // *
+//     "TOKEN_DIVISION", // /
+
+//     // Relation operators
+//     "TOKEN_EQUAL",      // ==
+//     "TOKEN_NOT_EQUAL",  // !=
+//     "TOKEN_GREATER",    // >
+//     "TOKEN_LESS",       // <
+//     "TOKEN_GREATER_EQ", // >=
+//     "TOKEN_LESS_EQ",    // <=
+
+//     // Special tokens
+//     "TOKEN_EOL",      // end of line \n
+//     "TOKEN_EOF",      // end of file
+//     "TOKEN_KEY_WORD", // key_word_t
+//     "TOKEN_EMPTY",    // "white" symbols
+
+//     // Punctuations
+//     "TOKEN_L_BRACKET", // (
+//     "TOKEN_R_BRACKET", // )
+//     "TOKEN_DOT",       // .
+//     "TOKEN_COMA",      // ,
+//     "TOKEN_SEMICOLON", // ;
+//     "TOKEN_DDOT",      // :
+//     "TOKEN_ID",
+//     "TOKEN_HEX",
+//     "TOKEN_INDEND", // indend
+//     "TOKEN_DEDEND", // dedend
+//     // "TOKEN_COMENT"
+//     "TOKEN_FNC",
+//     "TOKEN_NONE",
+//     "TOKEN_DIV_INT"
+// };
+
+// char *kw[] = {
+//     "_DEF_",
+//     "_ELSE_",
+//     "_IF_",
+//     "_NONE_",
+//     "_PASS_",
+//     "_RETURN_",
+//     "_WHILE_"
+// };
+
+// #endif
 
 int main(int arc, char **argv){
+
     (void)arc;
+    
     /* Input file */
     FILE *file;
     file = fopen(argv[1], "r");
@@ -18,44 +77,22 @@ int main(int arc, char **argv){
         fprintf(stderr, "Error in opening file %s\n", argv[0]);
         return ERR_OTHER;
     }
-<<<<<<< Updated upstream
-    while(1){
-        struct token_s *token = (struct token_s *)malloc(sizeof(struct token_s));
-        // int ret_code = scanner(file, token);
-        
-        // printf("%d\n", scanner(file, token));
-        
-        int ret_code = get_token(file, token);
-        if(ret_code != 0){
-            free(token);
-=======
+
+    struct token_s *token = (struct token_s *)malloc(sizeof(struct token_s));
+
     tStack *stack = (tStack*) malloc(sizeof(tStack));
+
     stackInit(stack);
     stackPush(stack, 0);
     
-    while(1){
-        struct token_s *token = (struct token_s *)malloc(sizeof(struct token_s));
-        
-        int ret_code = get_token(file, token, stack);
-        if(ret_code != 0){
-            free(token);
-            free(stack);
->>>>>>> Stashed changes
-            fclose(file);
-            return -1;
-        }
-        printf("token type: %d\n\n", token->type);
+    int state = 999;
+    int ret_code = 0;
 
-        if(token->type == TOKEN_ID || token->type == TOKEN_STRING){
-            free(token->attribute.string);
-        }
-        free(token);
-    }
-<<<<<<< Updated upstream
-=======
+    func_prog(file, token, stack, state, ret_code);
+    
     free(stack);
->>>>>>> Stashed changes
+    free(token);
     fclose(file);
 
-    return 0;
+return 0;
 }

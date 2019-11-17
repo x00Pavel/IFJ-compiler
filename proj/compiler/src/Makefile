@@ -1,16 +1,30 @@
 PROJ=ifj2019
-SCANNER=scanner.c
+SCANNER=scaner.c
 STRING=dynamic_string.c
-FLAGS := -Wconversion -Wunreachable-code -Wextra -Wall  -Og   
+SCTACK=./stack/c202.c
+PARSER=parser.c
+CODEGENERATOR=codegenerator.c
+CFLAGS= -Wconversion -Wunreachable-code -Wextra -Wall -O -g   
 
-# scanner.o: scanner.c
-	# gcc -o scanner.o scanner.c
 
 main: ${PROJ}.c 
-	gcc ${FLAGS} -o ${PROJ} ${PROJ}.c scaner.c dynamic_string.c ./stack/c202.c
+	gcc ${CFLAGS} -D DEBUG -o ${PROJ} ${PROJ}.c ${SCANNER} ${STRING} ${SCTACK} ${PARSER} ${CODEGENERATOR}
 
-test:
-	./${PROJ} test.txt
+rel: ${PROJ}.c
+	gcc ${CFLAGS} -o ${PROJ} ${PROJ}.c ${SCANNER} ${STRING} ${SCTACK}
 
-val: 
-	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes ./${PROJ} test.txt
+v1: 
+	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes ./${PROJ} test1.txt  
+v2:  
+	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes ./${PROJ} test2.txt  
+v3:  
+	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes ./${PROJ} test3.txt
+
+t1: 
+	./${PROJ} test1.txt
+t2: 
+	./${PROJ} test2.txt
+t3: 
+	./${PROJ} test3.txt
+
+

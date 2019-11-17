@@ -8,13 +8,11 @@
 /**
  * Structure representing dynamic string 
 */
-struct dynamic_string{
+typedef struct{
     char *str;   /*< String                  */
     size_t len;  /*< Length of string        */
     size_t size; /*< Size of string in bytes */
-};
-
-typedef struct dynamic_string *dynamic_string_ptr;
+} *dynamic_string_ptr;
 
 typedef char *string;
 
@@ -26,7 +24,7 @@ typedef char *string;
  * \return 0 on success
  * \return #ERR_INTERNAL in case of memory allocation error  
 */
-int realloc_string(dynamic_string_ptr *str);
+int realloc_string(dynamic_string_ptr str);
 
 /**
  * \brief Function for adding one character to string 
@@ -36,7 +34,7 @@ int realloc_string(dynamic_string_ptr *str);
  * 
  * \return true if everthings is OK, else false
 */
-bool add_char_to_str(dynamic_string_ptr dst, int src);
+bool add_char_to_str(dynamic_string_ptr dst, char *src);
 
 /**
  * \brief Function for deleting string
@@ -48,11 +46,9 @@ void str_clean(dynamic_string_ptr str);
 /**
  * \brief Function for initialization of dynamic string
  * 
- * \param[in] str Pointer to string that will be allocated 
- * 
- * \return Pointer to allocated string;
+ * \param[in] str Structure of dynamic string
 */
-void str_init(dynamic_string_ptr *str);
+void string_init(dynamic_string_ptr str);
 
 /**
  * \brief Inline function for compating string DST with SRC
@@ -62,8 +58,6 @@ void str_init(dynamic_string_ptr *str);
  *  
  * \return True if strings are the same, else false
 */
-inline int str_compare(string dst, string src){
-   return (strcmp(dst, src) == 0) ? true : false;
-}
+inline str_cp(string dst, string src);
 
 #endif // _DYNAMIC_STRING_H

@@ -7,12 +7,9 @@
 #include "errors.h"
 #include "dynamic_string.h"
 #include "scaner.h"
-<<<<<<< Updated upstream
-=======
 #include "./stack/c202.h"
->>>>>>> Stashed changes
 
-#define TOKEN_READY 0      // Read successful
+
 #define SCANNER_START 10  // Scanner begin to work
 #define SCANNER_STOP 11    // Scanner read one token
 #define SCANNER_STRING 12 // Begining of string
@@ -30,227 +27,204 @@
 #define SCANNER_WHITE_SPACE 24
 #define SCANNER_LESS_GREATER 25
 #define SCANNER_ASSIGN 26
-<<<<<<< Updated upstream
-#define SCANNER_EQUAL 27
-#define SCANNER_SUM_MINUS_MULTIPLY_DIVISION_DDOT 28
-#define SCANNER_NONE 29
-#define SCANNER_BRACKET 30
-=======
 #define SCANNER_NOT 27
 #define SCANNER_BRACKET 28
->>>>>>> Stashed changes
 #define SCANNER_EOF 100 // Scanner read last token
 
 /* Macros for freeing resources*/
-#define FREE_ALL(...)                                      \
+/*#define FREE_ALL(...)                                      \
     do                                                     \
     {                                                      \
-        unsigned int i = 0;                                         \
+        unsigned int i = 0;                                \
         void *pta[] = {__VA_ARGS__};                       \
         for (i = 0; i < sizeof(pta) / sizeof(void *); i++) \
         {                                                  \
             free(pta[i]);                                  \
         }                                                  \
-    } while (0)
+    } while (0)*/
 
-char *key_word_arr[] = {"def", "else", "if", "none", "pass", "return", "while"};
 
 /* Macros for log*/
-#define SLOG(msg, ret_code) \
+#define SLOG(msg) \
     _log(stdout, __FILE__, __LINE__, msg);\
-    return ret_code
 
 inline void _log(FILE *fd, char *file, int line, char *msg){
     fprintf(fd, "%s:%d %s\n", file, line, msg);
 }
 
-int get_token(FILE *file, struct token_s* token)
+typedef struct stack tStack;
+
+int get_token(FILE *file, struct token_s *token, tStack *stack)
 {
 
     if (!file){
-        SLOG("There is no input file.Rerun with file", ERR_INTERNAL);
+        SLOG("There is no input file.Rerun with file");
     }
 
     // string to writing down attribute
     struct dynamic_string *str;
-    str = (dynamic_string_ptr)malloc(sizeof(struct dynamic_string));
-    if (str == NULL)
-    {
-        SLOG("Error in allocating memory!", ERR_INTERNAL);
-    }
-
-    str->str = (string)malloc(DEF_STR_SIZE);
-    if (!str->str)
-    {
-        FREE_ALL(str);
-        SLOG("Error in allocating memory!", ERR_INTERNAL);
-    }
-    str->size = DEF_STR_SIZE;
-    str->len = 0;
-
+    str_init(&str);
+       
     int state = SCANNER_START;
     static bool first_token = true;
     static int double_quot = 0;
     static int count_of_quot = 0;
-    int c;
-<<<<<<< Updated upstream
-    while (state != SCANNER_EOF)
-    {
-        c = getc(file);
-        printf("c: %c\n", c);
-        //printf("c: %d\n", c);
-        // printf("state: %d\n", state);
-        // printf("first_token: %d\n", first_token);
-=======
+    int c; // for symbol
     int space_cnt = 0;
+     
     while (state != SCANNER_EOF)
     {
         c = getc(file);
-        //printf("c: %c\n", c);
-        //printf("c: %d\n", c);
-        // printf("state: %d\n", state);
-        //printf("first_token: %d\n", first_token);
-        //printf("space_cnt: %d\n", space_cnt);
-        //printf("stackTop: %d\n", stackTop(stack));
->>>>>>> Stashed changes
+        // printf("%c\n", c);
 
         if (feof(file)){
-            if(stackTop(stack)){
-                state = SCANNER_WHITE_SPACE;
-            }else{
-                printf("EOF\n");
-                token->type = TOKEN_EOF;        
-                state = SCANNER_EOF;
-            }
-        }
-        switch (state){
-        case SCANNER_START: case TOKEN_READY:
-<<<<<<< Updated upstream
-            if (c == '#'){
-=======
-            if (stackTop(stack) && first_token){
-                state = SCANNER_WHITE_SPACE;
-            }
-            else if (c == '#'){
->>>>>>> Stashed changes
-                printf("comment skipped\n\n");
-                //first_token = false;
-                state = SCANNER_COMMENT;
-            }
-            else if (isalpha(c)){
-                add_char_to_str(str, c);
-                state = SCANNER_ID;
-                first_token = false;
-            }
-            else if (isdigit(c)){
-                // printf("is digit\n");
-                state = SCANNER_INT_OR_FLOAT;
-                ungetc(c, file);
-                first_token = false;
-            }
-            else if(c == 10 || c == 13){
-                if(!first_token){
-                    token->type = TOKEN_EOL;
-                    state = TOKEN_READY;
-<<<<<<< Updated upstream
-=======
-                    first_token = true;
->>>>>>> Stashed changes
-                    FREE_ALL(str->str, str);
+                token->type = TOKEN_EOF;
+                if(stackTop(stack)){
+                    token->type = TOKEN_DEDEND;
+                    stackPop(stack);
+                    str_clean(str);
                     return OK;
                 }
-                else{
-                    state = SCANNER_START;
-                }
-            }
-            else if(c == ' '){
+                str_clean(str);
+                state = SCANNER_EOF;
+                return OK;
+        }
+
+        switch (state){
+        case SCANNER_START:
+            if(c == ' '){
                 if(first_token){
-                    // наверное надо заполнить в табулку с одсазеним??
                     state = SCANNER_WHITE_SPACE;
                     space_cnt++;
                 }
                 else{
                     state = SCANNER_START;
                 }
+                break;
             }
-            else if(c == '\''){
+            else if (first_token){
+                /* If it is a new line and previous was INDEND*/
+                if(c == '#'){
+                    state = SCANNER_COMMENT;
+                    break;    
+                }
+                if((stackTop(stack) != 0) && (c != '\n' && c != '\r')){
+                    ungetc(c, file);
+                    stackPop(stack);
+                    token->type = TOKEN_DEDEND;
+                    str_clean(str);
+                    return OK;
+                }
+            }
+
+            if (c == '#'){
+                state = SCANNER_COMMENT;
+                break;
+            }
+            else if (isalpha(c)){
+                add_char_to_str(str, c);
+                state = SCANNER_ID;
+                first_token = false;
+                break;
+            }
+            else if (isdigit(c)){
+                state = SCANNER_INT_OR_FLOAT;
+                ungetc(c, file);
+                first_token = false;
+                break;
+            }
+            else if(c == ','){
+                token->type = TOKEN_COMA;
+                str_clean(str);
+                return OK;
+            }
+            else if((c == '\n') || (c == '\r') ){
+                if(!first_token){
+                    token->type = TOKEN_EOL;
+                    state = SCANNER_START;
+                    first_token = true;
+                    str_clean(str);
+                    return OK;
+                }
+                else{
+                    state = SCANNER_START;
+                }
+                break;
+            }
+            else if (c == '\''){
                 state = SCANNER_STRING;
-                token->type = TOKEN_STRING;
+                break;
             }
-            else if(c == '<' || c == '>'){
+            else if (c == '"'){
+                state = SCANNER_BLOCK_STRING_BEGIN;
+                ungetc(c, file);
+                break;
+            }
+            else if (c == '<' || c == '>'){
                 state = SCANNER_LESS_GREATER;
                 ungetc(c, file);
+                break;
             }
-            else if(c == '='){
+            else if (c == '='){
                 state = SCANNER_ASSIGN;
+                break;
             }
-            else if(c == '+' || c == '-' || c == '*' || c == '/' || c == ':'){
-<<<<<<< Updated upstream
-                state = SCANNER_SUM_MINUS_MULTIPLY_DIVISION_DDOT;
-                if(c == '+')
+            else if (c == '+'){
                 token->type = TOKEN_SUM;
-                if(c == '-')
+                str_clean(str);
+                return OK;
+            }
+            else if (c == '-'){
                 token->type = TOKEN_MINUS;
-                if(c == '*')
+                str_clean(str);
+                return OK;
+            }
+            else if (c == '*') {
                 token->type = TOKEN_MULTIPLY;
-                if(c == '/')
-                token->type = TOKEN_DIVISION;
-                if(c == ':')
-                token->type = TOKEN_DDOT;
+                str_clean(str);
+                return OK;
             }
-            else if(c == '!'){
-                state = SCANNER_NONE;
-                add_char_to_str(str, c);
-=======
-                if(c == '+'){
-                    token->type = TOKEN_SUM;
-                    printf("token attribute: SUM\n");
-                }
-                if(c == '-'){
-                    token->type = TOKEN_MINUS;
-                    printf("token attribute: MINUS\n");
-                }
-                if(c == '*'){
-                    token->type = TOKEN_MULTIPLY;
-                    printf("token attribute: MULTIPLY\n");
-                }  
+            else if (c == '/'){
+                c = getc(file);
                 if(c == '/'){
+                    token->type = TOKEN_DIV_INT;
+                }
+                else{
+                    ungetc(c, file);
                     token->type = TOKEN_DIVISION;
-                    printf("token attribute: DIVISION\n");
                 }
-                if(c == ':'){
-                    token->type = TOKEN_DDOT;
-                    printf("token attribute: DDOT\n");
-                }
-            FREE_ALL(str->str, str);
-            state = SCANNER_START;
-            return TOKEN_READY;
+                str_clean(str);
+                return OK;
             }
-            else if(c == '!'){
+            else if (c == ':'){
+                token->type = TOKEN_DDOT;
+                // first_token = true;
+                str_clean(str);
+                return OK;
+            }
+            else if (c == '!'){
                 state = SCANNER_NOT;
->>>>>>> Stashed changes
+                break;
             }
-            else if(c == '(' || c == ')'){
+            else if (c == '(' || c == ')'){
                 state = SCANNER_BRACKET;
-                ungetc(c,file);
-            }
-            else if( c == '"'){
-                state = SCANNER_BLOCK_STRING_BEGIN;
-                ungetc(c,file);
+                ungetc(c, file);
+                break;
             }
             break;
         case SCANNER_ID:
             if(isalpha(c) || (c == '_') || (isdigit(c))){
-                add_char_to_str(str, c);
+                if(!add_char_to_str(str, c)){
+                    return ERR_INTERNAL;
+                }
             }
             else{
                 ungetc(c, file);
-                printf("token attribute: %s\n", str->str);
                 if (strcmp(str->str, "while") == 0){
                     token->type = TOKEN_KEY_WORD;
                     token->attribute.key_word = _WHILE_;
                 }
-                else if (strcmp(str->str, "define") == 0){
+                else if (strcmp(str->str, "def") == 0){
                     token->type = TOKEN_KEY_WORD;
                     token->attribute.key_word = _DEF_;
                 }
@@ -259,8 +233,8 @@ int get_token(FILE *file, struct token_s* token)
                     token->attribute.key_word = _ELSE_;
                 }
                 else if(strcmp(str->str, "none") == 0){
-                    token->type = TOKEN_KEY_WORD;
-                    token->attribute.key_word = _NONE_;
+                    token->type = TOKEN_NONE;
+                    // token->attribute.key_word = _NONE_;
                 }
                 else if(strcmp(str->str, "pass") == 0){
                     token->type = TOKEN_KEY_WORD;
@@ -270,14 +244,36 @@ int get_token(FILE *file, struct token_s* token)
                     token->type = TOKEN_KEY_WORD;
                     token->attribute.key_word = _RETURN_;
                 }
+                else if(strcmp(str->str, "if") == 0){
+                    token->type = TOKEN_KEY_WORD;
+                    token->attribute.key_word = _IF_;
+                }
                 else{
-                    token->type = TOKEN_ID;
+                    for(;;c = getc(file)){ 
+                        if(c == ' '){
+                            continue;
+                        }
+                        else if(c == '('){
+                            token->type = TOKEN_FNC;
+                            break;
+                        }
+                        else{
+                            /* I dont know why, but if without this IF it 
+                            doesn't generate TOKEN_ASSIGN type*/ 
+                            if(c == '='){
+                                ungetc(c, file);
+                            }
+                            token->type = TOKEN_ID;
+                            break;
+                        }
+                    }
                     token->attribute.string = (char *)malloc(str->size);
                     strncpy(token->attribute.string, str->str, str->size);
                 }
-                FREE_ALL(str->str, str);
+                
+                str_clean(str);
                 state = SCANNER_START;
-                return TOKEN_READY;
+                return OK;
             }
             break;
         case SCANNER_INT_OR_FLOAT:
@@ -295,12 +291,14 @@ int get_token(FILE *file, struct token_s* token)
                     state = SCANNER_EXP;
                 }
                 else if (isdigit(c)){
-                    // fprintf(stdout,"ERROR. In the begining of number cant be more then one\n");
-                    FREE_ALL(str->str, str);
-                    SLOG("ERROR. In the begining of number cant be more then one", ERR_LEXER);
-                    // return ERR_LEXER;
+                    str_clean(str);
+                    SLOG("ERROR. In the begining of number cant be more then one");
                 }
                 else{
+                    if(isalpha(c)){
+                        SLOG("Wrong indetificator");
+                        // return 
+                    }
                     ungetc(c,file);
                     add_char_to_str(str, '0');
                     state = SCANNER_INT;
@@ -324,18 +322,15 @@ int get_token(FILE *file, struct token_s* token)
                 state = SCANNER_EXP;
             }
             else{
+                if(isalpha(c)){
+                    SLOG("Wrong indetificator");
+                    return ERR_LEXER; 
+                }
                 ungetc(c,file);
                 int num = atoi(str->str);
-                printf("token attribute: %d\n",num);
-                // проверка на правильность выполнения перевода на инт
-                // if(num ==){
-                //     fprintf(stdout, "ERROR. Can not convert string to integer value\n");
-                //     FREE_ALL(str->str, str);
-                //     return ERR_INTERNAL;
-                // }
                 token->attribute.int_val = num;
                 token->type = TOKEN_INT;
-                FREE_ALL(str->str, str);
+                str_clean(str);
                 return OK;
             }
             break;
@@ -348,10 +343,15 @@ int get_token(FILE *file, struct token_s* token)
                 state = SCANNER_EXP;
             }
             else{
+                if(isalpha(c)){
+                    SLOG("Wrong indetificator");
+                    return ERR_LEXER; 
+                }
+
                 ungetc(c, file);
                 token->attribute.float_val = strtof(str->str, NULL);
                 token->type = TOKEN_FLOAT;
-                FREE_ALL(str->str, str);
+                str_clean(str);
                 return OK;
             }
             break;
@@ -363,128 +363,152 @@ int get_token(FILE *file, struct token_s* token)
                 add_char_to_str(str, c);
             }
             else{
+                if(isalpha(c)){
+                    SLOG("Wrong indetificator");
+                    return ERR_LEXER; 
+                }
+
                 ungetc(c, file);
                 token->attribute.float_val = strtof(str->str, NULL);
                 token->type = TOKEN_FLOAT;
-                FREE_ALL(str->str, str);
+                str_clean(str);
                 return OK;
             }
             break;
+       
         case SCANNER_WHITE_SPACE:
-            if(c == '\n'){
+            if(c == '\n' || c == '\r'){
+                space_cnt = 0;
                 state = SCANNER_START;
             }
             else if(c == ' '){
+                space_cnt++;
                 state = SCANNER_WHITE_SPACE;
+                break;
+            }
+            else if(c == '#'){
+                state = SCANNER_COMMENT;
+                break;
             }
             else{
                 ungetc(c,file);
                 // INDENT OR DEDEND
                 first_token = false;
-<<<<<<< Updated upstream
-            }
-            break;
-        case SCANNER_STRING:
-            if (c == '\''){
-                printf("token attribute: %s\n", str->str);
-                token->attribute.string = (char *)malloc(str->size);
-                strncpy(token->attribute.string, str->str, str->size);
-                FREE_ALL(str->str, str);
-                state = SCANNER_START;
-                return TOKEN_READY;
-            }
-            else if (c == '\n'){
-                FREE_ALL(str->str, str);
-                SLOG("ERROR. String must be in one line!", ERR_LEXER);
-            }
-            else{
-                add_char_to_str(str, c);
-            }
-            break;
-        case SCANNER_BLOCK_STRING_BEGIN:
-            if (c == '"' && double_quot < 3 && count_of_quot < 2 ){
-                double_quot++;
-                if(double_quot == 3){
-                    count_of_quot++;
-                }
-            }
-            else if(c != '"' && (double_quot == 3 || double_quot == 0)){  
-                double_quot = 0;
-                if(count_of_quot < 2){
-                    if(c != 13 && c != 10)
-                        add_char_to_str(str, c);
-                }else{
-                    count_of_quot = 0;
-                    ungetc(c,file);
-                    token->type = TOKEN_STRING;
-                    printf("token attribute: %s\n", str->str);
-                    token->attribute.string = (char *)malloc(str->size);
-                    strncpy(token->attribute.string, str->str, str->size);
-=======
                 if(space_cnt > stackTop(stack)){
                     // INDEND
                     stackPush(stack, space_cnt);
                     token->type = TOKEN_INDEND;
-                    printf("token attribute: INDEND\n");
                     state = SCANNER_START;
-                    FREE_ALL(str->str, str);
+                    str_clean(str);
                     return OK;
-
                 }
                 else if (space_cnt < stackTop(stack)){
                     // DEDEND
+                    c = getc(file);
+                    //  If it is a commnet line, so just skip it without DEDEND
+                    if(c == '#'){
+                        state = SCANNER_COMMENT;                                    
+                        break;
+                    }
+                    else{
+                        ungetc(c, file);
+                    }
+                    bool found =  false;
                     while (stackTop(stack) != 0){
-                        printf("stackTop: %d\n", stackTop(stack));
-                        stackPop(stack); // ungetc(c,file); --------------------------------
+                        stackPop(stack); 
                         if(stackTop(stack) == space_cnt){
                             // we found same level 
                             token->type = TOKEN_DEDEND;
-                            printf("token attribute: DEDEND\n");
                             state = SCANNER_START;
-                            FREE_ALL(str->str, str);
-                            return OK;
+                            found = true;
+                            break;
                         }
                     }
-                    // in case if there is now same offset
->>>>>>> Stashed changes
-                    FREE_ALL(str->str, str);
-                    state = SCANNER_START;
-                    return TOKEN_READY;
-                }
+                    if (!found){
+                        // in case if there is no same offset
+                        str_clean(str);
+                        state = SCANNER_START;
+                        printf("Wrong offset\n");
+                        return ERR_LEXER;
+                    }
+                    else{
+                        state = SCANNER_START;
+                        str_clean(str);
+                        return OK;
+                    }
+                }                
             }
-            else{
-                FREE_ALL(str->str, str);
-                SLOG("ERROR. Block string must start from '\"\"\"' !", ERR_LEXER);
-            }
-            break;
-        case SCANNER_COMMENT:
-            if (c == '\n'){
-                first_token = true;
-                state = SCANNER_START;
-            }
-            break;
-<<<<<<< Updated upstream
-        case SCANNER_LESS_GREATER:
-            add_char_to_str(str, c);
-            if (c == '>'){
-                token->type = TOKEN_GREATER;
-                printf("token attribute: MORE\n");
-            }else{
-                token->type = TOKEN_LESS;
-                printf("token attribute: LESS\n");
-=======
+            state = SCANNER_START;
+            break;   
         case SCANNER_STRING:
             if (c == '\''){
-                printf("token attribute: %s\n", str->str);
+                token->type = TOKEN_STRING;
                 token->attribute.string = (char *)malloc(str->size);
                 strncpy(token->attribute.string, str->str, str->size);
-                FREE_ALL(str->str, str);
+                str_clean(str);
                 state = SCANNER_START;
-                return TOKEN_READY;
+                return OK;
+            }
+            else if (c == '\\'){
+                c = getc(file);
+                // Hexadecimal value
+                if((c == 'x') || (c == 'X')){
+                    char tmp[4];
+                    tmp[0] = '0';
+                    tmp[1] = (char)c;
+                    for(int i = 2; i < 4; i++){
+                        c = getc(file);
+                        if (isdigit(c) ||
+                            (c == 'A') ||
+                            (c == 'a') ||
+                            (c == 'B') ||
+                            (c == 'b') ||
+                            (c == 'C') ||
+                            (c == 'c') ||
+                            (c == 'D') ||
+                            (c == 'd') ||
+                            (c == 'E') ||
+                            (c == 'e') ||
+                            (c == 'F') ||
+                            (c == 'f'))
+                        {
+                            tmp[i] = (char)c;
+                        }
+                        else{
+                            SLOG("Hexadecimal value in string must be in format '\\xAB, where A and B are integer numbers");
+                            return ERR_LEXER;
+                        }
+                    }
+
+                    char hex;
+                    // Convert to hex value
+                    sscanf(tmp, "%hhx", &hex);
+                    add_char_to_str(str, hex);
+                }
+                else if (c == 'n' ){
+                    add_char_to_str(str, '\n');
+                }
+                else if (c == 't'){
+                    add_char_to_str(str, '\t');
+                }
+                else if (c == '\\'){
+                    add_char_to_str(str, '\\');
+                }
+                else if (c == '\''){
+                    add_char_to_str(str, '\\');
+                }
+                else if (c == '\"'){
+                    add_char_to_str(str, '\"');
+                }
+                else{
+                    add_char_to_str(str,'\\');
+                    add_char_to_str(str, c);
+                }
             }
             else if (c == '\n'){
-                FREE_ALL(str->str, str);
-                SLOG("ERROR. String must be in one line!", ERR_LEXER);
+                str_clean(str);
+                str_clean(str);
+                SLOG("ERROR. String must be in one line!");
             }
             else{
                 add_char_to_str(str, c);
@@ -500,198 +524,159 @@ int get_token(FILE *file, struct token_s* token)
             else if(c != '"' && (double_quot == 3 || double_quot == 0)){  
                 double_quot = 0;
                 if(count_of_quot < 2){
-                    if(c != 13 && c != 10)
+                    if (c == '\\'){
+                        c = getc(file);
+                        // Hexadecimal value
+                        if((c == 'x') || (c == 'X')){
+                            char tmp[4];
+                            tmp[0] = '0';
+                            tmp[1] = (char)c;
+                            for(int i = 2; i < 4; i++){
+                                c = getc(file);
+                                if (isdigit(c) ||
+                                (c == 'A') ||
+                                (c == 'a') ||
+                                (c == 'B') ||
+                                (c == 'b') ||
+                                (c == 'C') ||
+                                (c == 'c') ||
+                                (c == 'D') ||
+                                (c == 'd') ||
+                                (c == 'E') ||
+                                (c == 'e') ||
+                                (c == 'F') ||
+                                (c == 'f'))
+                                {
+                                    tmp[i] = (char)c;
+                                }
+                                else{
+                                    SLOG("Hexadecimal value in string must be in format '\\xAB, where A and B are integer numbers");
+                                }
+                            }
+                            char hex;
+                            // Convert to hex value
+                            sscanf(tmp, "%hhx", &hex);
+                            add_char_to_str(str, hex);
+                        }
+                        else if (c == 'n' ){
+                            add_char_to_str(str, '\n');
+                        }
+                        else if (c == 't'){
+                            add_char_to_str(str, '\t');
+                        }
+                        else if (c == '\\'){
+                            add_char_to_str(str, '\\');
+                        }
+                        else if (c == '\''){
+                            add_char_to_str(str, '\\');
+                        }
+                        else if (c == '\"'){
+                            add_char_to_str(str, '\"');
+                        }
+                        else{
+                            add_char_to_str(str,'\\');
+                            add_char_to_str(str, c);
+                        }
+                    }
+                    else if (c == '\n' || c == '\r'){
+                        add_char_to_str(str, ' ');
+                    }
+                    else{
                         add_char_to_str(str, c);
-                }else{
+                    }
+                }
+                else{
                     count_of_quot = 0;
                     ungetc(c,file);
                     token->type = TOKEN_STRING;
-                    printf("token attribute: %s\n", str->str);
                     token->attribute.string = (char *)malloc(str->size);
                     strncpy(token->attribute.string, str->str, str->size);
-                    FREE_ALL(str->str, str);
+                    str_clean(str);
                     state = SCANNER_START;
-                    return TOKEN_READY;
+                    return OK;
                 }
             }
             else{
-                FREE_ALL(str->str, str);
-                SLOG("ERROR. Block string must start from '\"\"\"' !", ERR_LEXER);
+                str_clean(str);
+                SLOG("ERROR. Block string must start from '\"\"\"' !");
             }
             break;
         case SCANNER_COMMENT:
             if (c == '\n'){
                 first_token = true;
                 state = SCANNER_START;
+                break;
             }
             break;
         case SCANNER_LESS_GREATER:
             if (c == '>'){
                 token->type = TOKEN_GREATER;
-                printf("token attribute: MORE");
-            }else{
+            }
+            else{
                 token->type = TOKEN_LESS;
-                printf("token attribute: LESS");
->>>>>>> Stashed changes
             }
             c = getc(file);
             if (c == '='){
-                token->type += 2;
-<<<<<<< Updated upstream
-                printf("token attribute: MORE/LESS_OR_EQUAL\n");
-            }else if (c == ' '){
+                token->type += 2; // look to scaner.h
+            }
+            else{
                 ungetc(c, file);
-            }else{
-                FREE_ALL(str->str, str);
-                SLOG("ERROR. Can be only '<' or '<=' !", ERR_LEXER);
-=======
-                printf("_OR_EQUAL\n");
-            }else{
-                printf("\n");
-                ungetc(c, file);
->>>>>>> Stashed changes
             }
             
-            FREE_ALL(str->str, str);
+            str_clean(str);
             state = SCANNER_START;
-            return TOKEN_READY;
+            return OK;
             break;
         case SCANNER_ASSIGN:
-<<<<<<< Updated upstream
-            if(c == ' '){
-                ungetc(c,file);
-                token->type = TOKEN_ASSIGN;
-                printf("token attribute: ASSIGN\n");
-            }
-            else if(c == '='){
-                state = SCANNER_EQUAL;
-                printf("token attribute: EQUAL\n");
-            }
-            else{
-                FREE_ALL(str->str, str);
-                SLOG("ERROR. After '=' can be only '=' or ' ' !", ERR_LEXER);
-=======
             if(c == '='){
                 token->type = TOKEN_EQUAL;
-                printf("token attribute: EQUAL\n");
             }
             else{
                 ungetc(c,file);
                 token->type = TOKEN_ASSIGN;
-                printf("token attribute: ASSIGN\n");
->>>>>>> Stashed changes
             }
-            FREE_ALL(str->str, str);
+            str_clean(str);
             state = SCANNER_START;
-            return TOKEN_READY; 
+            return OK; 
             break;
-<<<<<<< Updated upstream
-        case SCANNER_EQUAL:
-            if(c != ' '){
-                FREE_ALL(str->str, str);
-                SLOG("ERROR. After '==' can be only ' ' !", ERR_LEXER);
-            }
-            else{
-                token->type = TOKEN_EQUAL;
-                printf("token attribute: %s\n", str->str);
-                token->attribute.string = (char *)malloc(str->size);
-                strncpy(token->attribute.string, str->str, str->size);
-                FREE_ALL(str->str, str);
-                state = SCANNER_START;
-                return TOKEN_READY; 
-            }
-            break;
-        case SCANNER_SUM_MINUS_MULTIPLY_DIVISION_DDOT:
-            if((c == ' ') || (c == 13) || (c == 10)){
-                printf("token attribute: SUM_MINUS_MULTIPLY_DIVISION_DDOT\n");
-                FREE_ALL(str->str, str);
-                state = SCANNER_START;
-                return TOKEN_READY;
-            }
-            else{
-                SLOG("ERROR. After '+,-,*,/,:' can be only ' ' !", ERR_LEXER);
-                FREE_ALL(str->str, str);
-            }
-            break;
-        case SCANNER_NONE:
-            if(c == '='){
-                add_char_to_str(str, c);
-                c = getc(file);
-                if(c != ' '){
-                    FREE_ALL(str->str, str);
-                    SLOG("ERROR. After '!=' can be only ' ' !", ERR_LEXER);
-                }
-                ungetc(c,file);
-
-                printf("token attribute: %s\n", str->str);
-                token->attribute.string = (char *)malloc(str->size);
-                strncpy(token->attribute.string, str->str, str->size);
-=======
-        // case SCANNER_EQUAL: // ---leave it here for future---
-        //     if(c != ' '){
-        //         FREE_ALL(str->str, str);
-        //         SLOG("ERROR. After '==' can be only ' ' !", ERR_LEXER);
-        //     }
-        //     else{
-        //         token->type = TOKEN_EQUAL;
-        //         printf("token attribute: %s\n", str->str);
-        //         token->attribute.string = (char *)malloc(str->size);
-        //         strncpy(token->attribute.string, str->str, str->size);
-        //         FREE_ALL(str->str, str);
-        //         state = SCANNER_START;
-        //         return TOKEN_READY; 
-        //     }
-        //     break;
-        // case SCANNER_SUM_MINUS_MULTIPLY_DIVISION_DDOT: ---leave it here for future---
-        //     if((c == ' ') || (c == 13) || (c == 10)){
-        //         printf("token attribute: SUM_MINUS_MULTIPLY_DIVISION_DDOT\n");
-        //         FREE_ALL(str->str, str);
-        //         state = SCANNER_START;
-        //         return TOKEN_READY;
-        //     }
-        //     else{
-        //         SLOG("ERROR. After '+,-,*,/,:' can be only ' ' !", ERR_LEXER);
-        //         FREE_ALL(str->str, str);
-        //     }
-        //     break;
         case SCANNER_NOT:
             if(c == '='){
-                printf("token attribute: NOT_EQUAL\n");
                 token->type = TOKEN_NOT_EQUAL;
->>>>>>> Stashed changes
-                FREE_ALL(str->str, str);
+                if(str->str != NULL){
+                    str_clean(str);
+                } 
+                else{
+                    str_clean(str);
+                }
                 state = SCANNER_START;
-                return TOKEN_READY; 
+                return OK; 
             }
             else{
-                FREE_ALL(str->str, str);
-                SLOG("ERROR. After '!' can be only '=' !", ERR_LEXER);
+                str_clean(str);
+                SLOG("ERROR. After '!' can be only '=' !");
             }
             break;
         case SCANNER_BRACKET:
             if(c == '('){
                 token->type = TOKEN_L_BRACKET;
-                printf("token attribute: L_BRACKET\n");
             }
-            else{
+            else if (c == ')'){
                 token->type = TOKEN_R_BRACKET;
-                printf("token attribute: R_BRACKET\n");
             }
-            FREE_ALL(str->str, str);
+            
+            str_clean(str);
+
             state = SCANNER_START;
-            return TOKEN_READY; 
+            return OK; 
             break;
-        case SCANNER_EOF:  
+        case SCANNER_EOF:
             break;
         default:
             state = SCANNER_START;
             break;
         }
-        
-        
     }
 
-    // printf("HERE\n");
-    FREE_ALL(str->str, str);
+    str_clean(str);
     return -1;
 }
