@@ -6,15 +6,18 @@
 #include <stdbool.h>
 #include "../scaner.h"
 
+
 #define MAX_HTSIZE 40
+
+#define ERR -1
+#define NEW 0
+#define FOUND 1
 
 typedef char* tKey;
 
-typedef struct token_s tData;
-
 typedef struct tHTItem{
-	tKey key;				 /*< Key                              */
-	tData data;				 /*< Token                            */
+	tKey key;				 /*< Key - name of id                 */
+	token_t type;			 /*< Token type                       */
 	bool id_declared;        /*< Flag for declared identeficators */
 	struct tHTItem* ptrnext; /*< Pointer to next node             */
 } tHTItem;
@@ -29,15 +32,11 @@ void htInit ( tHTable* ptrht );
 
 tHTItem* htSearch ( tHTable* ptrht, tKey key );
 
-void htInsert ( tHTable* ptrht, tKey key, tData data );
+int htInsert(tHTable *ptrht, tKey key, token_t type);
 
-tData* htRead ( tHTable* ptrht, tKey key );
-
-void htDelete ( tHTable* ptrht, tKey key );
+void htDelete(tHTable *ptrht, tKey key);
 
 void htClearAll ( tHTable* ptrht );
-
-void htPrintData(tData *ptrdata);
 
 void htPrintItem(tHTItem *ptritem);
 
