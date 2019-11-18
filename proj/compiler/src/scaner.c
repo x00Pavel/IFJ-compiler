@@ -7,7 +7,6 @@
 #include "errors.h"
 #include "dynamic_string.h"
 #include "scaner.h"
-#include "./stack/c202.h"
 
 
 #define SCANNER_START 10  // Scanner begin to work
