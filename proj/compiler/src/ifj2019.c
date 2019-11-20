@@ -8,6 +8,7 @@
 #include "scaner.h"
 #include "parser.h"
 #include "./stack/c202.h"
+#include "./hash_table/c016.h"
 
 // #ifdef DEBUG
 // char *types[] = {
@@ -81,15 +82,24 @@ int main(int arc, char **argv){
     struct token_s *token = (struct token_s *)malloc(sizeof(struct token_s));
 
     tStack *stack = (tStack*) malloc(sizeof(tStack));
+    if(!stack)
+        return ERR_INTERNAL;
 
     stackInit(stack);
     stackPush(stack, 0);
     
+    table_s *hash_table = (table_s *) malloc(sizeof(table_s));
+    if(!hash_table)
+        return ERR_INTERNAL;
+    htInit(hash_table);
+
     int state = 999;
     int ret_code = 0;
 
-    func_prog(file, token, stack, state, ret_code);
+    func_prog(file, token, stack, state, ret_code, hash_table);
     
+    htClearAll(hash_table);
+    free(hash_table);
     free(stack);
     free(token);
     fclose(file);

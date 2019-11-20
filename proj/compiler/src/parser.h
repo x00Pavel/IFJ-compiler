@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include "scaner.h"
+#include "./hash_table/c016.h"
 
 /**
  * \brief
@@ -48,7 +49,7 @@ int func_for_atributes(FILE *file, struct token_s *token, tStack *stack, int *co
 */
 int check_next_token(FILE *file, struct token_s *token, tStack *stack, int *count_of_params);
 
-int func_prog(FILE *file, struct token_s *token, tStack *stack, int state, int ret_code);
+int func_prog(FILE *file, struct token_s *token, tStack *stack, int state, int ret_code, table_s *hash_table);
 int func_cond_mb(FILE *file, struct token_s *token, tStack *stack, int count_of_brackets);
 int func_mb_ret(FILE *file, struct token_s *token, tStack *stack);
 

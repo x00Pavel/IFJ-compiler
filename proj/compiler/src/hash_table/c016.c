@@ -65,16 +65,17 @@ int hashCode ( tKey key ) {
 	return ( retval % HTSIZE );
 }
 
-void htInit ( tHTable* ptrht ) {
+void htInit (table_s *ptrht) {
     // initialize all elements to NULL
     for(int i = 0; i < HTSIZE; i++){
-        (*ptrht)[i] = NULL;
+        ptrht->hash_table[i] = NULL;
     }
+    ptrht->prev_hash_table = NULL;
 }
 
-tHTItem* htSearch ( tHTable* ptrht, tKey key ) {
+tHTItem* htSearch (table_s *ptrht, tKey key ) {
 
-    tHTItem *item = (*ptrht)[hashCode(key)];
+    tHTItem *item = (ptrht->hash_table)[hashCode(key)];
 
     while(item){
         if (strcmp(key, item->key) == 0){
@@ -88,7 +89,18 @@ tHTItem* htSearch ( tHTable* ptrht, tKey key ) {
 
 }
 
-int htInsert(tHTable *ptrht, tKey key, token_t type)
+bool search_everywhere(table_s *ptrht, tKey key){
+
+    while (ptrht != NULL){
+        if(htSearch(ptrht,key)){
+            return true;
+        }
+        ptrht = ptrht->prev_hash_table;
+    }
+    return false;
+}
+
+int htInsert(table_s *ptrht, tKey key, token_t type)
 {
     tHTItem *item = htSearch(ptrht, key);
     
@@ -110,7 +122,7 @@ int htInsert(tHTable *ptrht, tKey key, token_t type)
         // get index in hash table
         int index = hashCode(key);
         
-        item = (*ptrht)[index];
+        item = (ptrht->hash_table)[index];
 
         // if synonym exist
         if(item != NULL){
@@ -118,27 +130,19 @@ int htInsert(tHTable *ptrht, tKey key, token_t type)
             new_item->ptrnext = item;
         }
         // insert to the begining
-        (*ptrht)[index] = new_item;
-    }
+        (ptrht->hash_table)[index] = new_item;
+    }   
     return NEW;
 }
 
-// tData* htRead ( tHTable* ptrht, tKey key ) {
 
-//     tHTItem *item = htSearch(ptrht, key);
-//     if(item != NULL){
-//         return item->data; 
-//     }
-//     return NULL;
-// }
-
-void htDelete ( tHTable* ptrht, tKey key ) {
+void htDelete ( table_s* ptrht, tKey key ) {
 
     int index = hashCode(key);
-    tHTItem *item = (*ptrht)[index];
+    tHTItem *item = (ptrht->hash_table)[index];
     tHTItem *next_item = NULL, *prev_item = NULL;
 
-    // go through synonims list and check key
+    // go through synonyms list and check key
     while (item != NULL){
         next_item = item->ptrnext;
 
@@ -148,7 +152,7 @@ void htDelete ( tHTable* ptrht, tKey key ) {
 
             if(prev_item == NULL){
                 // item is in the begining of the list
-                (*ptrht)[index] = next_item;
+                (ptrht->hash_table)[index] = next_item;
             }
             else{
                 // item is in the end or in somewhere else in the list
@@ -156,19 +160,20 @@ void htDelete ( tHTable* ptrht, tKey key ) {
             }
             return;
         }
-        // go to next item to serch key
+        // go to next item to search key
         prev_item = item;
         item = item->ptrnext;
     }
 }
 
-void htClearAll ( tHTable* ptrht ) {
+void htClearAll(tHTItem *ptrht[MAX_HTSIZE])
+{
 
     tHTItem *item, *delete_item;
 
     // go through every index in table 
     for (int i = 0; i < HTSIZE; i++){
-        item = (*ptrht)[i];
+        item = ptrht[i];
         // go through every item in linked list
         while(item){
             delete_item = item;
@@ -176,7 +181,7 @@ void htClearAll ( tHTable* ptrht ) {
             free(delete_item->key);
             free(delete_item);
         }
-        (*ptrht)[i] = NULL;
+        ptrht[i] = NULL;
     }
 }
 
@@ -191,7 +196,7 @@ void htPrintItem(tHTItem *item)
     }
 }
 
-void htPrintTable(tHTable *ptrht)
+void htPrintTable(table_s *ptrht)
 {
     int sumcnt = 0;
 
@@ -199,7 +204,7 @@ void htPrintTable(tHTable *ptrht)
     for (int i = 0; i < HTSIZE; i++)
     {
         printf("%i:", i);
-        tHTItem *ptr = (*ptrht)[i];
+        tHTItem *ptr = (ptrht->hash_table)[i];
         while (ptr != NULL)
         {   
             printf("(");
