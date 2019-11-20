@@ -7,7 +7,6 @@
 #include "errors.h"
 #include "dynamic_string.h"
 #include "scaner.h"
-#include "./stack/c202.h"
 
 
 #define SCANNER_START 10  // Scanner begin to work
@@ -77,9 +76,13 @@ int get_token(FILE *file, struct token_s *token, tStack *stack)
         c = getc(file);
         // printf("%c\n", c);
 
-        if (feof(file)){
+        switch (state){
+        case SCANNER_START:
+            if (feof(file))
+            {
                 token->type = TOKEN_EOF;
-                if(stackTop(stack)){
+                if (stackTop(stack))
+                {
                     token->type = TOKEN_DEDEND;
                     stackPop(stack);
                     str_clean(str);
@@ -88,11 +91,8 @@ int get_token(FILE *file, struct token_s *token, tStack *stack)
                 str_clean(str);
                 state = SCANNER_EOF;
                 return OK;
-        }
-
-        switch (state){
-        case SCANNER_START:
-            if(c == ' '){
+            }
+            else if(c == ' '){
                 if(first_token){
                     state = SCANNER_WHITE_SPACE;
                     space_cnt++;

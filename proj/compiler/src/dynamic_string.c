@@ -14,6 +14,9 @@
 #define DEF_STR_SIZE 8
 
 void str_clean(dynamic_string_ptr str){
+
+    assert(str);
+
     if(str->str != NULL){
         free(str->str);
     }
@@ -57,7 +60,7 @@ void str_init(dynamic_string_ptr *str){
     if(!str){
         return ;
     }
-    
+        
     (*str)->str = (string)malloc(DEF_STR_SIZE);
     if(!(*str)->str){
         return;
