@@ -87,11 +87,11 @@ main(int arc, char **argv)
     stackPush(stack, 0);
     
     // Initialization of hash table for global frame
-    tHTable *hash_table =  (tHTable *) malloc(sizeof(tHTable));
-    if(!hash_table){
+    table_s *ht = (table_s *)malloc(sizeof(table_s));
+    if(!ht){
         return ERR_INTERNAL;
     }
-    htInit(hash_table);
+    htInit(ht);
 
     int ret_code = 0;
 
@@ -99,7 +99,7 @@ main(int arc, char **argv)
         ret_code = get_token(file, token, stack);
         
         if(token->type == TOKEN_FNC || token->type == TOKEN_ID){
-            htInsert(hash_table, token->attribute.string, token->type);
+            htInsert(ht, token->attribute.string, token->type);
         }
 
         if (ret_code != OK){
@@ -134,11 +134,10 @@ main(int arc, char **argv)
         
     }
 
+    htPrintTable(ht);
 
-    htPrintTable(hash_table);
-    
-    htClearAll(hash_table);
-    free(hash_table);
+    htClearAll(ht->hash_table);
+    free(ht);
     free(stack);
     free(token);
     fclose(file);
