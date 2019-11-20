@@ -66,7 +66,17 @@ typedef enum{
     // TOKEN_COMENT
     TOKEN_FNC = 28,
     TOKEN_NONE,
-    TOKEN_DIV_INT
+    TOKEN_DIV_INT,
+
+    TOKEN_PRINT,
+    TOKEN_INPUT_S,
+    TOKEN_INPUT_I,
+    TOKEN_INPUT_F,
+    TOKEN_ORD,
+    TOKEN_SUBSTR,
+    TOKEN_LEN,
+    TOKEN_CHR
+
 } token_t;
 /**
  * \brief Union with atrributes

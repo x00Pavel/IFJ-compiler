@@ -51,7 +51,16 @@ char *types[] = {
     "TOKEN_DEDEND", // dedend
     "TOKEN_FNC",
     "TOKEN_NONE",
-    "TOKEN_DIV_INT"};
+    "TOKEN_DIV_INT",
+    "TOKEN_PRINT",
+    "TOKEN_INPUT_S",
+    "TOKEN_INPUT_I",
+    "TOKEN_INPUT_F",
+    "TOKEN_ORD",
+    "TOKEN_SUBSTR",
+    "TOKEN_LEN",
+    "TOKEN_CHR"
+    };
 
 char *kw[] = {
     "_DEF_",

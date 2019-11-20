@@ -248,6 +248,30 @@ int get_token(FILE *file, struct token_s *token, tStack *stack)
                     token->type = TOKEN_KEY_WORD;
                     token->attribute.key_word = _IF_;
                 }
+                else if(strcmp(str->str, "print") == 0){
+                    token->type = TOKEN_PRINT;
+                }
+                else if(strcmp(str->str, "inputs") == 0){
+                    token->type = TOKEN_INPUT_S;
+                }
+                else if(strcmp(str->str, "inputi") == 0){
+                    token->type = TOKEN_INPUT_I;
+                }
+                else if(strcmp(str->str, "inputf") == 0){
+                    token->type = TOKEN_INPUT_F;
+                }
+                else if(strcmp(str->str, "ord") == 0){
+                    token->type = TOKEN_ORD;
+                }
+                else if(strcmp(str->str, "len") == 0){
+                    token->type = TOKEN_LEN;
+                }
+                else if(strcmp(str->str, "substr") == 0){
+                    token->type = TOKEN_SUBSTR;
+                }
+                else if(strcmp(str->str, "chr") == 0){
+                    token->type = TOKEN_CHR;
+                }
                 else{
                     for(;;c = getc(file)){ 
                         if(c == ' '){
