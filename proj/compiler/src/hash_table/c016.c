@@ -3,6 +3,60 @@
 
 int HTSIZE = MAX_HTSIZE;
 
+#ifdef DEBUG
+char *types_[] = {
+
+    "TOKEN_INT",    // integer int
+    "TOKEN_FLOAT ", // float
+    "TOKEN_STRING", // string
+
+    // Operators
+    "TOKEN_SUM ",     // +
+    "TOKEN_MINUS",    // -
+    "TOKEN_ASSIGN",   // =
+    "TOKEN_MULTIPLY", // *
+    "TOKEN_DIVISION", // /
+
+    // Relation operators
+    "TOKEN_EQUAL",      // ==
+    "TOKEN_NOT_EQUAL",  // !=
+    "TOKEN_GREATER",    // >
+    "TOKEN_LESS",       // <
+    "TOKEN_GREATER_EQ", // >=
+    "TOKEN_LESS_EQ",    // <=
+
+    // Special tokens
+    "TOKEN_EOL",      // end of line \n
+    "TOKEN_EOF",      // end of file
+    "TOKEN_KEY_WORD", // key_word_t
+    "TOKEN_EMPTY",    // "white" symbols
+
+    // Punctuations
+    "TOKEN_L_BRACKET", // (
+    "TOKEN_R_BRACKET", // )
+    "TOKEN_DOT",       // .
+    "TOKEN_COMA",      // ,
+    "TOKEN_SEMICOLON", // ;
+    "TOKEN_DDOT",      // :
+    "TOKEN_ID",
+    "TOKEN_HEX",
+    "TOKEN_INDEND", // indend
+    "TOKEN_DEDEND", // dedend
+    "TOKEN_FNC",
+    "TOKEN_NONE",
+    "TOKEN_DIV_INT"};
+
+char *kw_[] = {
+    "_DEF_",
+    "_ELSE_",
+    "_IF_",
+    "_NONE_",
+    "_PASS_",
+    "_RETURN_",
+    "_WHILE_"};
+#endif
+
+
 int hashCode ( tKey key ) {
 	int retval = 1;
 	size_t keylen = strlen(key);
@@ -11,22 +65,17 @@ int hashCode ( tKey key ) {
 	return ( retval % HTSIZE );
 }
 
-void htInit ( tHTable* ptrht ) {
+void htInit (table_s *ptrht) {
     // initialize all elements to NULL
     for(int i = 0; i < HTSIZE; i++){
-        (*ptrht)[i] = NULL;
+        ptrht->hash_table[i] = NULL;
     }
+    ptrht->prev_hash_table = NULL;
 }
 
-/* TRP s explicitně zřetězenými synonymy.
-** Vyhledání prvku v TRP ptrht podle zadaného klíče key.  Pokud je
-** daný prvek nalezen, vrací se ukazatel na daný prvek. Pokud prvek nalezen není,
-** vrací se hodnota NULL.
-**
-*/
-tHTItem* htSearch ( tHTable* ptrht, tKey key ) {
+tHTItem* htSearch (table_s *ptrht, tKey key ) {
 
-    tHTItem *item = (*ptrht)[hashCode(key)];
+    tHTItem *item = (ptrht->hash_table)[hashCode(key)];
 
     while(item){
         if (strcmp(key, item->key) == 0){
@@ -40,96 +89,70 @@ tHTItem* htSearch ( tHTable* ptrht, tKey key ) {
 
 }
 
-/*
-** TRP s explicitně zřetězenými synonymy.
-** Tato procedura vkládá do tabulky ptrht položku s klíčem key a s daty
-** data.  Protože jde o vyhledávací tabulku, nemůže být prvek se stejným
-** klíčem uložen v tabulce více než jedenkrát.  Pokud se vkládá prvek,
-** jehož klíč se již v tabulce nachází, aktualizujte jeho datovou část.
-**
-** Využijte dříve vytvořenou funkci htSearch.  Při vkládání nového
-** prvku do seznamu synonym použijte co nejefektivnější způsob,
-** tedy proveďte.vložení prvku na začátek seznamu.
-**/
+bool search_everywhere(table_s *ptrht, tKey key){
 
-void htInsert ( tHTable* ptrht, tKey key, tData data ) {
+    while (ptrht != NULL){
+        if(htSearch(ptrht,key)){
+            return true;
+        }
+        ptrht = ptrht->prev_hash_table;
+    }
+    return false;
+}
 
+int htInsert(table_s *ptrht, tKey key, token_t type)
+{
     tHTItem *item = htSearch(ptrht, key);
     
     if (item != NULL){
         // key already exist in hash table
-        item->data = data;
-        return;
+        return FOUND;
     }
    else{ 
         // create new item to insert 
         tHTItem *new_item = (tHTItem *) malloc(sizeof(tHTItem));
         if(!new_item){
-            return; 
+            return ERR; 
         }
-        new_item->key = key;
-        new_item->data = data;
+        new_item->key = (char*) malloc(sizeof(char) * strlen(key) + 1);
+        strcpy(new_item->key, key);
+        new_item->type = type;
         new_item->ptrnext = NULL;
 
         // get index in hash table
         int index = hashCode(key);
         
-        item = (*ptrht)[index];
+        item = (ptrht->hash_table)[index];
 
-        // if synonim exist
+        // if synonym exist
         if(item != NULL){
             // chain it with new item
             new_item->ptrnext = item;
         }
         // insert to the begining
-        (*ptrht)[index] = new_item;
-    }
+        (ptrht->hash_table)[index] = new_item;
+    }   
+    return NEW;
 }
 
-/*
-** TRP s explicitně zřetězenými synonymy.
-** Tato funkce zjišťuje hodnotu datové části položky zadané klíčem.
-** Pokud je položka nalezena, vrací funkce ukazatel na položku
-** Pokud položka nalezena nebyla, vrací se funkční hodnota NULL
-**
-** Využijte dříve vytvořenou funkci HTSearch.
-*/
-tData* htRead ( tHTable* ptrht, tKey key ) {
 
-    tHTItem *item = htSearch(ptrht, key);
-    if(item != NULL){
-        return &(item->data); 
-    }
-    return NULL;
-}
-
-/*
-** TRP s explicitně zřetězenými synonymy.
-** Tato procedura vyjme položku s klíčem key z tabulky
-** ptrht.  Uvolněnou položku korektně zrušte.  Pokud položka s uvedeným
-** klíčem neexistuje, dělejte, jako kdyby se nic nestalo (tj. nedělejte
-** nic).
-**
-** V tomto případě NEVYUŽÍVEJTE dříve vytvořenou funkci HTSearch.
-*/
-
-void htDelete ( tHTable* ptrht, tKey key ) {
+void htDelete ( table_s* ptrht, tKey key ) {
 
     int index = hashCode(key);
-    tHTItem *item = (*ptrht)[index];
+    tHTItem *item = (ptrht->hash_table)[index];
     tHTItem *next_item = NULL, *prev_item = NULL;
 
-    // go through synonims list and check key
+    // go through synonyms list and check key
     while (item != NULL){
         next_item = item->ptrnext;
 
         if(strcmp(item->key, key) == 0){
-            
+            free(item->key);
             free(item);
 
             if(prev_item == NULL){
                 // item is in the begining of the list
-                (*ptrht)[index] = next_item;
+                (ptrht->hash_table)[index] = next_item;
             }
             else{
                 // item is in the end or in somewhere else in the list
@@ -137,86 +160,64 @@ void htDelete ( tHTable* ptrht, tKey key ) {
             }
             return;
         }
-        // go to next item to serch key
+        // go to next item to search key
         prev_item = item;
         item = item->ptrnext;
     }
 }
 
-/* TRP s explicitně zřetězenými synonymy.
-** Tato procedura zruší všechny položky tabulky, korektně uvolní prostor,
-** který tyto položky zabíraly, a uvede tabulku do počátečního stavu.
-*/
+void htClearAll(tHTItem *ptrht[MAX_HTSIZE])
+{
 
-void htClearAll ( tHTable* ptrht ) {
-
-    tHTItem *item, *delet_item;
+    tHTItem *item, *delete_item;
 
     // go through every index in table 
     for (int i = 0; i < HTSIZE; i++){
-        item = (*ptrht)[i];
+        item = ptrht[i];
         // go through every item in linked list
         while(item){
-            delet_item = item;
+            delete_item = item;
             item = item->ptrnext;
-            if (delet_item->data.type == TOKEN_STRING ||
-                delet_item->data.type == TOKEN_ID ||
-                delet_item->data.type == TOKEN_FNC){
-                free(delet_item);
-                }
-                free(delet_item);
+            free(delete_item->key);
+            free(delete_item);
         }
-        (*ptrht)[i] = NULL;
+        ptrht[i] = NULL;
     }
 }
 
 #ifdef DEBUG
-/* tiskne tData ze struktury */
-void htPrintData(tData *ptrdata)
+void htPrintItem(tHTItem *item)
 {
-    if (ptrdata)
-        printf("%.2f\n", *ptrdata);
-    else
+    if (item){
+        printf("Key: %s -- Type: %s", item->key, types_[item->type]);
+    }
+    else{
         printf("NULL\n");
+    }
 }
 
-/* tiskne tItem ze struktury */
-void htPrintItem(tHTItem *ptritem)
+void htPrintTable(table_s *ptrht)
 {
-    if (ptritem)
-        printf("%s - %.2f\n", ptritem->key, ptritem->data);
-    else
-        printf("NULL\n");
-}
-
-/* tiskne celou tabulku */
-void htPrintTable(tHTable *ptrht)
-{
-    int maxlen = 0;
     int sumcnt = 0;
 
     printf("------------HASH TABLE--------------\n");
     for (int i = 0; i < HTSIZE; i++)
     {
         printf("%i:", i);
-        int cnt = 0;
-        tHTItem *ptr = (*ptrht)[i];
+        tHTItem *ptr = (ptrht->hash_table)[i];
         while (ptr != NULL)
-        {
-            printf(" (%s,%.2f)", ptr->key, ptr->data);
-            if (ptr != UNDEFPTR)
-                cnt++;
+        {   
+            printf("(");
+            htPrintItem(ptr);
             ptr = ptr->ptrnext;
+            sumcnt++;
+            printf(")");
         }
         printf("\n");
-
-        if (cnt > maxlen)
-            maxlen = cnt;
-        sumcnt += cnt;
     }
 
     printf("------------------------------------\n");
-    printf("Items count %i   The longest list %i\n", sumcnt, maxlen);
+    printf("Items count %i  \n", sumcnt);
     printf("------------------------------------\n");
 }
 #endif

@@ -6,41 +6,45 @@
 #include <stdbool.h>
 #include "../scaner.h"
 
+
 #define MAX_HTSIZE 40
+
+#define ERR -1
+#define NEW 0
+#define FOUND 1
 
 typedef char* tKey;
 
-typedef struct token_s tData;
-
 typedef struct tHTItem{
-	tKey key;				 /*< Key                              */
-	tData data;				 /*< Token                            */
+	tKey key;				 /*< Key - name of id                 */
+	token_t type;			 /*< Token type                       */
 	bool id_declared;        /*< Flag for declared identeficators */
 	struct tHTItem* ptrnext; /*< Pointer to next node             */
 } tHTItem;
 
-typedef tHTItem* tHTable[MAX_HTSIZE];
+typedef struct table{
+	tHTItem * hash_table[MAX_HTSIZE];
+	struct table *prev_hash_table;
+} table_s;
 
 extern int HTSIZE;
 
 int hashCode ( tKey key );
 
-void htInit ( tHTable* ptrht );
+void htInit(table_s *ptrht);
 
-tHTItem* htSearch ( tHTable* ptrht, tKey key );
+tHTItem *htSearch(table_s *ptrht, tKey key);
 
-void htInsert ( tHTable* ptrht, tKey key, tData data );
+int htInsert(table_s *ptrht, tKey key, token_t type);
 
-tData* htRead ( tHTable* ptrht, tKey key );
+bool find_key(table_s *ptrht, tKey key);
 
-void htDelete ( tHTable* ptrht, tKey key );
+void htDelete(table_s *ptrht, tKey key);
 
-void htClearAll ( tHTable* ptrht );
-
-void htPrintData(tData *ptrdata);
+void htClearAll(tHTItem *ptrht[MAX_HTSIZE]);
 
 void htPrintItem(tHTItem *ptritem);
 
-void htPrintTable(tHTable *ptrht);
+void htPrintTable(table_s *ptrht);
 
 #endif
