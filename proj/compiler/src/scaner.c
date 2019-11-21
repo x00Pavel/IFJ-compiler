@@ -5,374 +5,703 @@
 #include <stdbool.h>
 
 #include "errors.h"
+#include "dynamic_string.h"
 #include "scaner.h"
 
-#define DEF_STR_SIZE 8
 
-#define SCANNER_OK    0  // Read sucsessful 
-#define SCANNER_START 10 // Scaner begin to work 
-#define SCANER_STOP   11 // Scaner read one token 
+#define SCANNER_START 10  // Scanner begin to work
+#define SCANNER_STOP 11    // Scanner read one token
 #define SCANNER_STRING 12 // Begining of string
-#define SCANNER_EOL   13 // Reade end of line
-#define SCANNER_ID    14 // It is a identifire or keyword
+#define SCANNER_EOL 13    // Reade end of line
+#define SCANNER_ID 14     // It is a identifier or keyword
 #define SCANNER_INT_OR_FLOAT 15
 #define SCANNER_BLOCK_STRING_BEGIN 16
 #define SCANNER_BLOCK_STRING_START 17
 #define SCANNER_OUT_BLOCK_1 18
 #define SCANNER_OUT_BLOCK_2 19
-#define SCANNER_HEX_OR_FLOAT 20
-#define SCANER_FINISH 100 // Scaner readed last token 
+#define SCANNER_FLOAT 20
+#define SCANNER_EXP 21
+#define SCANNER_COMMENT 22
+#define SCANNER_INT 23 
+#define SCANNER_WHITE_SPACE 24
+#define SCANNER_LESS_GREATER 25
+#define SCANNER_ASSIGN 26
+#define SCANNER_NOT 27
+#define SCANNER_BRACKET 28
+#define SCANNER_EOF 100 // Scanner read last token
 
-void make_token(char *str, token_ptr ptr);
+/* Macros for freeing resources*/
+/*#define FREE_ALL(...)                                      \
+    do                                                     \
+    {                                                      \
+        unsigned int i = 0;                                \
+        void *pta[] = {__VA_ARGS__};                       \
+        for (i = 0; i < sizeof(pta) / sizeof(void *); i++) \
+        {                                                  \
+            free(pta[i]);                                  \
+        }                                                  \
+    } while (0)*/
 
-char *key_word_arr[] = {"def", "else", "if", "none", "pass", "return", "while"};
 
-void realloc_string(char *str){
-    size_t prev_size = strlen(str) * sizeof(char) ;
+/* Macros for log*/
+#define SLOG(msg) \
+    _log(stdout, __FILE__, __LINE__, msg);\
 
-    char *string = (char *) realloc( str, prev_size + DEF_STR_SIZE);    
-    (void) (string);
+inline void _log(FILE *fd, char *file, int line, char *msg){
+    fprintf(fd, "%s:%d %s\n", file, line, msg);
 }
 
-int scanner(FILE *file,token_ptr token){
-    
-    if (!file){
-        fprintf(stdout, "---------------------------------------\n\\
-                         There is no input file. Rerun with file\n\\
-                         ---------------------------------------\n");
-        return ERR_INTERNAL;
-    }
+typedef struct stack tStack;
 
-    int state = SCANNER_START;    
+// int get_token(FILE *file, struct token_s *token, tStack *stack)
+int get_token(struct token_s *token, tStack *stack)
+{
 
-    // string to wretting down attribute
-    char *str = (char *)malloc(DEF_STR_SIZE);
-    if (!str){
-        fprintf(stdout, "---------------------------\n\\
-                         Error in allocating memory!\n\\
-                         ---------------------------\n");
-        return ERR_INTERNAL;
-    }
+    // if (!file){
+    //     SLOG("There is no input file.Rerun with file");
+    // }
 
-    char c;
+    // string to writing down attribute
+    struct dynamic_string *str;
+    str_init(&str);
+       
+    int state = SCANNER_START;
+    static bool first_token = true;
+    static int double_quot = 0;
+    static int count_of_quot = 0;
+    int c; // for symbol
+    int space_cnt = 0;
+     
+    while (state != SCANNER_EOF)
+    {
+        c = getchar();
 
-    for(;;){
-        c = (char) getc(file);
-
-        switch (state)
-        {
+        switch (state){
         case SCANNER_START:
-            if((isalpha(c)) || (c == '_')){
-                /* countinue to read to any white space charectare
-                   then copy string to token atrribute
-                */
-               add_char_to_str(); // TODO
-               state = SCANNER_ID;
-               break;
-            }
-            else if (c == "\n"){
-                /* new line*/
-                state = SCANNER_EOL;
-            }
-            else if(c == "\'"){
-                state = SCANNER_STRING;
-            }       
-            else if (c == "\""){
-                state = SCANNER_BLOCK_STRING_BEGIN;
-            }     
-            else if (isdigit(c)){
-                if (c == "0"){
-                    state = SCANNER_HEX_OR_FLOAT;
-                }
-                else
-                {
-                    add_char_to_str(str, c);
-                    state = SCANNER_INT_OR_FLOAT;
-                }
-            }
-            else if(c == "{"){
-
-            }
-
-            break;
-        case SCANNER_BLOCK_STRING_BEGIN:
-            if (c == "\""){
-                state = SCANNER_BLOCK_STRING_START;
-            }
-            break;
-        case SCANNER_BLOCK_STRING_START:
-            if (c == "\""){
-                // process the string
-                while ((c = (char)getc(file)) !="\""){
-                    // add escape atd
-                    if (c != '#'){
-                        add_char_to_string(str, c);
-                    }
-                }
-                state = SCANNER_OUT_BLOCK_1;
-            }
-            else{
-                free(str);
-                return ERR_SYNTAX;
-            }
-            break;            
-        case SCANNER_OUT_BLOCK_1:
-            if (c == "\""){
-                state = SCANNER_OUT_BLOCK_2;
-            }
-            else{
-                free(str);
-                return ERR_SYNTAX;
-            }
-            break;
-        case SCANNER_OUT_BLOCK_2:
-            if(c == "\"")
-            {
-                strcpy(token->attribute.string, str);
-                free(str);
-                token->type = TOKEN_STRING;
-                return SCANNER_OK;
-            }
-            else
+            if (c == -1)
             {   
-                free(str);
-                return ERR_SYNTAX;
+                token->type = TOKEN_EOF;
+                if (stackTop(stack))
+                {
+                    token->type = TOKEN_DEDEND;
+                    stackPop(stack);
+                    str_clean(str);
+
+                    return OK;
+                }
+                str_clean(str);
+                return OK;
+            }
+            else if(c == ' '){
+                if(first_token){
+                    state = SCANNER_WHITE_SPACE;
+                    space_cnt++;
+                }
+                else{
+                    state = SCANNER_START;
+                }
+                break;
+            }
+            else if (first_token){
+                /* If it is a new line and previous was INDEND*/
+                if(c == '#'){
+                    state = SCANNER_COMMENT;
+                    break;    
+                }
+                if((stackTop(stack) != 0) && (c != '\n' && c != '\r')){
+                    ungetc(c, stdin);
+                    stackPop(stack);
+                    token->type = TOKEN_DEDEND;
+                    str_clean(str);
+                    return OK;
+                }
             }
 
-            
-        case SCANNER_STRING:
-            while ((c = (char) getc(file)) != '\''){
-                // add escape atd
-                if (c != '#'){
-                    add_char_to_string(str, c);
-                }
+            if (c == '#'){
+                state = SCANNER_COMMENT;
+                break;
             }
-            strcpy(token->attribute.string, str); 
-            token->type = TOKEN_STRING;
-            free(str);
-            return SCANNER_OK;
+            else if (isalpha(c)){
+                add_char_to_str(str, c);
+                state = SCANNER_ID;
+                first_token = false;
+                break;
+            }
+            else if (isdigit(c)){
+                state = SCANNER_INT_OR_FLOAT;
+                ungetc(c, stdin);
+                first_token = false;
+                break;
+            }
+            else if(c == ','){
+                token->type = TOKEN_COMA;
+                str_clean(str);
+                return OK;
+            }
+            else if((c == '\n') || (c == '\r') ){
+                if(!first_token){
+                    token->type = TOKEN_EOL;
+                    state = SCANNER_START;
+                    first_token = true;
+                    str_clean(str);
+                    return OK;
+                }
+                else{
+                    state = SCANNER_START;
+                }
+                break;
+            }
+            else if (c == '\''){
+                state = SCANNER_STRING;
+                break;
+            }
+            else if (c == '"'){
+                state = SCANNER_BLOCK_STRING_BEGIN;
+                ungetc(c, stdin);
+                break;
+            }
+            else if (c == '<' || c == '>'){
+                state = SCANNER_LESS_GREATER;
+                ungetc(c, stdin);
+                break;
+            }
+            else if (c == '='){
+                state = SCANNER_ASSIGN;
+                break;
+            }
+            else if (c == '+'){
+                token->type = TOKEN_SUM;
+                str_clean(str);
+                return OK;
+            }
+            else if (c == '-'){
+                token->type = TOKEN_MINUS;
+                str_clean(str);
+                return OK;
+            }
+            else if (c == '*') {
+                token->type = TOKEN_MULTIPLY;
+                str_clean(str);
+                return OK;
+            }
+            else if (c == '/'){
+                c = getchar();
+                if(c == '/'){
+                    token->type = TOKEN_DIV_INT;
+                }
+                else{
+                    ungetc(c, stdin);
+                    token->type = TOKEN_DIVISION;
+                }
+                str_clean(str);
+                return OK;
+            }
+            else if (c == ':'){
+                token->type = TOKEN_DDOT;
+                // first_token = true;
+                str_clean(str);
+                return OK;
+            }
+            else if (c == '!'){
+                state = SCANNER_NOT;
+                break;
+            }
+            else if (c == '(' || c == ')'){
+                state = SCANNER_BRACKET;
+                ungetc(c, stdin);
+                break;
+            }
+            break;
         case SCANNER_ID:
-            /* choose if it identifire or keyword */        
-                /* countinue to read to any white space charectare
-                   then copy string to token atrribute
-                */
-            if((isalpha(c)) || (c == "_") || (isdigit(c))){
-                add_char_to_string(str, c);
+            if(isalpha(c) || (c == '_') || (isdigit(c))){
+                if(!add_char_to_str(str, c)){
+                    return ERR_INTERNAL;
+                }
             }
             else{
-                ungetc(c, file);
-                check_kw_or_id(str, token);     
-                return SCANNER_OK;           
-            }
-        case SCANNER_HEX_OR_FLOAT:
-            if ((c == "x") || (c == "X")){
-                while ((c = (char) getc(file)) != ' '){
-                    if ((c > 47 && c < 58) || (c > 64 && c < 71) || (c > 96 && c < 103)){
-                        add_char_to_str(str, c);
-                    }
-                    else{
-                        free(str);
-                        return ERR_SYNTAX;
-                    }
+                ungetc(c, stdin);
+                if (strcmp(str->str, "while") == 0){
+                    token->type = TOKEN_KEY_WORD;
+                    token->attribute.key_word = _WHILE_;
                 }
-                strcpy(token->attribute.string, str);
-                token->type = TOKEN_HEX;
-                free(str);
-                return SCANNER_OK;
-            }
-            else if (c == "."){
-                add_char_to_str(str, "0.");
-                while ((c = (char)getc(file)) != ' ')
-                {
-                    if ((c > 47) && (c < 58)){
-                        add_char_to_str(str, c);
-                    }
-                    else
-                    {
-                        free(str);
-                        return ERR_SYNTAX;
-                    }
+                else if (strcmp(str->str, "def") == 0){
+                    token->type = TOKEN_KEY_WORD;
+                    token->attribute.key_word = _DEF_;
                 }
-                token->attribute.float_val = atof(str);
-                token->type = TOKEN_FLOAT;
-                free(str);
-                return SCANNER_OK;
-            }
-            else
-            {
-                free(str);
-                return ERR_SYNTAX;
+                else if (strcmp(str->str, "else") == 0){
+                    token->type = TOKEN_KEY_WORD;
+                    token->attribute.key_word = _ELSE_;
+                }
+                else if(strcmp(str->str, "none") == 0){
+                    token->type = TOKEN_NONE;
+                    // token->attribute.key_word = _NONE_;
+                }
+                else if(strcmp(str->str, "pass") == 0){
+                    token->type = TOKEN_KEY_WORD;
+                    token->attribute.key_word = _PASS_;
+                }
+                else if(strcmp(str->str, "return") == 0){
+                    token->type = TOKEN_KEY_WORD;
+                    token->attribute.key_word = _RETURN_;
+                }
+                else if(strcmp(str->str, "if") == 0){
+                    token->type = TOKEN_KEY_WORD;
+                    token->attribute.key_word = _IF_;
+                }
+                else if(strcmp(str->str, "print") == 0){
+                    token->type = TOKEN_PRINT;
+                }
+                else if(strcmp(str->str, "inputs") == 0){
+                    token->type = TOKEN_INPUT_S;
+                }
+                else if(strcmp(str->str, "inputi") == 0){
+                    token->type = TOKEN_INPUT_I;
+                }
+                else if(strcmp(str->str, "inputf") == 0){
+                    token->type = TOKEN_INPUT_F;
+                }
+                else if(strcmp(str->str, "ord") == 0){
+                    token->type = TOKEN_ORD;
+                }
+                else if(strcmp(str->str, "len") == 0){
+                    token->type = TOKEN_LEN;
+                }
+                else if(strcmp(str->str, "substr") == 0){
+                    token->type = TOKEN_SUBSTR;
+                }
+                else if(strcmp(str->str, "chr") == 0){
+                    token->type = TOKEN_CHR;
+                }
+                else{
+                    for(;;c = getchar()){ 
+                        if(c == ' '){
+                            continue;
+                        }
+                        else if(c == '('){
+                            token->type = TOKEN_FNC;
+                            break;
+                        }
+                        else{
+                            /* I dont know why, but if without this IF it 
+                            doesn't generate TOKEN_ASSIGN type*/ 
+                            if(c == '='){
+                                ungetc(c, stdin);
+                            }
+                            token->type = TOKEN_ID;
+                            break;
+                        }
+                    }
+                    token->attribute.string = (char *)malloc(str->size);
+                    strncpy(token->attribute.string, str->str, str->size);
+                }
+                
+                str_clean(str);
+                state = SCANNER_START;
+                return OK;
             }
             break;
         case SCANNER_INT_OR_FLOAT:
-            bool flt = false;
-            if(c == ' '){
-                strcpy(token->attribute.string, str);
-                free(str);
-                token->type = TOKEN_INT;
-                return SCANNER_OK;
-            }
-            do{
-                if ((c == '.') && (flt == false)){
-                    flt = true;
+            // if zero, then it can be only float number, or 0 as integer
+            if(c == '0'){
+                c = getchar();
+                if (c == '.'){
+                    add_char_to_str(str, '0');
+                    add_char_to_str(str, c);
+                    state = SCANNER_FLOAT;
                 }
-                else if (!(c > 47 && c < 58)){
-                    free(str);
-                    return ERR_SYNTAX;
-                } 
+                else if ((c == 'E') || (c == 'e')){
+                    add_char_to_str(str, '0');
+                    add_char_to_str(str, c);
+                    state = SCANNER_EXP;
+                }
+                else if (isdigit(c)){
+                    str_clean(str);
+                    SLOG("ERROR. In the begining of number cant be more then one");
+                }
+                else{
+                    if(isalpha(c)){
+                        SLOG("Wrong ID");
+                        return ERR_LEXER;
+                    }
+                    ungetc(c,stdin);
+                    add_char_to_str(str, '0');
+                    state = SCANNER_INT;
+                }
+            }            
+            else{
                 add_char_to_str(str, c);
-            } while ((c = (char)getc(file)) != ' ');
-            if(flt == false){
-                token->type = TOKEN_INT;
+                state = SCANNER_INT;
+            }
+            break;
+        case SCANNER_INT:
+            if(isdigit(c)){
+                add_char_to_str(str,c);
+            }
+            else if (c == '.'){
+                add_char_to_str(str, c);
+                state = SCANNER_FLOAT;
+            }
+            else if ((c == 'E') || (c == 'e')){
+                add_char_to_str(str,c);
+                state = SCANNER_EXP;
             }
             else{
-                token->type = TOKEN_FLOAT;
+                if(isalpha(c)){
+                    SLOG("Wrong indetificator");
+                    return ERR_LEXER; 
+                }
+                ungetc(c,stdin);
+                int num = atoi(str->str);
+                token->attribute.int_val = num;
+                token->type = TOKEN_INT;
+                str_clean(str);
+                return OK;
             }
-            strcpy(token->attribute.string, str);
-            free(str);
-            return SCANNER_OK;
             break;
-        
+        case SCANNER_FLOAT:
+            if (isdigit(c)){
+                add_char_to_str(str, c);
+            }
+            else if((c == 'e') || (c == 'E')){
+                add_char_to_str(str, c);
+                state = SCANNER_EXP;
+            }
+            else{
+                if(isalpha(c)){
+                    SLOG("Wrong indetificator");
+                    return ERR_LEXER; 
+                }
+
+                ungetc(c, stdin);
+                token->attribute.float_val = strtof(str->str, NULL);
+                token->type = TOKEN_FLOAT;
+                str_clean(str);
+                return OK;
+            }
+            break;
+        case SCANNER_EXP:
+            if((c == '-') || (c == '+')){
+                add_char_to_str(str, c);
+            }
+            else if(isdigit(c)){
+                add_char_to_str(str, c);
+            }
+            else{
+                if(isalpha(c)){
+                    SLOG("Wrong indetificator");
+                    return ERR_LEXER; 
+                }
+
+                ungetc(c, stdin);
+                token->attribute.float_val = strtof(str->str, NULL);
+                token->type = TOKEN_FLOAT;
+                str_clean(str);
+                return OK;
+            }
+            break;
+       
+        case SCANNER_WHITE_SPACE:
+            if(c == '\n' || c == '\r'){
+                space_cnt = 0;
+                state = SCANNER_START;
+            }
+            else if(c == ' '){
+                space_cnt++;
+                state = SCANNER_WHITE_SPACE;
+                break;
+            }
+            else if(c == '#'){
+                state = SCANNER_COMMENT;
+                break;
+            }
+            else{
+                ungetc(c,stdin);
+                // INDENT OR DEDEND
+                first_token = false;
+                if(space_cnt > stackTop(stack)){
+                    // INDEND
+                    stackPush(stack, space_cnt);
+                    token->type = TOKEN_INDEND;
+                    state = SCANNER_START;
+                    str_clean(str);
+                    return OK;
+                }
+                else if (space_cnt < stackTop(stack)){
+                    // DEDEND
+                    c = getchar();
+                    //  If it is a commnet line, so just skip it without DEDEND
+                    if(c == '#'){
+                        state = SCANNER_COMMENT;                                    
+                        break;
+                    }
+                    else{
+                        ungetc(c, stdin);
+                    }
+                    bool found =  false;
+                    while (stackTop(stack) != 0){
+                        stackPop(stack); 
+                        if(stackTop(stack) == space_cnt){
+                            // we found same level 
+                            token->type = TOKEN_DEDEND;
+                            state = SCANNER_START;
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found){
+                        // in case if there is no same offset
+                        str_clean(str);
+                        state = SCANNER_START;
+                        printf("Wrong offset\n");
+                        return ERR_LEXER;
+                    }
+                    else{
+                        state = SCANNER_START;
+                        str_clean(str);
+                        return OK;
+                    }
+                }                
+            }
+            state = SCANNER_START;
+            break;   
+        case SCANNER_STRING:
+            if (c == '\''){
+                token->type = TOKEN_STRING;
+                token->attribute.string = (char *)malloc(str->size);
+                strncpy(token->attribute.string, str->str, str->size);
+                str_clean(str);
+                state = SCANNER_START;
+                return OK;
+            }
+            else if (c == '\\'){
+                c = getchar();
+                // Hexadecimal value
+                if((c == 'x') || (c == 'X')){
+                    char tmp[4];
+                    tmp[0] = '0';
+                    tmp[1] = (char)c;
+                    for(int i = 2; i < 4; i++){
+                        c = getchar();
+                        if (isdigit(c) ||
+                            (c == 'A') ||
+                            (c == 'a') ||
+                            (c == 'B') ||
+                            (c == 'b') ||
+                            (c == 'C') ||
+                            (c == 'c') ||
+                            (c == 'D') ||
+                            (c == 'd') ||
+                            (c == 'E') ||
+                            (c == 'e') ||
+                            (c == 'F') ||
+                            (c == 'f'))
+                        {
+                            tmp[i] = (char)c;
+                        }
+                        else{
+                            SLOG("Hexadecimal value in string must be in format '\\xAB, where A and B are integer numbers");
+                            return ERR_LEXER;
+                        }
+                    }
+
+                    char hex;
+                    // Convert to hex value
+                    sscanf(tmp, "%hhx", &hex);
+                    add_char_to_str(str, hex);
+                }
+                else if (c == 'n' ){
+                    add_char_to_str(str, '\n');
+                }
+                else if (c == 't'){
+                    add_char_to_str(str, '\t');
+                }
+                else if (c == '\\'){
+                    add_char_to_str(str, '\\');
+                }
+                else if (c == '\''){
+                    add_char_to_str(str, '\\');
+                }
+                else if (c == '\"'){
+                    add_char_to_str(str, '\"');
+                }
+                else{
+                    add_char_to_str(str,'\\');
+                    add_char_to_str(str, c);
+                }
+            }
+            else if (c == '\n'){
+                str_clean(str);
+                str_clean(str);
+                SLOG("ERROR. String must be in one line!");
+                return ERR_LEXER;
+            }
+            else{
+                add_char_to_str(str, c);
+            }
+            break;
+        case SCANNER_BLOCK_STRING_BEGIN:
+            if (c == '"' && double_quot < 3 && count_of_quot < 2 ){
+                double_quot++;
+                if(double_quot == 3){
+                    count_of_quot++;
+                }
+            }
+            else if(c != '"' && (double_quot == 3 || double_quot == 0)){  
+                double_quot = 0;
+                if(count_of_quot < 2){
+                    if (c == '\\'){
+                        c = getchar();
+                        // Hexadecimal value
+                        if((c == 'x') || (c == 'X')){
+                            char tmp[4];
+                            tmp[0] = '0';
+                            tmp[1] = (char)c;
+                            for(int i = 2; i < 4; i++){
+                                c = getchar();
+                                if (isdigit(c) ||
+                                (c == 'A') ||
+                                (c == 'a') ||
+                                (c == 'B') ||
+                                (c == 'b') ||
+                                (c == 'C') ||
+                                (c == 'c') ||
+                                (c == 'D') ||
+                                (c == 'd') ||
+                                (c == 'E') ||
+                                (c == 'e') ||
+                                (c == 'F') ||
+                                (c == 'f'))
+                                {
+                                    tmp[i] = (char)c;
+                                }
+                                else{
+                                    SLOG("Hexadecimal value in string must be in format '\\xAB, where A and B are integer numbers");
+                                }
+                            }
+                            char hex;
+                            // Convert to hex value
+                            sscanf(tmp, "%hhx", &hex);
+                            add_char_to_str(str, hex);
+                        }
+                        else if (c == 'n' ){
+                            add_char_to_str(str, '\n');
+                        }
+                        else if (c == 't'){
+                            add_char_to_str(str, '\t');
+                        }
+                        else if (c == '\\'){
+                            add_char_to_str(str, '\\');
+                        }
+                        else if (c == '\''){
+                            add_char_to_str(str, '\\');
+                        }
+                        else if (c == '\"'){
+                            add_char_to_str(str, '\"');
+                        }
+                        else{
+                            add_char_to_str(str,'\\');
+                            add_char_to_str(str, c);
+                        }
+                    }
+                    else if (c == '\n' || c == '\r'){
+                        add_char_to_str(str, ' ');
+                    }
+                    else{
+                        add_char_to_str(str, c);
+                    }
+                }
+                else{
+                    count_of_quot = 0;
+                    ungetc(c,stdin);
+                    token->type = TOKEN_STRING;
+                    token->attribute.string = (char *)malloc(str->size);
+                    strncpy(token->attribute.string, str->str, str->size);
+                    str_clean(str);
+                    state = SCANNER_START;
+                    return OK;
+                }
+            }
+            else{
+                str_clean(str);
+                SLOG("ERROR. Block string must start from '\"\"\"' !");
+            }
+            break;
+        case SCANNER_COMMENT:
+            if (c == '\n'){
+                first_token = true;
+                state = SCANNER_START;
+                break;
+            }
+            break;
+        case SCANNER_LESS_GREATER:
+            if (c == '>'){
+                token->type = TOKEN_GREATER;
+            }
+            else{
+                token->type = TOKEN_LESS;
+            }
+            c = getchar();
+            if (c == '='){
+                token->type += 2; // look to scaner.h
+            }
+            else{
+                ungetc(c, stdin);
+            }
+            
+            str_clean(str);
+            state = SCANNER_START;
+            return OK;
+            break;
+        case SCANNER_ASSIGN:
+            if(c == '='){
+                token->type = TOKEN_EQUAL;
+            }
+            else{
+                ungetc(c,stdin);
+                token->type = TOKEN_ASSIGN;
+            }
+            str_clean(str);
+            state = SCANNER_START;
+            return OK; 
+            break;
+        case SCANNER_NOT:
+            if(c == '='){
+                token->type = TOKEN_NOT_EQUAL;
+                if(str->str != NULL){
+                    str_clean(str);
+                } 
+                else{
+                    str_clean(str);
+                }
+                state = SCANNER_START;
+                return OK; 
+            }
+            else{
+                str_clean(str);
+                SLOG("ERROR. After '!' can be only '=' !");
+            }
+            break;
+        case SCANNER_BRACKET:
+            if(c == '('){
+                token->type = TOKEN_L_BRACKET;
+            }
+            else if (c == ')'){
+                token->type = TOKEN_R_BRACKET;
+            }
+            
+            str_clean(str);
+
+            state = SCANNER_START;
+            return OK; 
+            break;
+        case SCANNER_EOF:
+            break;
         default:
+            state = SCANNER_START;
             break;
         }
     }
 
-    printf("TOKEN: %s\n", str);
-    free(str);
-    return SCANNER_OK;
-}
-
-void check_kw_or_id(char *str, token_ptr token){
-    if (strcmp(str, "define"))
-    {
-        token->attribute.key_word = _DEF_;
-        token->type = TOKEN_KEY_WORD;
-    }
-    if (strcmp(str, "else"))
-    {
-        token->attribute.key_word = _ELSE_;
-        token->type = TOKEN_KEY_WORD;
-    }
-    if (strcmp(str, "if"))
-    {
-        token->attribute.key_word = _IF_;
-        token->type = TOKEN_KEY_WORD;
-    }
-    if (strcmp(str, "none"))
-    {
-        token->attribute.key_word = _NONE_;
-        token->type = TOKEN_KEY_WORD;
-    }
-    else if (strcmp(str, "pass"))
-    {
-        token->attribute.key_word = _PASS_;
-        token->type = TOKEN_KEY_WORD;
-    }
-    else if (strcmp(str, "return"))
-    {
-        token->attribute.key_word = _RETURN_;
-        token->type = TOKEN_KEY_WORD;
-    }
-    else if (strcmp(str, "while"))
-    {
-        token->attribute.key_word = _WHILE_;
-        token->type = TOKEN_KEY_WORD;
-    }
-    else {
-        token->type = TOKEN_ID;
-        token->attribute.string = str;
-    }
-}
-
-void make_token(char *str, token_ptr ptr) {
-    //types of token
-    for (int i = 0; i < 22; i++)
-    {
-        if (strcmp(str, "+"))
-        {
-            ptr->type = TOKEN_SUM;
-        }
-        if (strcmp(str, "*"))
-        {
-            ptr->type = TOKEN_MULTIPLY;
-        }
-        if (strcmp(str, "/"))
-        {
-            ptr->type = TOKEN_DIVISION;
-        }
-        if (strcmp(str, "="))
-        {
-            ptr->type = TOKEN_ASSIGN;
-        }
-        if (strcmp(str, "=="))
-        {
-            ptr->type = TOKEN_EQUAL;
-        }
-        if (strcmp(str, "!="))
-        {
-            ptr->type = TOKEN_NOT_EQUAL;
-        }
-        if (strcmp(str, ">")){
-            ptr->type = TOKEN_GREATER;
-        }
-        if (strcmp(str, "<"))
-        {
-            ptr->type = TOKEN_LESS;
-        }
-        if (strcmp(str, ">="))
-        {
-            ptr->type = TOKEN_GREATER_EQ;
-        }
-        if (strcmp(str, "<="))
-        {
-            ptr->type = TOKEN_LESS_EQ;
-        }
-        if (strcmp(str, "\n"))
-        {
-            ptr->type = TOKEN_EOL;
-        }
-        if (strcmp(str, " "))
-        {
-            ptr->type = TOKEN_EMPTY;
-        }
-        if (strcmp(str, "("))
-        {
-            ptr->type = TOKEN_L_BRACKET;
-        }
-        if (strcmp(str, ")"))
-        {
-            ptr->type = TOKEN_R_BRACKET;
-        }
-        if (strcmp(str, "."))
-        {
-            ptr->type = TOKEN_DOT;
-        }
-        if (strcmp(str, ","))
-        {
-            ptr->type = TOKEN_COMA;
-        }
-        if (strcmp(str, ";"))
-        {
-            ptr->type = TOKEN_SEMICOLON;
-        }
-        // check if it is STRING
-        if ((str[0] == 0x24) ||
-            ((str[0] == 0x22) &&
-             (str[1] == 0x22) &&
-             (str[2] == 0x22))){
-                ptr->type = TOKEN_STRING;
-                // if string must end with \0 or \n or someting else?
-                ptr->attribute.string = str;
-        }
-        // check if it is INT or FLOAT
-        // if (&str){
-
-        // }
-        if (*str == EOF)
-        {
-            ptr->type = TOKEN_EOF;
-        }
-        //at , asi podarzi se nam tento kus kodu zoptimizovat
-    }
+    str_clean(str);
+    return -1;
 }
