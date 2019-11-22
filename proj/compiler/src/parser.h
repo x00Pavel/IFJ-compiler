@@ -12,6 +12,7 @@
 
 #include <stdio.h>
 #include "scaner.h"
+#include "symtable.h"
 
 /**
  * \brief
@@ -22,7 +23,7 @@
  * 
  * \return
 */
-int func_for_id(FILE *file, struct token_s *token, tStack *stack);
+int func_for_id(FILE *file, struct token_s *token, tStack *stack, table_s *hash_table);
 
 /**
  * \brief
@@ -33,7 +34,7 @@ int func_for_id(FILE *file, struct token_s *token, tStack *stack);
  * 
  * \return
 */
-int func_for_FNC(FILE *file, struct token_s *token, tStack *stack);
+int func_for_FNC(FILE *file, struct token_s *token, tStack *stack, table_s *hash_table, bool flag_def);
 
 /**
  * \brief
@@ -44,7 +45,7 @@ int func_for_FNC(FILE *file, struct token_s *token, tStack *stack);
  * 
  * \return
 */
-int func_for_atributes(FILE *file, struct token_s *token, tStack *stack);
+int func_for_atributes(FILE *file, struct token_s *token, tStack *stack, int *count_of_params, table_s *hash_table, bool flag_def);
 
 /**
  * \brief
@@ -55,6 +56,10 @@ int func_for_atributes(FILE *file, struct token_s *token, tStack *stack);
  * 
  * \return
 */
-int check_next_token(FILE *file, struct token_s *token, tStack *stack);
+int check_next_token(FILE *file, struct token_s *token, tStack *stack, int *count_of_params, table_s *hash_table, bool flag_def);
 
-#endif 
+int func_prog(FILE *file, struct token_s *token, tStack *stack, int state, int ret_code, table_s *hash_table);
+int func_cond_mb(FILE *file, struct token_s *token, tStack *stack, int count_of_brackets, table_s *hash_table);
+int func_mb_ret(FILE *file, struct token_s *token, tStack *stack, table_s *hash_table);
+
+#endif
