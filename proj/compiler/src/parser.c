@@ -1,3 +1,12 @@
+/**
+ * \file  ./parser.c
+ * \brief Implimetation of syntax and semantics analyzes
+ * 
+ * \author Korniienko Oleksii (xkorni02@stud.fit.vutbr.cz)
+ * 
+ * \date 2019
+*/
+
 #include <stdio.h>
 #include <assert.h>
 #include <string.h>
@@ -8,7 +17,7 @@
 #include "scaner.h"
 #include "parser.h"
 #include "codegenerator.h"
-#include "./stack/c202.h"
+#include "stack.h"
 
 int check_next_token(FILE *file, struct token_s *token, tStack *stack){
 
