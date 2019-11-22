@@ -1,4 +1,14 @@
+/**
+ * \file  ./codegenerator.c
+ * \brief Implimentation of target code generator \file ./codegenerator.c
+ * 
+ * \author 	Aghayev Raul (xaghay00@stud.fit.vutbr.cz)
+ * 
+ * \date 2019
+*/
+
 //#include "./dynamic_string/dynamic_string.h"
+
 #include "errors.h"
 #include "scaner.h"
 #include <stdio.h>
