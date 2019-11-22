@@ -1,13 +1,14 @@
 
-/* ******************************* c202.h *********************************** */
-/*  Předmět: Algoritmy (IAL) - FIT VUT v Brně                                 */
-/*  Úkol: c202 - Zásobník znaků v poli                                        */
-/*  Hlavičkový soubor pro c202.c                                              */
-/*  Vytvořil: Václav Topinka, září 2005                                       */
-/*  Úpravy: Kamil Jeřábek, září 2019                                         */
-/* ************************************************************************** */
-
-/* TENTO SOUBOR, PROSÍME, NEUPRAVUJTE! */
+/**
+ * \file ./stack.h
+ * \brief Header of stack \file ./stack.c
+ * 
+ * \author Yadlouski Pavel (xyadlo00@stud.fit.vutbr.cz)
+ * 
+ * \note Ispeared by solution from IAL course (du1)
+ * 
+ * \date 2019
+ */
 
 #ifndef _STACK_H_
 #define _STACK_H_

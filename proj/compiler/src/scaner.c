@@ -1,3 +1,12 @@
+/**
+ * \file ./scaner.c
+ * \brief Implementation lexical analyzes
+ * 
+ * \author Yadlouski Pavel (xyadlo00@stud.fit.vutbr.cz)
+ *  
+ * \date 2019
+ */
+
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>

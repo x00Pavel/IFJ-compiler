@@ -1,3 +1,14 @@
+/**
+ * \file ./symtable.h
+ * \brief Header of symbol table with hash table
+ * 
+ * \author Yadlouski Pavel (xyadlo00@stud.fit.vutbr.cz)
+ * 
+ * \note Ispeared by solution from IAL course (du2)
+ * 
+ * \date 2019
+ */
+
 #ifndef _HASHTABLE_H_
 #define _HASHTABLE_H_
 

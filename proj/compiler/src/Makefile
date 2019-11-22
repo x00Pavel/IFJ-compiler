@@ -1,3 +1,5 @@
+# author: Yadlouski Pavel
+
 PROJ=ifj2019
 SCANNER=scaner.c
 STRING=dynamic_string.c
