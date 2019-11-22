@@ -11,6 +11,36 @@
 #include "codegenerator.h"
 #include "./stack/c202.h"
 
+
+#define substr_function
+        "\n #Built-in function Substr\n"\
+        "LABEL $substr\n"
+        "PUSHFRAME\n"
+        "DEFVAR LF@retval\n"
+        "MOVE LF@%%retval string@\n"
+        "DEFVAR LF@length_str\n"
+        "CREATEFRAME\n"
+        "DEFVAR TF@%%0\n"
+        "MOVE TF@%%0 LF@%%0\n"
+        "CALL $length\n"
+        "MOVE LF@lenght_str TF@%%retval\n"
+        "DEFVAR LF@ret_cond\n"
+        "LT LF@ret_cond LF@length_str int@0\n"
+        "JUMPIFEQ $substr$return LF@ret_cond bool@true" 
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
 void define_variable_GF(struct token_s *token, char *s)//typ id // attriubute a// int 1
 {
     //printf("SRABOTAL DEFVAR %s \n", token->attribute.string);
