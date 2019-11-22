@@ -1,5 +1,5 @@
 /**
- * \file src/scanner/scanner.h
+ * \file src/scanner.h
  * \author Pavel Yadlouski (xyadlo00@stud.fit.vutbr.cz)
  * \brief Implementation of scanner
  * \date 2019
@@ -7,7 +7,7 @@
 #ifndef _SCANNER_H
 #define _SCANNER_H
 
-#include "./stack/c202.h"
+#include "stack.h"
 
 /**
  * \brief Enumeration of avaliable key words
@@ -113,5 +113,6 @@ typedef struct token* token_ptr;
  * \return #ERR_LEXER in case of lexical error 
 */
 int get_token(FILE *file, struct token_s *token, tStack *stack);
+// int get_token(struct token_s *token, tStack *stack);
 
 #endif //_SCANNER_H
