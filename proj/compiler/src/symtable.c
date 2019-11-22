@@ -1,5 +1,5 @@
-#include "c016.h"
 #include <ctype.h>
+#include "symtable.h"
 
 int HTSIZE = MAX_HTSIZE;
 

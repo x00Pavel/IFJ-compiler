@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
-#include "../scaner.h"
+#include "scaner.h"
 
 
 #define MAX_HTSIZE 40

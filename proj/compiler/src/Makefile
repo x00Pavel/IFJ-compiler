@@ -1,8 +1,8 @@
 PROJ=ifj2019
 SCANNER=scaner.c
 STRING=dynamic_string.c
-SCTACK=./stack/c202.c
-TABLE=./hash_table/c016.c
+SCTACK=stack.c
+TABLE=symtable.c
 CFLAGS= -Wconversion -Wunreachable-code -Wextra -Wall -O -g   
 
 
@@ -20,7 +20,7 @@ v3:
 	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes ./${PROJ} test3.txt
 
 t1: 
-	./${PROJ} test1.txt
+	./${PROJ} test1.txt 
 t2: 
 	./${PROJ} test2.txt
 t3: 
