@@ -1,3 +1,12 @@
+/**
+ * \file  ./codegenerator.h
+ * \brief Header file for target code generator \file ./codegenerator.c
+ * 
+ * \author 	Aghayev Raul (xaghay00@stud.fit.vutbr.cz)
+ * 
+ * \date 2019
+*/
+
 #ifndef _CODEGENERATOR_H
 #define _CODEGENERATOR_H
 
