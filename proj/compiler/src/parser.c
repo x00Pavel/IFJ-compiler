@@ -1,3 +1,12 @@
+/**
+ * \file  ./parser.c
+ * \brief Implimetation of syntax and semantics analyzes
+ * 
+ * \author Korniienko Oleksii (xkorni02@stud.fit.vutbr.cz)
+ * 
+ * \date 2019
+*/
+
 #include <stdio.h>
 #include <assert.h>
 #include <string.h>
