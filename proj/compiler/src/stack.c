@@ -1,3 +1,14 @@
+/**
+ * \file ./stack.c
+ * \brief Implementation of stack 
+ * 
+ * \author Yadlouski Pavel (xyadlo00@stud.fit.vutbr.cz)
+ * 
+ * \note Ispeared by solution from IAL course (du1)
+ * 
+ * \date 2019
+ */
+
 #include "stack.h"
 
 int STACK_SIZE = MAX_STACK;

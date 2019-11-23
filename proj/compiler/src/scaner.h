@@ -1,7 +1,7 @@
 /**
  * \file src/scanner.h
  * \author Pavel Yadlouski (xyadlo00@stud.fit.vutbr.cz)
- * \brief Implementation of scanner
+ * \brief Header of scanner \file ./scaner.c
  * \date 2019
 */
 #ifndef _SCANNER_H
