@@ -305,13 +305,15 @@ void generate_while_head(struct token_s *token, char *s){
         case//TOKEN true ci false
             TOKEN_INT:
             TOKEN_FLOAT:
-            fprintf("")
+            //fprintf("");
             break;
         case TOKEN_EQUAL:
-            fprintf("JUMPIFEQ %s\n", token->attribute.string);
-            fprintf("LABEL to")//a == b
+            fprintf(stdout,"JUMPIFEQ %s\n", token->attribute.string);
+            fprintf(stdout,"LABEL to");//a == b
+            break;
         case TOKEN_NOT_EQUAL:
-            fprintf("JUMPIFNEQ %s\n", token->attribute.string);
+            fprintf(stdout,"JUMPIFNEQ %s\n", token->attribute.string);
+            break;
 
     
     default:
@@ -322,8 +324,8 @@ void generate_while_head(struct token_s *token, char *s){
 
 void generate_while_end(struct token_s *token){
 
-    fprintf("JUMP WHILE\n");
-    fprintf("LABEL %s\n", token->attribute.string);
+    fprintf(stdout,"JUMP WHILE\n");
+    fprintf(stdout,"LABEL %s\n", token->attribute.string);
 }
 
 
@@ -331,10 +333,10 @@ void generate_while_end(struct token_s *token){
 
 void generate_if_head()
 {
-    fprintf("#Endif\n");
+    fprintf(stdout,"#Endif\n");
 }
 
 void generate_if_start(){
     fprintf(stdout, "JUMPIFEQ $");
-    fprintf("DEFVAR %sres")
+    fprintf(stdout,"DEFVAR %sres");
 }
