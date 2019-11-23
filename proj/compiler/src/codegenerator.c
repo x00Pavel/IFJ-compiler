@@ -19,7 +19,7 @@
 
 #include "parser.h"
 #include "codegenerator.h"
-#include "./stack/c202.h"
+#include "./stack.h"
 
 
 #define FUNCTION_LENGTH														\
@@ -126,7 +126,9 @@
 //generate main function
 void generate_main()
 {
-    fprintf(stdout, "LABEL $%main\n"); 
+    fprintf(stdout, "LABEL $%%main\n"); 
+    fprintf(stdout,".IFJcode19\n    ");
+    fprintf(stdout,"JUMP $$main\n");
 }
 
 //Define variables in all scopes
@@ -139,14 +141,14 @@ void assign_to_variable(struct token_s *token,struct token_s *token_a, char *s)
       switch (token->type)
     {  
         case TOKEN_INT:
-            fprintf(stdout, "MOVE %s@%%s int@%d\n",s,token->attrubite.string, token_a->attribute.int_val); 
+            fprintf(stdout, "MOVE %s@%%s int@%d\n",s,token->attribute.string, token_a->attribute.int_val); 
             break;
         case TOKEN_FLOAT:
-            fprintf(stdout, "MOVE %s@%%s float@%f\n",s,token->attrubite.string, token_a->attribute.float_val); 
+            fprintf(stdout, "MOVE %s@%%s float@%f\n",s,token->attribute.string, token_a->attribute.float_val); 
             break;
         case TOKEN_STRING:
         case TOKEN_ID:
-            fprintf(stdout, "MOVE %s@%%s string@%s\n",s,token->attrubite.string, token_a->attribute.string);
+            fprintf(stdout, "MOVE %s@%%s string@%s\n",s,token->attribute.string, token_a->attribute.string);
             break;
         default:
             break;  
@@ -156,7 +158,7 @@ void assign_to_variable(struct token_s *token,struct token_s *token_a, char *s)
 void token_return(struct token_s *token, char *s)
 {
     //MOVE LF@%retval float@0x0p+0
-    fprintf("MOVE LF@%%retval ");
+    fprintf(stdout,"MOVE LF@%%retval\n");
     //fprintf("%s", returnvalue);
     switch (token->type)
     {
@@ -295,7 +297,7 @@ void generate_while_head(struct token_s *token, char *s){
     switch (token->type)
     {
         case TOKEN_GREATER_EQ:
-
+            fprintf("JUMPIFEQ %s\n", token->attribute.string);            
             break;
         case TOKEN_GREATER:
 
@@ -333,5 +335,6 @@ void generate_if_head()
 }
 
 void generate_if_start(){
-
+    fprintf(stdout, "JUMPIFEQ $");
+    fprintf("DEFVAR %sres")
 }
