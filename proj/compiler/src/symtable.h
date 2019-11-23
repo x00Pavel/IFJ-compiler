@@ -29,6 +29,7 @@ typedef char* tKey;
 typedef struct tHTItem{
 	tKey key;				 /*< Key - name of id                 */
 	token_t type;			 /*< Token type                       */
+	int param_count;         /*< Count of paramters for functions */
 	bool id_declared;        /*< Flag for declared identeficators */
 	struct tHTItem* ptrnext; /*< Pointer to next node             */
 } tHTItem;
@@ -52,7 +53,7 @@ bool find_key(table_s *ptrht, tKey key);
 
 void htDelete(table_s *ptrht, tKey key);
 
-void htClearAll(tHTItem *ptrht[MAX_HTSIZE]);
+void htClearAll(table_s *hash_table);
 
 void htPrintItem(tHTItem *ptritem);
 
