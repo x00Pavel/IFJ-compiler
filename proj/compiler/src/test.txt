@@ -1,1 +1,1 @@
-a = my_func(10, 'Raul', b)
+a = b + 3

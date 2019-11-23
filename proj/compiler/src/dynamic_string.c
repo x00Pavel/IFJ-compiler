@@ -1,3 +1,14 @@
+/**
+ * \file ./dynamic_string.c
+ * \brief Implimentation of symbol table using hash table 
+ * 
+ * \author Yadlouski Pavel (xyadlo00@stud.fit.vutbr.cz)
+ * 
+ * \note Ispeared by solution from IAL course (du2)
+ * 
+ * \date 2019
+ */
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>

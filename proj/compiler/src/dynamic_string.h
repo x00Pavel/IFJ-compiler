@@ -1,3 +1,14 @@
+/**
+ * \file ./dynamic_string.h
+ * \brief Header of symbol table using hash table 
+ * 
+ * \author Yadlouski Pavel (xyadlo00@stud.fit.vutbr.cz)
+ * 
+ * \note Ispeared by solution from IAL course (du2)
+ * 
+ * \date 2019
+ */
+
 #include <stdbool.h>
 
 #ifndef _DYNAMIC_STRING_H

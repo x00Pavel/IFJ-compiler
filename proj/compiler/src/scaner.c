@@ -43,17 +43,11 @@
     } while (0)*/
 
 
-/* Macros for log*/
-#define SLOG(msg) \
-    _log(stdout, __FILE__, __LINE__, msg);\
-
-inline void _log(FILE *fd, char *file, int line, char *msg){
-    fprintf(fd, "%s:%d %s\n", file, line, msg);
-}
 
 typedef struct stack tStack;
 
 int get_token(FILE *file, struct token_s *token, tStack *stack)
+// int get_token(struct token_s *token, tStack *stack)
 {
 
     if (!file){
@@ -74,22 +68,21 @@ int get_token(FILE *file, struct token_s *token, tStack *stack)
     while (state != SCANNER_EOF)
     {
         c = getc(file);
-        // printf("%c\n", c);
 
         switch (state){
         case SCANNER_START:
-            if (feof(file))
-            {
+            if (c == -1)
+            {   
                 token->type = TOKEN_EOF;
                 if (stackTop(stack))
                 {
                     token->type = TOKEN_DEDEND;
                     stackPop(stack);
                     str_clean(str);
+
                     return OK;
                 }
                 str_clean(str);
-                state = SCANNER_EOF;
                 return OK;
             }
             else if(c == ' '){
@@ -320,8 +313,8 @@ int get_token(FILE *file, struct token_s *token, tStack *stack)
                 }
                 else{
                     if(isalpha(c)){
-                        SLOG("Wrong indetificator");
-                        // return 
+                        SLOG("Wrong ID");
+                        return ERR_LEXER;
                     }
                     ungetc(c,file);
                     add_char_to_str(str, '0');
@@ -533,6 +526,7 @@ int get_token(FILE *file, struct token_s *token, tStack *stack)
                 str_clean(str);
                 str_clean(str);
                 SLOG("ERROR. String must be in one line!");
+                return ERR_LEXER;
             }
             else{
                 add_char_to_str(str, c);

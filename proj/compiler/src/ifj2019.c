@@ -7,8 +7,10 @@
 #include "errors.h"
 #include "scaner.h"
 #include "parser.h"
-#include "./stack/c202.h"
-#include "./hash_table/c016.h"
+#include "stack.h"
+#include "symtable.h"
+#include "codegenerator.h"
+#include "dynamic_string.h"
 
 // #ifdef DEBUG
 // char *types[] = {
@@ -96,8 +98,12 @@ int main(int arc, char **argv){
     int state = 999;
     int ret_code = 0;
 
-    func_prog(file, token, stack, state, ret_code, hash_table);
-    
+    struct dynamic_string *str;
+    str_init(&str);
+    // generate_main();
+    // generate_inserted_functions();
+    func_prog(file, token, stack, state, ret_code, hash_table, str);
+    str_clean(str);
     htClearAll(hash_table);
     free(hash_table);
     free(stack);

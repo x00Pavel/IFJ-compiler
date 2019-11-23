@@ -1,5 +1,17 @@
-#include "c016.h"
+
+/**
+ * \file ./symtable.c
+ * \brief Implementation of symbol table with hash table
+ * 
+ * \author Yadlouski Pavel (xyadlo00@stud.fit.vutbr.cz)
+ * 
+ * \note Ispeared by solution from IAL course (du2)
+ * 
+ * \date 2019
+ */
+
 #include <ctype.h>
+#include "symtable.h"
 
 int HTSIZE = MAX_HTSIZE;
 
@@ -71,6 +83,7 @@ void htInit (table_s *ptrht) {
         ptrht->hash_table[i] = NULL;
     }
     ptrht->prev_hash_table = NULL;
+
 }
 
 tHTItem* htSearch (table_s *ptrht, tKey key ) {
@@ -89,15 +102,18 @@ tHTItem* htSearch (table_s *ptrht, tKey key ) {
 
 }
 
-bool search_everywhere(table_s *ptrht, tKey key){
+tHTItem* search_everywhere(table_s *ptrht, tKey key){
+
+    tHTItem *item;
 
     while (ptrht != NULL){
-        if(htSearch(ptrht,key)){
-            return true;
+        item = htSearch(ptrht, key);
+        if(item){
+            return item;
         }
         ptrht = ptrht->prev_hash_table;
     }
-    return false;
+    return NULL;
 }
 
 int htInsert(table_s *ptrht, tKey key, token_t type)
@@ -166,14 +182,14 @@ void htDelete ( table_s* ptrht, tKey key ) {
     }
 }
 
-void htClearAll(tHTItem *ptrht[MAX_HTSIZE])
+void htClearAll(table_s *hash_table)
 {
 
     tHTItem *item, *delete_item;
 
     // go through every index in table 
     for (int i = 0; i < HTSIZE; i++){
-        item = ptrht[i];
+        item = hash_table->hash_table[i];
         // go through every item in linked list
         while(item){
             delete_item = item;
@@ -181,7 +197,7 @@ void htClearAll(tHTItem *ptrht[MAX_HTSIZE])
             free(delete_item->key);
             free(delete_item);
         }
-        ptrht[i] = NULL;
+        hash_table->hash_table[i] = NULL;
     }
 }
 
