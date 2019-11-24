@@ -41,10 +41,12 @@ void select_operator(struct token_s *token);
 void generate_if_start(struct token_s *token, char *s);
 void change_int_and_float(struct token_s *token, struct token_s *token_a);
 void stack_operation(struct token_s *token);
-void dedend_of_if(int *is_else);
+void end_of_if(int *t);
+void end_of_else(int *t);
 void found_else(int *t);
 void returnvalue1(struct token_s *token_right_side, char *s);
 void returnvalue(struct token_s *token_left_side, char *s);
 void generate_while_end(int *t);
 void call_inserted_functions(char *d);
+void create_functions();
 #endif 

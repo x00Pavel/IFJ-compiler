@@ -78,7 +78,7 @@ void create_functions(){
 	fprintf(stdout,"DEFVAR LF@char\n");
 	fprintf(stdout,"DEFVAR LF@process_loop_cond\n");
 	fprintf(stdout,"LABEL $substr$process_loop\n");
-	fprintf(stdout,"GETCHAR LF@char LF@%0 LF@index\n");									
+	fprintf(stdout,"GETCHAR LF@char LF@%%0 LF@index\n");									
 	fprintf(stdout,"CONCAT LF@%%retval LF@%%retval LF@char\n");							
 	fprintf(stdout,"ADD LF@index LF@index int@1\n");										
 	fprintf(stdout,"SUB LF@%%2 LF@%%2 int@1\n");											
@@ -99,13 +99,13 @@ void create_functions(){
 	fprintf(stdout,"DEFVAR LF@length_str\n");												
 	fprintf(stdout,"CREATEFRAME\n");														    
 	fprintf(stdout,"DEFVAR TF@%%0\n");														
-	fprintf(stdout,"MOVE TF@%0 LF@%%0\n");													
+	fprintf(stdout,"MOVE TF@%%0 LF@%%0\n");													
 	fprintf(stdout,"CALL $len\n");														
 	fprintf(stdout,"MOVE LF@length_str TF@%%retval\n");										
 	fprintf(stdout,"GT LF@cond_length LF@%%1 LF@length_str\n");						
 	fprintf(stdout,"JUMPIFEQ $asc$return LF@cond_length bool@true\n");
 	fprintf(stdout,"SUB LF@%%1 LF@%%1 int@1\n");									
-	fprintf(stdout,"STRI2INT LF@%%retval LF@%0 LF@%%1\n");
+	fprintf(stdout,"STRI2INT LF@%%retval LF@%%0 LF@%%1\n");
 	fprintf(stdout,"LABEL $asc$return\n");
 	fprintf(stdout,"POPFRAME\n");														
 	fprintf(stdout,"RETURN\n\n");
@@ -116,9 +116,9 @@ void create_functions(){
 	fprintf(stdout,"DEFVAR LF@%%retval\n");													
 	fprintf(stdout,"MOVE LF@%%retval string@\n");											
 	fprintf(stdout,"DEFVAR LF@cond_range\n");									
-	fprintf(stdout,"LT LF@cond_range LF@%0 int@0\n");					
+	fprintf(stdout,"LT LF@cond_range LF@%%0 int@0\n");					
 	fprintf(stdout,"JUMPIFEQ $chr$return LF@cond_range bool@true\n");
-	fprintf(stdout,"GT LF@cond_range LF@%0 int@255\n");						
+	fprintf(stdout,"GT LF@cond_range LF@%%0 int@255\n");						
 	fprintf(stdout,"JUMPIFEQ $chr$return LF@cond_range bool@true\n");
 	fprintf(stdout,"INT2CHAR LF@%%retval LF@%%0\n");											
 	fprintf(stdout,"LABEL $chr$return\n");													
@@ -161,12 +161,12 @@ void end_main(){
         //DEFVAR LF@param1
         //MOVE LF@param1  LF@%
         fprintf(stdout, "DEFVAR %s@%s%d\n",s,token->attribute.string, *counter);
-        fprintf(stdout, "MOVE %s@%s%d %s@%%d\n",s,token->attribute.string , *counter); 
+        fprintf(stdout, "MOVE %s@%s%d %s@%%%d\n",s,token->attribute.string,*counter ,s ,*counter); 
     }
 
     void def_function_end(){
         fprintf(stdout, "POPFRAME\n");
-        fprontf(stdout, "RETURN\n");
+        fprintf(stdout, "RETURN\n");
     }
 /*
  *
@@ -192,6 +192,7 @@ void assign_to_variable(struct token_s *token,struct token_s *token_a, char *s)
             break;
         case TOKEN_STRING:
             fprintf(stdout, "MOVE %s@%%%s %s@%s\n",s,token->attribute.string, s, token_a->attribute.string);
+            break;
         case TOKEN_ID:
             fprintf(stdout, "MOVE %s@%%%s string@%s\n",s,token->attribute.string, token_a->attribute.string);
             break;
@@ -212,10 +213,6 @@ void assign_to_variable(struct token_s *token,struct token_s *token_a, char *s)
 // 	}
 // }
 
-void call_function(struct token_s *token)
-{   
-    fprintf(stdout,"CALL $%s", token->attribute.string);
-}
 
 
 
@@ -227,18 +224,18 @@ void assign_to_y(struct token_s *token, char *s){
 void token_return(struct token_s *token, char *s)
 {
     //MOVE LF@%retval float@0x0p+0
-    fprintf(stdout,"MOVE LF@%%retval\n");
+    fprintf(stdout,"MOVE %s@%%retval\n",s);
     //fprintf("%s", returnvalue);
     switch (token->type)
     {
         case TOKEN_INT:
-            fprintf(stdout, "int@%d\n",s, token->attribute.int_val);
+            fprintf(stdout, "int@%d\n", token->attribute.int_val);
             break;
         case TOKEN_FLOAT:
-            fprintf(stdout, "float@%f\n",s, token->attribute.float_val);
+            fprintf(stdout, "float@%f\n", token->attribute.float_val);
             break;
         case TOKEN_STRING:
-            fprintf(stdout, "string@%s\n",s, token->attribute.string);
+            fprintf(stdout, "string@%s\n", token->attribute.string);
             break;
         case TOKEN_ID:
 
@@ -274,10 +271,12 @@ void function_call(struct token_s *token,int *counter, char *s){
         case TOKEN_STRING:
                 fprintf(stdout, "DEFVAR %s@%d\n",s, *counter);
                 fprintf(stdout, "MOVE %s@%d string@%s\n",s,*counter, token->attribute.string);
+            break;
         case TOKEN_ID:
                 fprintf(stdout, "DEFVAR %s@%d\n",s, *counter);
                 fprintf(stdout, "MOVE %s@%d %s@%s\n",s,*counter,s, token->attribute.string);
             break;
+            
 
         default:
             break;  
@@ -336,28 +335,28 @@ void generate_while_head(struct token_s *token, char *s){
     fprintf(stdout,"DEFVAR %s@returnvalueforwhile\n",s);//
     switch (token->type)
     {
-    case TOKEN_FLOAT :
-        fprintf(stdout,"MOVE %s@returnvalue float@%f\n",s, token->attribute.float_val);
-        break;
-    case TOKEN_INT :
-        fprintf(stdout,"MOVE %s@returnvalue int@%d\n",s, token->attribute.int_val);
-        break;
-    case TOKEN_STRING:
-        fprintf("MOVE %s@returnvalue string@%s\n",s, token->attribute.string);
-        break;
-    case TOKEN_ID:
-        fprintf("MOVE %s@returnvalue %s@%s\n",s, s,token->attribute.string);
-        break;
-    
-    default:
-        break;
+        case TOKEN_FLOAT :
+            fprintf(stdout,"MOVE %s@returnvalue float@%f\n",s, token->attribute.float_val);
+            break;
+        case TOKEN_INT :
+            fprintf(stdout,"MOVE %s@returnvalue int@%d\n",s, token->attribute.int_val);
+            break;
+        case TOKEN_STRING:
+            fprintf(stdout,"MOVE %s@returnvalue string@%s\n",s, token->attribute.string);
+            break;
+        case TOKEN_ID:
+            fprintf(stdout,"MOVE %s@returnvalue %s@%s\n",s, s,token->attribute.string);
+            break;
+        
+        default:
+            break;
     }
 
 }
 void generate_while_end(int *t){
     
-    fprintf(stdout,"JUMP while%d\n", t);
-    fprintf(stdout,"LABEL $EXIT%d\n", t);
+    fprintf(stdout,"JUMP while%d\n", *t);
+    fprintf(stdout,"LABEL $EXIT%d\n", *t);
 }
 
 
@@ -396,24 +395,24 @@ void select_operator(struct token_s *token){
 }
 void if_body(int *t){
     
-    fprintf(stdout,"LF@res LF@valueforcounting%d LF@valueforcounting1%d",t,t);
-    fprintf(stdout,"JUMPIFNEQ $B0DY-EL%d LF@res boot@true",t);
+    fprintf(stdout,"LF@res LF@valueforcounting%d LF@valueforcounting1%d",*t,*t);
+    fprintf(stdout,"JUMPIFNEQ $B0DY-EL%d LF@res boot@true", *t);
 }
-void found_else(int *t){
-    fprintf(stdout, "JUMP $EXIT%d\n",t);
-    fprintf(stdout, "LABEL B0DY-EL%d\n",t);
+void found_else(int *t){    
+    fprintf(stdout, "JUMP $EXIT%d\n", *t);
+    fprintf(stdout, "LABEL B0DY-EL%d\n", *t);
 }
 void end_of_if(int *t){
-    fprintf(stdout,"BODY_EL%d\n",t);
+    fprintf(stdout,"BODY_EL%d\n", *t);
 }    
 void end_of_else(int *t){
-    fprintf(stdout,"LABEL EXIT%d\n",t);  
+    fprintf(stdout,"LABEL EXIT%d\n", *t);  
 }
 void stack_operations(){
     fprintf(stdout, "DEFVAR GT@valueforcounting\n");
     fprintf(stdout, "MOVE GT@valueforcounting\n int@0");
 }
-void stack_func_sum(struct token_s *token_one, char *s, int *count){
+void stack_func_sum(struct token_s *token_one, char *s){
 
     if(token_one->type == TOKEN_FLOAT)
     {
@@ -440,7 +439,7 @@ void stack_func_sum(struct token_s *token_one, char *s, int *count){
         fprintf(stdout, "ADDS GF@valueforcouning string@%s",token_one->attribute.string);
     }    
 }
-void stack_func_mul(struct token_s *token_one, char *s, int *count){
+void stack_func_mul(struct token_s *token_one, char *s){
         if(token_one->type == TOKEN_FLOAT)
     {
         //fprintf(stdout, "DEFVAR %s@%%%d", s , *count);
@@ -466,7 +465,7 @@ void stack_func_mul(struct token_s *token_one, char *s, int *count){
         fprintf(stdout, "MULS GF@valueforcouning string@%s",token_one->attribute.string);
     }    
 }
-void stack_func_sub(struct token_s *token_one, char *s, int *count){
+void stack_func_sub(struct token_s *token_one, char *s){
         if(token_one->type == TOKEN_FLOAT)
     {
         //fprintf(stdout, "DEFVAR %s@%%%d", s , *count);
@@ -492,7 +491,7 @@ void stack_func_sub(struct token_s *token_one, char *s, int *count){
         fprintf(stdout, "SUBS GF@valueforcouning string@%s",token_one->attribute.string);
     }    
 }
-void stack_func_div(struct token_s *token_one, char *s, int *count){
+void stack_func_div(struct token_s *token_one, char *s){
         if(token_one->type == TOKEN_FLOAT)
     {
         //fprintf(stdout, "DEFVAR %s@%%%d", s , *count);
@@ -518,7 +517,7 @@ void stack_func_div(struct token_s *token_one, char *s, int *count){
         fprintf(stdout, "DIVS GF@valueforcouning string@%s",token_one->attribute.string);
     }    
 }
-void stack_func_int_div(struct token_s *token_one, char *s, int *count){
+void stack_func_int_div(struct token_s *token_one){
 		
     if(token_one->type == TOKEN_INT)
     { 
