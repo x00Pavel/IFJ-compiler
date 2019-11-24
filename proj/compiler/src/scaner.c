@@ -71,7 +71,7 @@ int get_token(FILE *file, struct token_s *token, tStack *stack)
     static bool first_token = true;
     static int double_quot = 0;
     static int count_of_quot = 0;
-    static bool tmp = false;
+    // static bool tmp = true;
     int c;
     static int prev_sym;
     int space_cnt = 0;
@@ -79,14 +79,16 @@ int get_token(FILE *file, struct token_s *token, tStack *stack)
     while (state != SCANNER_EOF)
     {
         c = getc(file);
-        if(c == -1 && prev_sym != '\n' && !tmp){
-            ungetc(c, file);
-            tmp = true;
+        if(c == -1 && prev_sym != '\n' && state == SCANNER_START){
             token->type = TOKEN_EOL;
             str_clean(str);
-            return OK;
+            prev_sym = '\n';
+            ungetc(c, file);
+            return OK;            
         }
-        prev_sym = c;
+        else{
+            prev_sym = c;
+        }
 
         switch (state){
         case SCANNER_START:
@@ -96,7 +98,6 @@ int get_token(FILE *file, struct token_s *token, tStack *stack)
                     token->type = TOKEN_DEDEND;
                     stackPop(stack);
                     str_clean(str);
-
                     return OK;
                 }
                 str_clean(str);
@@ -137,7 +138,6 @@ int get_token(FILE *file, struct token_s *token, tStack *stack)
                     return OK;
                 }
             }
-
             if (c == '#'){
                 state = SCANNER_COMMENT;
                 break;
@@ -255,7 +255,6 @@ int get_token(FILE *file, struct token_s *token, tStack *stack)
                 }
                 else if(strcmp(str->str, "none") == 0){
                     token->type = TOKEN_NONE;
-                    // token->attribute.key_word = _NONE_;
                 }
                 else if(strcmp(str->str, "pass") == 0){
                     token->type = TOKEN_KEY_WORD;
@@ -294,24 +293,23 @@ int get_token(FILE *file, struct token_s *token, tStack *stack)
                     token->type = TOKEN_CHR;
                 }
                 else{
-                    for(;;c = getc(file)){ 
+                    for (c = getc(file);; c = getc(file)){
                         if(c == ' '){
                             continue;
                         }
                         else if(c == '('){
                             token->type = TOKEN_FNC;
+                            ungetc(c, file);
                             break;
                         }
                         else{
                             /* I dont know why, but if without this IF it 
-                            doesn't generate TOKEN_ASSIGN type*/ 
-                            if(c == '='){
-                                ungetc(c, file);
-                            }
-                            token->type = TOKEN_ID;
+                            doesn't generate TOKEN_ASSIGN type */ 
+                            ungetc(c, file);
                             break;
                         }
                     }
+                    token->type = TOKEN_ID;
                     token->attribute.string = (char *)malloc(str->size);
                     strncpy(token->attribute.string, str->str, str->size);
                 }
@@ -708,6 +706,7 @@ int get_token(FILE *file, struct token_s *token, tStack *stack)
             }
             break;
         case SCANNER_BRACKET:
+            printf("HERE\n");
             if(c == '('){
                 token->type = TOKEN_L_BRACKET;
             }
@@ -720,6 +719,10 @@ int get_token(FILE *file, struct token_s *token, tStack *stack)
             state = SCANNER_START;
             return OK; 
             break;
+        case SCANNER_EOL:
+            token->type = TOKEN_EOL;
+            str_clean(str);
+            return OK;
         case SCANNER_EOF:
             break;
         default:
