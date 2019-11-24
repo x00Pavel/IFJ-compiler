@@ -52,13 +52,6 @@
     } while (0)*/
 
 
-/* Macros for log*/
-#define SLOG(msg) \
-    _log(stdout, __FILE__, __LINE__, msg);\
-
-inline void _log(FILE *fd, char *file, int line, char *msg){
-    fprintf(fd, "%s:%d %s\n", file, line, msg);
-}
 
 typedef struct stack tStack;
 
@@ -78,20 +71,28 @@ int get_token(FILE *file, struct token_s *token, tStack *stack)
     static bool first_token = true;
     static int double_quot = 0;
     static int count_of_quot = 0;
-    int c; // for symbol
+    static bool tmp = false;
+    int c;
+    static int prev_sym;
     int space_cnt = 0;
      
     while (state != SCANNER_EOF)
     {
         c = getc(file);
+        if(c == -1 && prev_sym != '\n' && !tmp){
+            ungetc(c, file);
+            tmp = true;
+            token->type = TOKEN_EOL;
+            str_clean(str);
+            return OK;
+        }
+        prev_sym = c;
 
         switch (state){
         case SCANNER_START:
-            if (c == -1)
-            {   
+            if (c == -1){   
                 token->type = TOKEN_EOF;
-                if (stackTop(stack))
-                {
+                if (stackTop(stack)){
                     token->type = TOKEN_DEDEND;
                     stackPop(stack);
                     str_clean(str);
@@ -110,6 +111,17 @@ int get_token(FILE *file, struct token_s *token, tStack *stack)
                     state = SCANNER_START;
                 }
                 break;
+            }
+            else if(c == '\t'){
+                if(first_token){
+                    state = SCANNER_WHITE_SPACE;
+                    space_cnt += 4;
+                }
+                else{
+                    state = SCANNER_START;
+                }
+                break;
+                
             }
             else if (first_token){
                 /* If it is a new line and previous was INDEND*/
@@ -413,6 +425,11 @@ int get_token(FILE *file, struct token_s *token, tStack *stack)
             if(c == '\n' || c == '\r'){
                 space_cnt = 0;
                 state = SCANNER_START;
+            }
+            else if(c == '\t'){
+                space_cnt += 4;
+                state = SCANNER_WHITE_SPACE;
+                break;
             }
             else if(c == ' '){
                 space_cnt++;
