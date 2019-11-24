@@ -71,7 +71,6 @@ int get_token(FILE *file, struct token_s *token, tStack *stack)
     static bool first_token = true;
     static int double_quot = 0;
     static int count_of_quot = 0;
-    // static bool tmp = true;
     int c;
     static int prev_sym;
     int space_cnt = 0;
