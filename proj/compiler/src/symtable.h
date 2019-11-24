@@ -49,7 +49,7 @@ tHTItem *htSearch(table_s *ptrht, tKey key);
 
 int htInsert(table_s *ptrht, tKey key, token_t type);
 
-bool find_key(table_s *ptrht, tKey key);
+tHTItem* search_everywhere(table_s *ptrht, tKey key);
 
 void htDelete(table_s *ptrht, tKey key);
 

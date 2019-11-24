@@ -101,15 +101,18 @@ tHTItem* htSearch (table_s *ptrht, tKey key ) {
 
 }
 
-bool search_everywhere(table_s *ptrht, tKey key){
+tHTItem* search_everywhere(table_s *ptrht, tKey key){
+
+    tHTItem *item;
 
     while (ptrht != NULL){
-        if(htSearch(ptrht,key)){
-            return true;
+        item = htSearch(ptrht, key);
+        if(item){
+            return item;
         }
         ptrht = ptrht->prev_hash_table;
     }
-    return false;
+    return NULL;
 }
 
 int htInsert(table_s *ptrht, tKey key, token_t type)
