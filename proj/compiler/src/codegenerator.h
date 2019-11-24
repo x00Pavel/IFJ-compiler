@@ -33,4 +33,11 @@ void generate_if_head();
 void generate_while_head(struct token_s *token, char *s);
 void generate_while_head();
 void generate_main();
+void if_end();
+void if_else_body(struct token_s *token, char *s);
+void if_body(struct token_s *token, char *s);   
+void returnvalue1 (struct token_s *token, char *s);
+void select_operator(struct token_s *token);
+void generate_if_start(struct token_s *token, char *s);
+void generate_if_head();
 #endif 
