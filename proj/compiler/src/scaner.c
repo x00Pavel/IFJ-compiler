@@ -71,20 +71,28 @@ int get_token(FILE *file, struct token_s *token, tStack *stack)
     static bool first_token = true;
     static int double_quot = 0;
     static int count_of_quot = 0;
-    int c; // for symbol
+    static bool tmp = false;
+    int c;
+    static int prev_sym;
     int space_cnt = 0;
      
     while (state != SCANNER_EOF)
     {
         c = getc(file);
+        if(c == -1 && prev_sym != '\n' && !tmp){
+            ungetc(c, file);
+            tmp = true;
+            token->type = TOKEN_EOL;
+            str_clean(str);
+            return OK;
+        }
+        prev_sym = c;
 
         switch (state){
         case SCANNER_START:
-            if (c == -1)
-            {   
+            if (c == -1){   
                 token->type = TOKEN_EOF;
-                if (stackTop(stack))
-                {
+                if (stackTop(stack)){
                     token->type = TOKEN_DEDEND;
                     stackPop(stack);
                     str_clean(str);
