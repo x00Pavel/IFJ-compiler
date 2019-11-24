@@ -102,6 +102,7 @@ int main(int arc, char **argv){
     str_init(&str);
     // generate_main();
     // generate_inserted_functions();
+    create_functions(); // generate all inside functions
     func_prog(file, token, stack, state, ret_code, hash_table, str);
     str_clean(str);
     htClearAll(hash_table);
