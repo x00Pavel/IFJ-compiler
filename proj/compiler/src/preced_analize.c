@@ -7,15 +7,18 @@
 */
 
 #include <string.h>
+#include "symtable.h"
+#include "codegenerator.h"
 #include "preced_analize.h"
 #include "stack.h"
+#include "errors.h"
 
 typedef enum{
     S, /* <      */
     R, /* >      */
     Q, /*< =     */
     E  /*< Error */
-};
+} tab_operator;
 
 int stack_top_term(tStack *stack){
     int top = stackTop(stack);
@@ -27,6 +30,7 @@ int stack_top_term(tStack *stack){
     else if(top < INT){
         return top;        
     }
+    return 0;
 }
 
 int prec_table[10][10] = {
@@ -44,7 +48,6 @@ int prec_table[10][10] = {
 };
 
 tab_symbol token_to_element(struct token_s *token){
-
     switch (token->type){
     case TOKEN_INT:
         return INT;    
@@ -158,6 +161,7 @@ rule check_rule(tab_symbol op3, tab_symbol op2, tab_symbol op1){
         else if ((op3 == INT && op1 == FLT) || (op3 == FLT && op1 == INT)){
             // check types. in need, call convertion function
             // it would be print out before expression
+
             return NT_GT_NT;
         }
         else{
@@ -187,7 +191,6 @@ rule check_rule(tab_symbol op3, tab_symbol op2, tab_symbol op1){
             return NT_GE_NT;
         }
         else{
-            // error
             return ERROR;
         }
     case LE:
@@ -249,11 +252,55 @@ rule check_rule(tab_symbol op3, tab_symbol op2, tab_symbol op1){
     default:
         break;
     }
-
-
+    return ERR;
 }
 
-bool preced_analyze(FILE *file, struct token_s *token, table_s *hash_table, int bracket_cnt){
+void gen_operation(rule _rule, struct token_s *token1, struct token_s *token2){
+    (void)token1;
+    (void)token2;
+
+    switch(_rule)
+    {
+    case NT_PLUS_NT:
+        // add(token, prev_token);
+        break;
+    case NT_MINUS_NT:
+        // substr(token, token_prev);
+        break;
+    case NT_MUL_NT:
+        // mul(token1, token2);
+        break;
+    case NT_DIV_NT:
+        // div(token1, token2);
+        break;
+    case NT_INT_DIV_NT:
+        // int_div(token1, token2);
+        break;
+    case NT_EQ_NT:
+        // equal(token1, token2);
+        break;
+    case NT_GE_NT:
+        // greater_equal(token1, token2);
+        break;
+    case NT_GT_NT:
+        // greater(token1, token2);
+        break;
+    case NT_LE_NT:
+        // less_equal(token1, token2);
+        break;
+    case NT_LS_NT:
+        // less(token1,token2);
+        break;
+    case NT_NE_NT:
+        // not_equal(token1, token2);
+        break;
+    
+    default:
+        break;
+    }
+}
+
+int preced_analyze(FILE *file, struct token_s *token, table_s *hash_table, int bracket_cnt){
     tStack *stack = (tStack *) malloc(sizeof(tStack)); 
     stackInit(stack);
     stackPush(stack, DLR);
@@ -264,7 +311,7 @@ bool preced_analyze(FILE *file, struct token_s *token, table_s *hash_table, int 
 
     int top;
     tab_symbol symbol;
-    struct token_s *token = (struct token_s *)malloc(sizeof(struct token_s));
+    // struct token_s *token = (struct token_s *)malloc(sizeof(struct token_s));
     struct token_s *prev_token = (struct token_s *)malloc(sizeof(struct token_s));
     do{
         symbol = token_to_element(token);
@@ -283,7 +330,7 @@ bool preced_analyze(FILE *file, struct token_s *token, table_s *hash_table, int 
             }
             else{
                 stackPush(stack, S);
-                stackPUSH(stack, symbol);
+                stackPush(stack, symbol);
             }
             break;
         case R: // >
@@ -310,17 +357,17 @@ bool preced_analyze(FILE *file, struct token_s *token, table_s *hash_table, int 
                                 else if(top == INT && top_2 == INT){
                                     stackPush(stack, INT);
                                 }
+                                else{
+                                    return ERR_INCOMPATIBLE;
+                                }
+                                printf("reduce NT\n");
+                            }
+                            else{
+                                return ERR_INCOMPATIBLE;
                             }
                             // switch with call function for generating 
                             // code based on rule
-                            /* switch (){
-                            case :
-                                
-                                break;
-                            
-                            default:
-                                break;*/
-                            // }
+                            gen_operation(_rule, token, prev_token);
                         }
                     }
                 }
@@ -353,6 +400,15 @@ bool preced_analyze(FILE *file, struct token_s *token, table_s *hash_table, int 
         }
         else if(token->type == TOKEN_L_BRACKET){
             bracket_cnt--;
+        }
+  
+        if ((token->type == TOKEN_ID)){
+            if(!htSearch(hash_table, token->attribute.string)){
+                if (!search_everywhere(hash_table, token->attribute.string)){
+                    // ID not found in hash_table -> ERROR 
+                    return ERR_PARAM;                   
+                }
+            }
         }
     } while ((stackTop(stack) != DLR) &&
              (token->type != TOKEN_DDOT) &&
