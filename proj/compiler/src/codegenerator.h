@@ -35,15 +35,16 @@ void generate_while_head_1();
 void generate_main();
 void if_end();
 void if_else_body(struct token_s *token, char *s);
-void if_body(struct token_s *token, char *s);   
+void if_body(int * t);   
 void returnvalue1 (struct token_s *token, char *s);
 void select_operator(struct token_s *token);
 void generate_if_start(struct token_s *token, char *s);
 void change_int_and_float(struct token_s *token, struct token_s *token_a);
 void stack_operation(struct token_s *token);
 void dedend_of_if(int *is_else);
-void found_else();
+void found_else(int *t);
 void returnvalue1(struct token_s *token_right_side, char *s);
 void returnvalue(struct token_s *token_left_side, char *s);
 void generate_while_end(struct token_s *token);
+void call_inserted_functions(char *d);
 #endif 
