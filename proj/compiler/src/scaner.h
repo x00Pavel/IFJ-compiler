@@ -9,6 +9,14 @@
 
 #include "stack.h"
 
+/* Macros for log*/
+#define SLOG(msg) \
+    _log(stdout, __FILE__, __LINE__, msg);
+
+inline void _log(FILE *fd, char *file, int line, char *msg){
+    fprintf(fd, "%s:%d %s\n", file, line, msg);
+}
+
 /**
  * \brief Enumeration of avaliable key words
 */
