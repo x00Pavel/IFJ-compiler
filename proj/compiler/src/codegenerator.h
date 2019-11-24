@@ -49,4 +49,5 @@ void returnvalue(struct token_s *token_left_side, char *s);
 void generate_while_end(int *t);
 void call_inserted_functions(char *d);
 void create_functions();
+void create_returnvalue(char *s);
 #endif 

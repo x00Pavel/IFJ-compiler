@@ -25,7 +25,7 @@ int t = 0;
 void create_functions(){
     fprintf(stdout,"FUNCLEN\n");
 	fprintf(stdout,"PUSHFRAME\n");
-	fprintf(stdout,"\n LABEL $len\n");
+	fprintf(stdout,"LABEL $len\n");
 	fprintf(stdout,"DEFVAR LF@%%retval\n");
 	fprintf(stdout,"STRLEN LF@%%retval LF@%%1\n");
 	fprintf(stdout,"POPFRAME\n");
@@ -217,7 +217,7 @@ void assign_to_variable(struct token_s *token,struct token_s *token_a, char *s)
 
 
 void assign_to_y(struct token_s *token, char *s){
-    fprintf(stdout, " MOVE %s@%s %s@retval",s, token->attribute.string,s ); 
+    fprintf(stdout, " MOVE %s@%s %s@retval\n",s, token->attribute.string,s ); 
 }
 
 
@@ -292,7 +292,7 @@ void call_inserted_functions(char *d)
 }
 void retval_assign_function(struct token_s *token, char *s)
 {
-    fprintf(stdout, "MOVE %s@%s LF@%%retval",s, token->attribute.string);
+    fprintf(stdout, "MOVE %s@%s LF@%%retval\n",s, token->attribute.string);
 }
 /*
  * END FUNCTION
@@ -395,8 +395,8 @@ void select_operator(struct token_s *token){
 }
 void if_body(int *t){
     
-    fprintf(stdout,"LF@res LF@valueforcounting%d LF@valueforcounting1%d",*t,*t);
-    fprintf(stdout,"JUMPIFNEQ $B0DY-EL%d LF@res boot@true", *t);
+    fprintf(stdout,"LF@res LF@valueforcounting%d LF@valueforcounting1%d\n",*t,*t);
+    fprintf(stdout,"JUMPIFNEQ $B0DY-EL%d LF@res bool@true\n", *t);
 }
 void found_else(int *t){    
     fprintf(stdout, "JUMP $EXIT%d\n", *t);
