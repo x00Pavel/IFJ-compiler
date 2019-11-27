@@ -301,6 +301,7 @@ return 1; // WE R OK
 int func_for_id(FILE *file, struct token_s *token, tStack *stack, table_s *hash_table, int *count_of_params){
     //printf("SRABOTAL func_for_id \n"); 
     tHTItem *item;
+    int tmp_int = 0;
 
     struct token_s token_for_time; // token_for_time
     
@@ -332,11 +333,6 @@ int func_for_id(FILE *file, struct token_s *token, tStack *stack, table_s *hash_
             free(token_for_time.attribute.string);
             break;
         case TOKEN_STRING:
-            // if(hash_table->prev_hash_table){
-            //     assign_to_variable(&token_for_time, token, "LF");
-            // }else{
-            //     assign_to_vatiable(&token_for_time, token, "GF");
-            // }
             // PRECEDENCNI ANALYZA
             if(hash_table->prev_hash_table){
                 retval_assign_function(&token_for_time, "LF");
@@ -347,13 +343,6 @@ int func_for_id(FILE *file, struct token_s *token, tStack *stack, table_s *hash_
             free(token->attribute.string); // INSIDE PREC ANALY
             break;
         case TOKEN_FLOAT:
-            // move float to ID
-            // precedencni analyza
-            // if(hash_table->prev_hash_table){
-            //     assign_to_variable(&token_for_time, token, "LF");
-            // }else{
-            //     assign_to_vatiable(&token_for_time, token, "GF");
-            // }
             // PRECEDENCNI ANALYZA
             if(hash_table->prev_hash_table){
                 retval_assign_function(&token_for_time, "LF");
@@ -362,10 +351,7 @@ int func_for_id(FILE *file, struct token_s *token, tStack *stack, table_s *hash_
             }
             free(token_for_time.attribute.string);
             break;
-        case TOKEN_NONE:
-            //printf("SRABOTAL NONE \n");
-            // move NONE to ID
-            // def_and_move(&token_for_time, &(*token));
+        case TOKEN_NONE: // ----------------------------------------- ASK RAUL about ID = NONE
             if(hash_table->prev_hash_table){
                 retval_assign_function(&token_for_time, "LF");
             }else{
@@ -468,6 +454,155 @@ int func_for_id(FILE *file, struct token_s *token, tStack *stack, table_s *hash_
             free(token_for_time.attribute.string);
             free(token->attribute.string); // INSIDE PA
             break;
+
+        case TOKEN_LEN: // ADD SOME CODEGENERATOR FUNCTIONS FOR END ----------------------------------------
+                // GENERACE CILOVEHO KODU
+                get_token(file, token, stack);
+                if(token->type != TOKEN_L_BRACKET){
+                    free(token_for_time.attribute.string);
+                    return -1; // MUST BE L BRACKET
+                }
+                get_token(file, token, stack);
+                if(token->type != TOKEN_STRING){
+                    free(token_for_time.attribute.string);
+                    return -1; // MUST BE STRING
+                }
+                tmp_int = 0;
+                function_call(token, &tmp_int, "TF");
+                call_inserted_functions("len");
+                free(token->attribute.string);
+                get_token(file, token, stack);
+                if (token->type != TOKEN_R_BRACKET){
+                    free(token_for_time.attribute.string);
+                    return -1; // MUST BE R BRACKET
+                }
+                get_token(file, token, stack);
+                if(token->type != TOKEN_EOL && token->type != TOKEN_EOF && token->type != TOKEN_DEDEND){
+                    free(token_for_time.attribute.string);
+                    return -1; // ERROR MUST BE EOL or EOF or DEDENT
+                }
+                free(token_for_time.attribute.string);
+                break;
+
+            case TOKEN_SUBSTR: // CILOVY KOD BUDE KONTROLOVAT VSECHNO, JA JEN MAM PREDAT TAM VSECHNY PARAMETRY
+                get_token(file, token, stack);
+                if(token->type != TOKEN_L_BRACKET){
+                    free(token_for_time.attribute.string);
+                    return -1; // MUST BE L BRACKET
+                }
+                get_token(file, token, stack);
+                if(token->type != TOKEN_STRING){
+                    free(token_for_time.attribute.string);
+                    return -1; // MUST BE STRING
+                }
+                tmp_int = 0;
+                function_call(token, &tmp_int, "TF");
+                free(token->attribute.string);
+                get_token(file, token, stack);
+                if(token->type != TOKEN_COMA){
+                    free(token_for_time.attribute.string);
+                    return -1; // MUST BE something , something
+                }
+                get_token(file, token, stack);
+                if(token->type != TOKEN_INT){
+                    free(token_for_time.attribute.string);
+                    return -1; // MUST BE INDEX - ZACATEK RETEZCE (INT)
+                }
+                tmp_int = 1;
+                function_call(token, &tmp_int, "TF");
+                get_token(file, token, stack);
+                if(token->type != TOKEN_COMA){
+                    free(token_for_time.attribute.string);
+                    return -1; // MUST BE something , something
+                }
+                get_token(file, token, stack);
+                if(token->type != TOKEN_INT){
+                    free(token_for_time.attribute.string);
+                    return -1; // MUST BE RANGE OF NEW STRING
+                }
+                tmp_int = 2;
+                function_call(token, &tmp_int, "TF");
+                get_token(file, token, stack);
+                if (token->type != TOKEN_R_BRACKET){
+                    free(token_for_time.attribute.string);
+                    return -1; // MUST BE R BRACKET
+                }
+                call_inserted_functions("substr");
+                get_token(file, token, stack);
+                if(token->type != TOKEN_EOL && token->type != TOKEN_EOF && token->type != TOKEN_DEDEND){
+                    free(token_for_time.attribute.string);
+                    return -1; // ERROR MUST BE EOL or EOF or DEDENT
+                }
+                free(token_for_time.attribute.string);
+                break;
+
+            case TOKEN_ORD: // RDY
+                get_token(file, token, stack);
+                if(token->type != TOKEN_L_BRACKET){
+                    free(token_for_time.attribute.string);
+                    return -1; // MUST BE L BRACKET
+                }
+                get_token(file, token, stack);
+                if(token->type != TOKEN_STRING){
+                    free(token_for_time.attribute.string);
+                    return -1; // MUST BE STRING
+                }
+                tmp_int = 2;
+                function_call(token, &tmp_int, "TF");
+                free(token->attribute.string);
+                get_token(file, token, stack);
+                if(token->type != TOKEN_COMA){
+                    free(token_for_time.attribute.string);
+                    return -1; // MUST BE string , int
+                }
+                get_token(file, token, stack);
+                if(token->type != TOKEN_INT){
+                    free(token_for_time.attribute.string);
+                    return -1; // MUST BE RANGE OF NEW STRING
+                }
+                tmp_int = 1;
+                function_call(token, &tmp_int, "TF");
+                call_inserted_functions("ord");
+                get_token(file, token, stack);
+                if (token->type != TOKEN_R_BRACKET){
+                    free(token_for_time.attribute.string);
+                    return -1; // MUST BE R BRACKET
+                }
+                get_token(file, token, stack);
+                if(token->type != TOKEN_EOL && token->type != TOKEN_EOF && token->type != TOKEN_DEDEND){
+                    free(token_for_time.attribute.string);
+                    return -1; // ERROR MUST BE EOL or EOF or DEDENT
+                }
+                free(token_for_time.attribute.string);
+                //GENERACE CILOVEHO KODU
+                break;
+
+            case TOKEN_CHR: // RDY
+                get_token(file, token, stack);
+                if(token->type != TOKEN_L_BRACKET){
+                    free(token_for_time.attribute.string);
+                    return -1; // MUST BE L BRACKET
+                }
+                get_token(file, token, stack);
+                if(token->type != TOKEN_INT){
+                    free(token_for_time.attribute.string);
+                    return -1;
+                }
+                tmp_int = 0;
+                function_call(token, &tmp_int, "TF");
+                call_inserted_functions("chr");
+                get_token(file, token, stack);
+                if(token->type != TOKEN_R_BRACKET){
+                    free(token_for_time.attribute.string);
+                    return -1;
+                }
+                get_token(file, token, stack);
+                if(token->type != TOKEN_EOL && token->type != TOKEN_EOF && token->type != TOKEN_DEDEND){
+                    free(token_for_time.attribute.string);
+                    return -1; // ERROR MUST BE EOL or EOF or DEDENT
+                }
+                free(token_for_time.attribute.string);
+                break;
         default:
             free(token_for_time.attribute.string);
             return -1;
@@ -477,7 +612,6 @@ int func_for_id(FILE *file, struct token_s *token, tStack *stack, table_s *hash_
         free(token_for_time.attribute.string);
         return -1; // ERROR must be =
     }
- // mb need free
 return 1; // WE R OK
 }
 
@@ -498,14 +632,8 @@ int func_prog(FILE *file, struct token_s *token, tStack *stack, int state, int r
 
     bool flag_def = false;
 
-    int substr_i = 0;
-    int substr_n = 0;
-    char *substr_s;
-    char *ord_s;
-    int ord_i = 0;
-    (void)ord_i;
-    (void)substr_n;
-    (void)substr_i;
+    int tmp_int = 0;
+
     (void)str_1;
 
     while (ret_code != -1){
@@ -651,12 +779,12 @@ int func_prog(FILE *file, struct token_s *token, tStack *stack, int state, int r
                     return -1; // MUST BE L BRACKET
                 get_token(file, token, stack);
                 if(token->type != TOKEN_STRING){
-                    free(token->attribute.string);
                     return -1; // MUST BE STRING
                 }
+                tmp_int = 0;
+                function_call(token, &tmp_int, "TF");
+                call_inserted_functions("len");
                 free(token->attribute.string);
-                function_call(token, 0, "TF");
-                call_inserted_function("len");
                 get_token(file, token, stack);
                 if (token->type != TOKEN_R_BRACKET){
                     return -1; // MUST BE R BRACKET
@@ -673,50 +801,39 @@ int func_prog(FILE *file, struct token_s *token, tStack *stack, int state, int r
                 get_token(file, token, stack);
                 if(token->type != TOKEN_STRING){
                     return -1; // MUST BE STRING
-                }else{
-                    substr_s = (char *) malloc(sizeof(char) * strlen(token->attribute.string) + 1);
-                    strcpy(substr_s, token->attribute.string);
-                    free(token->attribute.string);
                 }
-                function_call(token, 0, "TF");
+                tmp_int = 0;
+                function_call(token, &tmp_int, "TF");
+                free(token->attribute.string);
                 get_token(file, token, stack);
                 if(token->type != TOKEN_COMA){
-                    free(substr_s);
                     return -1; // MUST BE something , something
                 }
                 get_token(file, token, stack);
                 if(token->type != TOKEN_INT){
-                    free(substr_s);
                     return -1; // MUST BE INDEX - ZACATEK RETEZCE (INT)
-                }else{
-                    substr_i = token->attribute.int_val;
                 }
-                function_call(token, 1, "TF");
+                tmp_int = 1;
+                function_call(token, &tmp_int, "TF");
                 get_token(file, token, stack);
                 if(token->type != TOKEN_COMA){
-                    free(substr_s);
                     return -1; // MUST BE something , something
                 }
                 get_token(file, token, stack);
                 if(token->type != TOKEN_INT){
-                    free(substr_s);
                     return -1; // MUST BE RANGE OF NEW STRING
-                }else{
-                    substr_n = token->attribute.int_val;
                 }
-                function_call(token, 2, "TF");
+                tmp_int = 2;
+                function_call(token, &tmp_int, "TF");
                 get_token(file, token, stack);
                 if (token->type != TOKEN_R_BRACKET){
-                    free(substr_s);
                     return -1; // MUST BE R BRACKET
                 }
-                call_inserted_function("substr");
+                call_inserted_functions("substr");
                 get_token(file, token, stack);
                 if(token->type != TOKEN_EOL && token->type != TOKEN_EOF && token->type != TOKEN_DEDEND){
-                    free(substr_s);
                     return -1; // ERROR MUST BE EOL or EOF or DEDENT
                 }
-                free(substr_s);
                 break;
 
             case TOKEN_ORD: // RDY
@@ -726,38 +843,30 @@ int func_prog(FILE *file, struct token_s *token, tStack *stack, int state, int r
                 get_token(file, token, stack);
                 if(token->type != TOKEN_STRING){
                     return -1; // MUST BE STRING
-                }else{
-                    ord_s = (char *) malloc(sizeof(char) * strlen(token->attribute.string) + 1);
-                    strcpy(ord_s, token->attribute.string);
-                    free(token->attribute.string);
                 }
-                function_call(token, 0, "TF");
+                tmp_int = 2;
+                function_call(token, &tmp_int, "TF");
+                free(token->attribute.string);
                 get_token(file, token, stack);
                 if(token->type != TOKEN_COMA){
-                    free(ord_s);
                     return -1; // MUST BE string , int
                 }
                 get_token(file, token, stack);
                 if(token->type != TOKEN_INT){
-                    free(ord_s);
                     return -1; // MUST BE RANGE OF NEW STRING
-                }else{
-                    ord_i = token->attribute.int_val;
                 }
-                function_call(token, 1, "TF");
-                call_iserted_function("ord");
+                tmp_int = 1;
+                function_call(token, &tmp_int, "TF");
+                call_inserted_functions("ord");
                 get_token(file, token, stack);
                 if (token->type != TOKEN_R_BRACKET){
-                    free(ord_s);
                     return -1; // MUST BE R BRACKET
                 }
                 get_token(file, token, stack);
                 if(token->type != TOKEN_EOL && token->type != TOKEN_EOF && token->type != TOKEN_DEDEND){
-                    free(ord_s);
                     return -1; // ERROR MUST BE EOL or EOF or DEDENT
                 }
                 //GENERACE CILOVEHO KODU
-                free(ord_s);
                 break;
 
             case TOKEN_CHR: // RDY
@@ -767,8 +876,9 @@ int func_prog(FILE *file, struct token_s *token, tStack *stack, int state, int r
                 get_token(file, token, stack);
                 if(token->type != TOKEN_INT)
                     return -1;
-                function_call(token, 0, "TF");
-                call_inserted_function("chr");
+                tmp_int = 0;
+                function_call(token, &tmp_int, "TF");
+                call_inserted_functions("chr");
                 get_token(file, token, stack);
                 if(token->type != TOKEN_R_BRACKET)
                     return -1;
@@ -798,17 +908,20 @@ int func_prog(FILE *file, struct token_s *token, tStack *stack, int state, int r
                     // GENERATION OF CONDITION
                     count_of_params = 0;
                     if_body(&actual_if);// GENERACE JMPIFNEQ
-
-                    // get_token(file, token, stack);
-                    // if(token->type != TOKEN_DDOT)
+                    //get_token(file, token, stack);
+                    // if(token->type != TOKEN_DDOT){
                     //     return -1; // must be :
+                    // }
+                    //printf("im here\n");
                     get_token(file, token, stack);
+                    //printf("%d\n", token->type);
                     if(token->type != TOKEN_EOL)
                         return -1; // must be end of line
                     get_token(file, token, stack);
                     if(token->type != TOKEN_INDEND)
                         return -1; // must be INDENT
                     func_prog(file, token, stack, state, ret_code, local_hash_table_if, str); // inside if, generace body
+                    //printf("ja tutu\n");
                     if(token->type != TOKEN_DEDEND)
                         return -1; // must be DEDENT
 

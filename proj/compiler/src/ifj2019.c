@@ -103,11 +103,16 @@ int main(int arc, char **argv){
     // generate_main();
     // generate_inserted_functions();
     create_functions(); // generate all inside functions
+
     func_prog(file, token, stack, state, ret_code, hash_table, str);
+
     str_clean(str);
     htClearAll(hash_table);
     free(hash_table);
     free(stack);
+    if(token->type == TOKEN_STRING || token->type == TOKEN_ID || token->type == TOKEN_FNC){
+        free(token->attribute.string);
+    }
     free(token);
     fclose(file);
 
