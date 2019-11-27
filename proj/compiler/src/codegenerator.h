@@ -50,4 +50,5 @@ void generate_while_end(int *t);
 void call_inserted_functions(char *d);
 void create_functions();
 void create_returnvalue(char *s);
+void generate_function_return(char *function_id);
 #endif 
