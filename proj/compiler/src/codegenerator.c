@@ -17,11 +17,12 @@
 #include <stdlib.h>
 #include <ctype.h>
 
+// #include "dynamic_string.h"
 #include "parser.h"
-#include "codegenerator.h"
-#include "./stack.h"
-int i = 0;
-int t = 0;
+// #include "codegenerator.h"
+// #include "stack.h"
+// #include "ifj2019_old.h"
+
 void create_functions(){
     fprintf(stdout,"FUNCLEN\n");
 	fprintf(stdout,"PUSHFRAME\n");
@@ -30,6 +31,8 @@ void create_functions(){
 	fprintf(stdout,"STRLEN LF@%%retval LF@%%1\n");
 	fprintf(stdout,"POPFRAME\n");
 	fprintf(stdout,"RETURN\n\n");
+
+
     
     fprintf(stdout,"#SUBSTRFUNCTION\n");
 	fprintf(stdout,"LABEL $substr\n");
@@ -66,7 +69,7 @@ void create_functions(){
 	fprintf(stdout,"JUMPIFEQ $substr$edit_n LF@edit_n_cond bool@true\n");
 	fprintf(stdout,"JUMP $substr$process\n");
 	fprintf(stdout,"LABEL $substr$edit_n\n");
-	fprintf(stdout,"MOVE LF@%%3 LF@max_n\n");
+	fprintf(stdout,"MOVE LF@%%3 LF@max_n\n")                                                                                                                                                                                                                                                    ;
 	fprintf(stdout,"LABEL $substr$process\n");
 	fprintf(stdout,"DEFVAR LF@index\n");
 	fprintf(stdout,"MOVE LF@index LF@%%2\n");
@@ -123,14 +126,14 @@ void create_functions(){
 
 }
 
-//generate main function
-void generate_main()
-{
-    fprintf(stdout, "LABEL $%%main\n"); 
-    fprintf(stdout,".IFJcode19\n    ");
+
+void jump_to_main(){
+    fprintf(stdout,".IFJcode19\n");
     fprintf(stdout,"JUMP $$main\n");
 }
-//generate end of main function
+void label_main(){
+    fprintf(stdout, "LABEL $%%main\n");
+}
 void end_main(){
     fprintf(stdout,"# End of main scope\n");
 	fprintf(stdout,"POPFRAME\n");
@@ -138,108 +141,369 @@ void end_main(){
 }
 
 
-/*
- *
- * DEFINE FUNCTION
- *
- */
-    void define_function_begin(struct token_s *token){
-        fprintf(stdout,"# Start of function\n");
-        fprintf(stdout,"LABEL $%s\n", token->attribute.string);
-        fprintf(stdout,"PUSHFRAME\n");    
-    }
-    void retval_function()
-    {
-        fprintf(stdout, "DEFVAR LF@retval\n");
-        fprintf(stdout, "MOVE LF@%%retval nil@nil\n");
-    }
-    void def_function_call(struct token_s *token, int *counter, char *s){
-        //DEFVAR LF@param1
-        //MOVE LF@param1  LF@%
-        fprintf(stdout, "DEFVAR %s@%s%d\n",s,token->attribute.string, *counter);
-        fprintf(stdout, "MOVE %s@%s%d %s@%%%d\n",s,token->attribute.string,*counter ,s ,*counter); 
-    }
 
-    void def_function_end(){
-        fprintf(stdout, "POPFRAME\n");
-        fprintf(stdout, "RETURN\n");
+
+
+
+/*
+*
+* START CODE DEFINE FUNCTION
+*
+*/
+    void define_function_begin(struct token_s *token, struct dynamic_string *str){
+        if(flag_while == 0)
+        {
+            fprintf(stdout,"# Start of function\n");
+            fprintf(stdout,"LABEL $%s\n", token->attribute.string);
+            fprintf(stdout,"PUSHFRAME\n");
+        }
+        else
+        {
+            for(unsigned int i = 0; i < strlen("# Start of function\nLABEL $"); i++)
+            {
+                add_char_to_str(str, "# Start of function\nLABEL $"[i]);
+            }
+            for(unsigned int i = 0; i < strlen(token->attribute.string); i++)
+            {
+                add_char_to_str(str, token->attribute.string[i]);
+            }
+            add_char_to_str(str, 10);
+            for(unsigned int i = 0; i < strlen("PUSHFRAME\n"); i++)
+            {
+                add_char_to_str(str, "PUSHFRAME\n"[i]);
+            }
+            
+        }
+            
+    }
+    void retval_function(struct dynamic_string *str){
+        if(flag_while == 0){
+            fprintf(stdout, "DEFVAR LF@retval\n");
+            fprintf(stdout, "MOVE LF@%%retval nil@nil\n");
+        }
+        else{   
+            for(unsigned int i = 0; i < strlen("DEFVAR LF@retval\n"); i++){
+                add_char_to_str(str, "DEFVAR LF@retval\n"[i]);
+            }
+            for(unsigned int i = 0; i < strlen("MOVE LF@%%retval nil@nil\n"); i++){
+                add_char_to_str(str, "MOVE LF@%%retval nil@nil\n"[i]);
+            }
+        }
+    }
+    void def_function_call(struct token_s *token, int *counter, char *s,struct dynamic_string *str){
+        if(flag_while == 0){
+            fprintf(stdout, "DEFVAR %s@%s%d\n",s,token->attribute.string, *counter);
+            fprintf(stdout, "MOVE %s@%s%d %s@%%%d\n",s,token->attribute.string, *counter ,s ,*counter);
+        }
+        else{
+            for(unsigned int i = 0; i < strlen("DEFVAR "); i++){
+                add_char_to_str(str, "DEFVAR "[i]);
+            }
+            for(unsigned int i = 0; i < strlen(s); i++){
+                add_char_to_str(str,s[i]);
+            }
+            for(unsigned int i = 0; i < strlen("@"); i++){
+                add_char_to_str(str,"@"[i]);
+            }
+            for(unsigned int i = 0; i < strlen(token->attribute.string); i++){
+                add_char_to_str(str,token->attribute.string[i]);
+            }
+            char temp30[100];
+            sprintf(temp30, "%d",*counter);
+            for(unsigned int i = 0; i < strlen(temp30); i++){
+                add_char_to_str(str, temp30[i]);
+            }
+            add_char_to_str(str, 10);
+            for(unsigned int i = 0; i < strlen("MOVE "); i++){
+                add_char_to_str(str, "MOVE "[i]);
+            }
+            for(unsigned int i = 0; i < strlen(s); i++){
+                add_char_to_str(str,s[i]);
+            }       
+            for(unsigned int i = 0; i < strlen("@"); i++){
+                add_char_to_str(str,"@"[i]);
+            }
+            for(unsigned int i = 0; i < strlen(token->attribute.string); i++){
+                add_char_to_str(str,token->attribute.string[i]);
+            }
+            char temp29[100];
+            sprintf(temp29, "%d",*counter);
+            for(unsigned int i = 0; i < strlen(temp29); i++){
+                add_char_to_str(str, temp29[i]);
+            }
+            for(unsigned int i = 0; i < strlen(s); i++)
+            {
+                add_char_to_str(str,s[i]);
+            }
+            for(unsigned int i = 0; i < strlen("@%"); i++)
+            {
+                add_char_to_str(str,"@%"[i]);
+            }   
+            char temp28[100];
+            sprintf(temp28, "%d",*counter);
+            for(unsigned int i = 0; i < strlen(temp28); i++){
+                add_char_to_str(str, temp28[i]);
+            }
+            add_char_to_str(str, 10);
+        }
+    
+    }
+    void def_function_end(struct dynamic_string *str){
+        if(flag_while == 0)
+        {
+            fprintf(stdout, "POPFRAME\n");
+            fprintf(stdout, "RETURN\n");
+        }
+        else
+        {
+            for(unsigned int i = 0; i < strlen("POPFRAME\nRETURN\n"); i++)
+            {
+                add_char_to_str(str, "POPFRAME\nRETURN\n"[i]);
+            }
+        }
+           
+        
     }
 /*
  *
- * END OF DEFINE FUNCTION
+ * END CODE DEFINE FUNCTION
  * 
 */
 
-//Define variables in all scopes
-void define_variable_GF(struct token_s *token, char *s){
-    fprintf(stdout, "DEFVAR %s@%s\n",s,token->attribute.string);   
-}
+/*
+* Define variables in all scopes
+*/
+  void define_variable_GF(struct token_s *token, char *s, struct dynamic_string *str){
+    if(flag_while == 0)
+    {
+        fprintf(stdout, "DEFVAR %s@%s\n",s,token->attribute.string); 
+    }
+    else
+    {
+        for(unsigned int i = 0; i < strlen("DEFVAR "); i++)
+        {
+            add_char_to_str(str, "DEFVAR "[i]);
+        }
+        for(unsigned int i = 0; i < strlen(s); i++)
+        {
+            add_char_to_str(str, s[i]);
+        }
+        for(unsigned int i = 0; i < strlen("@"); i++)
+        {
+            add_char_to_str(str, "@"[i]);
+        }
+        for(unsigned int i = 0; i < strlen(token->attribute.string); i++)
+        {
+            add_char_to_str(str, token->attribute.string[i]);
+        }
+        add_char_to_str(str, 10);
+    }
+    
+        
+    }
+/*
+*End define variables in all scopes
+*/
 
-//Assign value to variablei in all scopes
-void assign_to_variable(struct token_s *token,struct token_s *token_a, char *s)
-{//MOVE TF@%1 int@10
+
+
+//y = a + b + c эта функиция приржадит все что спарава к у
+void assign_to_variable(struct token_s *token,struct token_s *token_a, char *s, struct dynamic_string *str){
       switch (token->type)
     {  
         case TOKEN_INT:
-            fprintf(stdout, "MOVE %s@%%%s int@%d\n",s,token->attribute.string, token_a->attribute.int_val); 
+        if(flag_while == 0){
+            fprintf(stdout, "MOVE %s@%%%s int@valueforcounting\n",s,token->attribute.string ); 
             break;
+        } else {
+            for(unsigned int i = 0; i < strlen("MOVE "); i++){
+                add_char_to_str(str, "MOVE "[i]);
+            }
+            for(unsigned int i = 0; i < strlen(s); i++){
+                add_char_to_str(str, s[i]);
+            }
+            for(unsigned int i = 0; i < strlen("@%"); i++){
+                add_char_to_str(str, "@%"[i]);
+            }
+            for(unsigned int i = 0; i < strlen(token->attribute.string ); i++){
+                add_char_to_str(str, token->attribute.string [i]);
+            }
+            for(unsigned int i = 0; i < strlen("int@valueforcounting"); i++){
+                add_char_to_str(str, "int@valueforcounting"[i]);
+            }
+            add_char_to_str(str, 10);
+            break;
+            
+        }
         case TOKEN_FLOAT:
-            fprintf(stdout, "MOVE %s@%%%s float@%f\n",s,token->attribute.string, token_a->attribute.float_val); 
+        if(flag_while == 0)
+        {
+            fprintf(stdout, "MOVE %s@%%%s float@valueforcounting\n",s,token->attribute.string); 
             break;
+        }
+        else
+        {
+            for(unsigned int i = 0; i < strlen("MOVE "); i++)
+            {
+                add_char_to_str(str, "MOVE "[i]);
+            }
+            for(unsigned int i = 0; i < strlen(s); i++)
+            {
+                add_char_to_str(str, s[i]);
+            }
+            for(unsigned int i = 0; i < strlen("@%"); i++)
+            {
+                add_char_to_str(str, "@%"[i]);
+            }
+            for(unsigned int i = 0; i < strlen(token->attribute.string ); i++)
+            {
+                add_char_to_str(str, token->attribute.string [i]);
+            }
+            for(unsigned int i = 0; i < strlen("float@valueforcounting"); i++)
+            {
+                add_char_to_str(str, "float@valueforcounting"[i]);
+            }
+            add_char_to_str(str, 10);
+            break; 
+        }
         case TOKEN_STRING:
-            fprintf(stdout, "MOVE %s@%%%s %s@%s\n",s,token->attribute.string, s, token_a->attribute.string);
+        if(flag_while == 0)
+        {
+            fprintf(stdout, "MOVE %s@%%%s string@valueforcounting\n",s,token->attribute.string);
             break;
+        }
+        else
+        {
+            for(unsigned int i = 0; i < strlen("MOVE "); i++)
+            {
+                add_char_to_str(str, "MOVE "[i]);
+            }
+            for(unsigned int i = 0; i < strlen(s); i++)
+            {
+                add_char_to_str(str, s[i]);
+            }
+            for(unsigned int i = 0; i < strlen("@%"); i++)
+            {
+                add_char_to_str(str, "@%"[i]);
+            }
+            for(unsigned int i = 0; i < strlen(token->attribute.string ); i++)
+            {
+                add_char_to_str(str, token->attribute.string [i]);
+            }
+            for(unsigned int i = 0; i < strlen("string@valueforcounting"); i++)
+            {
+                add_char_to_str(str, "string@valueforcounting"[i]);
+            }
+            add_char_to_str(str, 10);
+            break; 
+        }
         case TOKEN_ID:
-            fprintf(stdout, "MOVE %s@%%%s string@%s\n",s,token->attribute.string, token_a->attribute.string);
+        if(flag_while == 0)
+        {
+            fprintf(stdout, "MOVE %s@%%%s %s@valueforcounting\n",s,token->attribute.string, token_a->attribute.string);
             break;
+        }
+        else
+        {
+            for(unsigned int i = 0; i < strlen("MOVE "); i++)
+            {
+                add_char_to_str(str, "MOVE "[i]);
+            }
+            for(unsigned int i = 0; i < strlen(s); i++)
+            {
+                add_char_to_str(str, s[i]);
+            }
+            for(unsigned int i = 0; i < strlen("@%"); i++)
+            {
+                add_char_to_str(str, "@%"[i]);
+            }
+            for(unsigned int i = 0; i < strlen(token->attribute.string ); i++)
+            {
+                add_char_to_str(str, token->attribute.string [i]);
+            }
+            for(unsigned int i = 0; i < strlen(token_a->attribute.string); i++)
+            {
+                add_char_to_str(str, token_a->attribute.string[i]);
+            }
+            for(unsigned int i = 0; i < strlen("@valueforcounting"); i++)
+            {
+                add_char_to_str(str, "@valueforcounting"[i]);
+            }
+            add_char_to_str(str, 10);
+            break;    
+        }
+        case TOKEN_NONE:
+        if(flag_while == 0)
+        {
+            fprintf(stdout, "MOVE %s@%%%s nil@nil\n",s,token->attribute.string);
+            break;
+        }
+        else
+        {
+            for(unsigned int i = 0; i < strlen("MOVE "); i++)
+            {
+                add_char_to_str(str, "MOVE "[i]);
+            }
+            for(unsigned int i = 0; i < strlen(s); i++)
+            {
+                add_char_to_str(str, s[i]);
+            }
+            for(unsigned int i = 0; i < strlen("@%"); i++)
+            {
+                add_char_to_str(str, "@%"[i]);
+            }
+            for(unsigned int i = 0; i < strlen(token->attribute.string ); i++)
+            {
+                add_char_to_str(str,token->attribute.string [i]);
+            }
+            for(unsigned int i = 0; i < strlen("nil@nil"); i++)
+            {
+                add_char_to_str(str, "nil@nil"[i]);
+            }
+            add_char_to_str(str, 10);
+            break;          
+        }
         default:
             break;  
     }  
 }
 
-// void change_int_and_float(struct token_s *token, struct token_s *token_a)
-// {
-//     if (token->type == TOKEN_FLOAT && token_a->type == TOKEN_INT)
-// 	{
-// 		fprintf(stdout, "FLOAT2R2EINT TF@%%retval TF@%%retval");
-//     }
-// 	if (token->type == TOKEN_INT && token->type == TOKEN_FLOAT)
-// 	{
-// 		fprintf(stdout,"INT2FLOAT TF@%%retval TF@%%retval");
-// 	}
-// }
 
-
-
-
-void assign_to_y(struct token_s *token, char *s){
-    fprintf(stdout, " MOVE %s@%s %s@retval\n",s, token->attribute.string,s ); 
-}
-
-
-void token_return(struct token_s *token, char *s)
-{
-    //MOVE LF@%retval float@0x0p+0
-    fprintf(stdout,"MOVE %s@%%retval\n",s);
-    //fprintf("%s", returnvalue);
-    switch (token->type)
+//Это функия y=foo(a,b) приржадит то что вышло в fоо к у
+void assign_to_y(struct token_s *token, char *s,struct dynamic_string *str){
+    if(flag_while == 0)
     {
-        case TOKEN_INT:
-            fprintf(stdout, "int@%d\n", token->attribute.int_val);
-            break;
-        case TOKEN_FLOAT:
-            fprintf(stdout, "float@%f\n", token->attribute.float_val);
-            break;
-        case TOKEN_STRING:
-            fprintf(stdout, "string@%s\n", token->attribute.string);
-            break;
-        case TOKEN_ID:
-
-        default:
-            break;
+        fprintf(stdout, " MOVE %s@%s %s@retval\n",s, token->attribute.string,s); 
     }
+    else
+    {
+        for(unsigned int i = 0; i < strlen("MOVE "); i++){
+            add_char_to_str(str, "MOVE "[i]);
+        }
+        for(unsigned int i = 0; i < strlen(s); i++){
+            add_char_to_str(str,s[i]);
+        }
+        for(unsigned int i = 0; i < strlen("@"); i++){
+            add_char_to_str(str,"@"[i]);
+        }
+        for(unsigned int i = 0; i < strlen(s); i++){
+            add_char_to_str(str,s[i]);
+        }
+        for(unsigned int i = 0; i < strlen("@"); i++){
+            add_char_to_str(str,"@"[i]);
+        }
+        for(unsigned int i = 0; i < strlen("retval"); i++){
+            add_char_to_str(str,"retval"[i]);
+        }
+        add_char_to_str(str, 10);
+    }
+    
+   
 }
-//foo , y
+
+
+
+
 
 
 
@@ -248,50 +512,297 @@ void token_return(struct token_s *token, char *s)
 /*
 *   CALL FUNCTION
 */
-    void token_function_begin_with_y(){
-    fprintf(stdout, "CREATEFRAME\n");
-    //fprintf(stdout, "DEFVAR LF@%s\n CREATEFRAME\n",token->attribute.string);     
+    //Эта функия создают фрейм чтоб работать с переменными a,b  foo(a,b)
+    void token_function_begin_with_y(struct dynamic_string *str){
+        if(flag_while == 0)
+        {
+            fprintf(stdout, "CREATEFRAME\n");
+        }
+        else
+        {
+            for(unsigned int i = 0; i < strlen("CREATEFRAME\n"); i++){
+                add_char_to_str(str, "CREATEFRAME\n"[i]);
+            }
+        }
+        
+    
     }
-    void function_call(struct token_s *token,int *counter, char *s){
+
+    //Эта функция дефинирует значение и прираживает им ходноту foo(a,b) мы дефинируем параметры
+    //1 и 2  а потом посылаем туда значения a и b
+    void function_call(struct token_s *token,int *counter, char *s,struct dynamic_string *str){
         switch (token->type)
-        {   //DEFVAR TF@%1
-            //MOVE TF@%1 int@10
+        {   
             case TOKEN_INT:
+                if(flag_while == 0)
+                {
                     fprintf(stdout, "DEFVAR %s@%d\n",s, *counter);
-                    fprintf(stdout, "MOVE %s@%d int@%d\n",s,*counter, token->attribute.int_val); 
-                break;
-            case TOKEN_FLOAT:
-                    fprintf(stdout, "DEFVAR %s@%d\n",s, *counter);
-                    fprintf(stdout, "MOVE %s@%d float@%f\n",s,*counter, token->attribute.float_val); 
-                break;
-            case TOKEN_STRING:
-                    fprintf(stdout, "DEFVAR %s@%d\n",s, *counter);
-                    fprintf(stdout, "MOVE %s@%d string@%s\n",s,*counter, token->attribute.string);
-                break;
-            case TOKEN_ID:
-                    fprintf(stdout, "DEFVAR %s@%d\n",s, *counter);
-                    fprintf(stdout, "MOVE %s@%d %s@%s\n",s,*counter,s, token->attribute.string);
-                break;
+                    fprintf(stdout, "MOVE %s@%d int@%d\n",s, *counter, token->attribute.int_val); 
+                    break;
+                }
+                else
+                {
+                    for(unsigned int i = 0; i < strlen("DEFVAR "); i++){
+                        add_char_to_str(str, "DEFVAR "[i]);
+                    }
+                    for(unsigned int i = 0; i < strlen(s); i++){
+                        add_char_to_str(str,s[i]);
+                    }
+                    for(unsigned int i = 0; i < strlen("@"); i++){
+                        add_char_to_str(str,"@"[i]);
+                    }
+                    char temp27[100];
+                    sprintf(temp27, "%d",*counter);
+                    for(unsigned int i = 0; i < strlen(temp27); i++){
+                        add_char_to_str(str, temp27[i]);
+                    }
+                    add_char_to_str(str, 10);
+                    for(unsigned int i = 0; i < strlen("MOVE "); i++){
+                        add_char_to_str(str, "MOVE "[i]);
+                    }
+                    for(unsigned int i = 0; i < strlen(s); i++){
+                        add_char_to_str(str,s[i]);
+                    }
+                    for(unsigned int i = 0; i < strlen("@"); i++){
+                        add_char_to_str(str,"@"[i]);
+                    }
+                    char temp26[100];
+                    sprintf(temp26, "%d",*counter);
+                    for(unsigned int i = 0; i < strlen(temp26); i++){
+                        add_char_to_str(str, temp26[i]);
+                    }
+                    for(unsigned int i = 0; i < strlen("int@"); i++){
+                        add_char_to_str(str, "int@"[i]);
+                    }
+                    char temp[100];
+                    sprintf(temp, "%d", token->attribute.int_val);
+                    for(unsigned int i = 0; i < strlen(temp); i++){
+                        add_char_to_str(str, temp[i]);
+                    }
+                    add_char_to_str(str, 10);
+                    break;
+                }
                 
 
+            case TOKEN_FLOAT:
+                if(flag_while == 0)
+                {
+                    fprintf(stdout, "DEFVAR %s@%d\n",s, *counter);
+                    fprintf(stdout, "MOVE %s@%d float@%f\n",s, *counter, token->attribute.float_val); 
+                    break;
+                }
+                else
+                {
+                    for(unsigned int i = 0; i < strlen("DEFVAR "); i++){
+                        add_char_to_str(str, "DEFVAR "[i]);
+                    }
+                    for(unsigned int i = 0; i < strlen(s); i++){
+                        add_char_to_str(str,s[i]);
+                    }
+                    for(unsigned int i = 0; i < strlen("@"); i++){
+                        add_char_to_str(str,"@"[i]);
+                    }
+                    char temp24[100];
+                    sprintf(temp24, "%d",*counter);
+                    for(unsigned int i = 0; i < strlen(temp24); i++){
+                        add_char_to_str(str, temp24[i]);
+                    }
+                    add_char_to_str(str, 10);
+                    for(unsigned int i = 0; i < strlen("MOVE "); i++){
+                        add_char_to_str(str, "MOVE "[i]);
+                    }
+                    for(unsigned int i = 0; i < strlen(s); i++){
+                        add_char_to_str(str,s[i]);
+                    }
+                    for(unsigned int i = 0; i < strlen("@"); i++){
+                        add_char_to_str(str,"@"[i]);
+                    }
+                    char temp23[100];
+                    sprintf(temp23, "%d",*counter);
+                    for(unsigned int i = 0; i < strlen(temp23); i++){
+                        add_char_to_str(str, temp23[i]);
+                    }
+                    for(unsigned int i = 0; i < strlen("float@"); i++){
+                        add_char_to_str(str, "float@"[i]);
+                    }
+                    char temp[100];
+                    sprintf(temp, "%f", token->attribute.float_val);
+                    for(unsigned int i = 0; i < strlen(temp); i++){
+                        add_char_to_str(str, temp[i]);
+                    }
+                    add_char_to_str(str, 10);
+                    break;
+                }
+
+            case TOKEN_STRING:
+                if(flag_while == 0)
+                {
+                    fprintf(stdout, "DEFVAR %s@%d\n",s,*counter);
+                    fprintf(stdout, "MOVE %s@%d string@%s\n",s,*counter,token->attribute.string);
+                    break;
+                }
+                else
+                {
+                    for(unsigned int i = 0; i < strlen("DEFVAR "); i++){
+                        add_char_to_str(str, "DEFVAR "[i]);
+                    }
+                    for(unsigned int i = 0; i < strlen(s); i++){
+                        add_char_to_str(str,s[i]);
+                    }
+                    for(unsigned int i = 0; i < strlen("@"); i++){
+                        add_char_to_str(str,"@"[i]);
+                    }
+                    char temp22[100];
+                    sprintf(temp22, "%d",*counter);
+                    for(unsigned int i = 0; i < strlen(temp22); i++){
+                        add_char_to_str(str, temp22[i]);
+                    }
+                    add_char_to_str(str, 10);
+                    for(unsigned int i = 0; i < strlen("MOVE "); i++){
+                        add_char_to_str(str, "MOVE "[i]);
+                    }
+                    for(unsigned int i = 0; i < strlen(s); i++){
+                        add_char_to_str(str,s[i]);
+                    }
+                    for(unsigned int i = 0; i < strlen("@"); i++){
+                        add_char_to_str(str,"@"[i]);
+                    }
+                    char temp[100];
+                    sprintf(temp, "%d",*counter);
+                    for(unsigned int i = 0; i < strlen(temp); i++){
+                        add_char_to_str(str, temp[i]);
+                    }
+                    for(unsigned int i = 0; i < strlen("string@"); i++){
+                        add_char_to_str(str, "string@"[i]);
+                    }
+                    for(unsigned int i = 0; i < strlen(token->attribute.string); i++){
+                        add_char_to_str(str,token->attribute.string[i]);
+                    }
+                    add_char_to_str(str, 10); 
+                    break;                  
+                }
+
+                break;
+            case TOKEN_ID:
+                if(flag_while == 0)
+                {
+                    fprintf(stdout, "DEFVAR %s@%d\n",s,*counter);
+                    fprintf(stdout, "MOVE %s@%d %s@%s\n",s,*counter,s,token->attribute.string);
+                    break ;
+                    
+                }
+                else
+                {
+                    for(unsigned int i = 0; i < strlen("DEFVAR "); i++){
+                        add_char_to_str(str, "DEFVAR "[i]);
+                    }
+                    for(unsigned int i = 0; i < strlen(s); i++){
+                        add_char_to_str(str,s[i]);
+                    }
+                    for(unsigned int i = 0; i < strlen("@"); i++){
+                        add_char_to_str(str,"@"[i]);
+                    }
+                    char temp[100];
+                    sprintf(temp, "%d",*counter);
+                    for(unsigned int i = 0; i < strlen(temp); i++){
+                        add_char_to_str(str, temp[i]);
+                    }
+                    add_char_to_str(str, 10);
+                    for(unsigned int i = 0; i < strlen("MOVE "); i++){
+                        add_char_to_str(str, "MOVE "[i]);
+                    }
+                    for(unsigned int i = 0; i < strlen(s); i++){
+                        add_char_to_str(str,s[i]);
+                    }
+                    for(unsigned int i = 0; i < strlen("@"); i++){
+                        add_char_to_str(str,"@"[i]);
+                    }
+                    char temp21[100];
+                    sprintf(temp21, "%d",*counter);
+                    for(unsigned int i = 0; i < strlen(temp21); i++){
+                        add_char_to_str(str, temp21[i]);
+                    }
+                    for(unsigned int i = 0; i < strlen(s); i++){
+                        add_char_to_str(str, s[i]);
+                    }
+                    for(unsigned int i = 0; i < strlen("@"); i++){
+                        add_char_to_str(str,"@"[i]);
+                    }
+                    for(unsigned int i = 0; i < strlen(token->attribute.string); i++){
+                        add_char_to_str(str,token->attribute.string[i]);
+                    }
+                    add_char_to_str(str, 10); 
+                    break;                    
+                }
             default:
                 break;  
         } 
     }
-    void call_function(struct token_s *token)
-    {   
-        fprintf(stdout,"CALL $%s\n", token->attribute.string);
+
+
+
+    //вызов функции
+    void call_function(struct token_s *token,struct dynamic_string *str){   
+        if(flag_while == 0)
+        {
+            fprintf(stdout,"CALL $%s\n", token->attribute.string);
+        }
+        else
+        {
+            for(unsigned int i = 0; i < strlen("CALL $"); i++){
+                add_char_to_str(str, "CALL $"[i]);
+            }
+            for(unsigned int i = 0; i < strlen(token->attribute.string); i++){
+                 add_char_to_str(str, token->attribute.string[i]);
+            }
+            add_char_to_str(str, 10);            
+        }                              
     }
-    void call_inserted_functions(char *d)
-    {
-        fprintf(stdout, "CALL $%s\n", d);
+    //вызов выставене функции
+    void call_inserted_functions(char *d,struct dynamic_string *str){
+        if(flag_while == 0)
+        {
+            fprintf(stdout, "CALL $%s\n", d);
+        }
+        else
+        {
+            for(unsigned int i = 0; i < strlen("CALL $"); i++){
+                add_char_to_str(str, "CALL $"[i]);
+            }
+            for(unsigned int i = 0; i < strlen(d); i++){
+                 add_char_to_str(str, d[i]);
+            }
+            add_char_to_str(str, 10);            
+        }
     }
-    void retval_assign_function(struct token_s *token, char *s)
-    {
-        fprintf(stdout, "MOVE %s@%s LF@%%retval\n",s, token->attribute.string);
+    //функия чтоб вернуть прирадить ретвал какому-нибудь значению
+    void retval_assign_function(struct token_s *token, char *s,struct dynamic_string *str){
+        if(flag_while == 0)
+        {
+            fprintf(stdout, "MOVE %s@%s TF@%%retval\n",s, token->attribute.string);
+        }
+        else
+        {
+            for(unsigned int i = 0; i < strlen("MOVE "); i++){
+                add_char_to_str(str, "MOVE "[i]);
+            }
+            for(unsigned int i = 0; i < strlen(s); i++){
+                 add_char_to_str(str, s[i]);
+            }
+            for(unsigned int i = 0; i < strlen("@"); i++){
+                add_char_to_str(str, "@"[i]);
+            }
+            for(unsigned int i = 0; i < strlen(token->attribute.string ); i++){
+                add_char_to_str(str, token->attribute.string [i]);
+            }
+            for(unsigned int i = 0; i < strlen("TF@%%retval\n"); i++){
+                add_char_to_str(str, "TF@%%retval\n"[i]);
+            }
+            add_char_to_str(str, 10);            
+        }
     }
 /*
- * END FUNCTION
+ *  END FUNCTION
  */
 
 
@@ -304,192 +815,460 @@ void token_return(struct token_s *token, char *s)
 
 
 
-
-
-void print_function(struct token_s *token_write, char *s)
-{
-    fprintf(stdout,"WRITE %s@%s",s,token_write->attribute.string);
+//принт флоута
+void print_float(struct token_s *token_write,struct dynamic_string *str){
+    if(flag_while == 0){
+        fprintf(stdout,"WRITE float@%a",token_write->attribute.float_val);
+    }else{
+        for(unsigned int i = 0; i < strlen("WRITE float@"); i++){
+            add_char_to_str(str, "WRITE float@"[i]);
+        }
+        char temp[100];
+        sprintf(temp, "%a", token_write->attribute.float_val);
+        for(unsigned int i = 0; i < strlen(temp); i++){
+            add_char_to_str(str, temp[i]);
+        }
+    }
 }
+
+//принт инта   
+void print_int(struct token_s *token_write,struct dynamic_string *str){
+    if(flag_while == 0){
+        fprintf(stdout,"WRITE int@%d",token_write->attribute.int_val);
+    }else{
+        for(unsigned int i = 0; i < strlen("WRITE int@"); i++){
+            add_char_to_str(str, "WRITE int@"[i]);
+        }
+        char temp[100];
+        sprintf(temp, "%d",token_write->attribute.int_val);
+        for(unsigned int i = 0; i < strlen(temp); i++){
+            add_char_to_str(str, temp[i]);
+        }
+    }
+    
+}
+
+//принт стринга
+void print_string(struct token_s *token_write,struct dynamic_string *str){
+    if(flag_while == 0){
+        fprintf(stdout,"WRITE string@%s",token_write->attribute.string);
+    }else{
+        for(unsigned int i = 0; i < strlen("WRITE string@"); i++){
+            add_char_to_str(str, "WRITE string@"[i]);
+        }
+        for(unsigned int i = 0; i < strlen(token_write->attribute.string); i++){
+            add_char_to_str(str, token_write->attribute.string[i]);
+        }
+    }
+    
+}
+
+//принт ничега
+void print_none(struct dynamic_string *str){
+    if(flag_while == 0){
+            fprintf(stdout,"WRITE None");
+    }else{
+        for(unsigned int i = 0; i < strlen("WRITE None"); i++){
+            add_char_to_str(str, "WRITE None"[i]);
+        }
+    }
+    
+}
+
+
+//Функия для принта переменной с ее значением 
+void print_id(struct token_s *token_write,tHTItem *item, struct dynamic_string *str){
+    if(item->ret_val == TOKEN_INT)
+    {
+        if(flag_while == 0){
+           fprintf(stdout,"WRITE int@%d",token_write->attribute.int_val); 
+        }else{
+            for(unsigned int i = 0; i < strlen("WRITE int@"); i++){
+                add_char_to_str(str, "WRITE int@"[i]);
+            }
+            char temp[100];
+            sprintf(temp, "%d",token_write->attribute.int_val);
+            for(unsigned int i = 0; i < strlen(temp); i++){
+                add_char_to_str(str, temp[i]);
+            }
+        }        
+        
+    }
+    if(item->ret_val == TOKEN_FLOAT)
+    {
+       
+        if(flag_while == 0){
+           fprintf(stdout,"WRITE float@%a",token_write->attribute.float_val);
+        }else{
+            for(unsigned int i = 0; i < strlen("WRITE float@"); i++){
+                add_char_to_str(str, "WRITE float@"[i]);
+            }
+            char temp[100];
+            sprintf(temp, "%a",token_write->attribute.float_val);
+            for(unsigned int i = 0; i < strlen(temp); i++){
+                add_char_to_str(str, temp[i]);
+            }
+        }  
+    }
+    if(item->ret_val == TOKEN_STRING)
+    {
+        if(flag_while == 0){
+            fprintf(stdout,"WRITE string@%s",token_write->attribute.string); 
+        }else{
+            for(unsigned int i = 0; i < strlen("WRITE string@"); i++){
+                add_char_to_str(str, "WRITE string@"[i]);
+            }
+            for(unsigned int i = 0; i < strlen(token_write->attribute.string); i++){
+                add_char_to_str(str, token_write->attribute.string[i]);
+            }
+        }   
+    }
+
+}
+//принт пробела
+void print_space(struct dynamic_string *str){
+    if(flag_while == 0){
+        fprintf(stdout," "); 
+    }else{
+        for(unsigned int i = 0; i < strlen(" "); i++){
+            add_char_to_str(str, " "[i]);
+        }
+    }
+}
+//принт \n
+void print_end(struct dynamic_string *str){
+    if(flag_while == 0){
+             fprintf(stdout,"\n");
+        }else{
+            for(unsigned int i = 0; i < strlen("\n"); i++){
+                add_char_to_str(str, "\n"[i]);
+            }
+        }
+}
+
+
+
+
 
 /*
 *   if function
 *
 */
-    void generate_if_head(){
-        fprintf(stdout,"#IF START\n");
+    //выписывает хлавичку if start
+    void generate_if_head(struct dynamic_string *str){
+        if(flag_while == 0)
+        {
+            fprintf(stdout,"#IF_START\n");
+        }
+        else
+        {
+            for(unsigned int i = 0; i < strlen("#IF START\n"); i++){
+                add_char_to_str(str, "#IF START\n"[i]);
+            }
+        }
     }
-    void create_returnvalue(char *s){
-        fprintf(stdout,"DEFVAR %s@res%d\n",s, t);
+
+    //здесь будет тру или фалсе в зависимоти он выследка сравнение
+    //и если булет фалсе то деламе скок 
+    void create_returnvalue(struct dynamic_string *str,char *s, int *t){
+        if(flag_while == 0)
+        {
+            fprintf(stdout,"DEFVAR %s@res%d\n",s, *t);
+        }
+        else
+        {
+            for(unsigned int i = 0; i < strlen("DEFVAR "); i++){
+                add_char_to_str(str, "DEFVAR "[i]);
+            }
+            for(unsigned int i = 0; i < strlen(s); i++){
+                add_char_to_str(str,  s[i]);
+            }
+            for(unsigned int i = 0; i < strlen("@res"); i++){
+                add_char_to_str(str, "@res"[i]);
+            }
+            char temp[100];
+            sprintf(temp, "%d", *t);
+            for(unsigned int i = 0; i < strlen(temp); i++){
+                add_char_to_str(str, temp[i]);
+            }
+        }  
+        
     }
-    void select_operator(struct token_s *token){
+
+    //функция выбора операторов(Привет Паша)
+    void select_operator(struct token_s *token,struct dynamic_string *str){
         switch (token->type)
         {
             case TOKEN_EQUAL:
-                fprintf(stdout,"EQ ");
-                break;
+                if(flag_while == 0)
+                {
+                    fprintf(stdout,"EQ ");
+                    break;
+                }
+                else
+                {
+                    for(unsigned int i = 0; i < strlen("EQ "); i++){
+                        add_char_to_str(str, "EQ"[i]);
+                    }   
+                    break;
+                }
+            
+
             case TOKEN_NOT_EQUAL:
-                fprintf(stdout,"NOT EQ ");
-                break;
+                if(flag_while == 0)
+                {
+                    fprintf(stdout,"NOT EQ ");
+                    break;
+                }
+                else
+                {
+                    for(unsigned int i = 0; i < strlen("NOT EQ "); i++){
+                        add_char_to_str(str, "NOT EQ "[i]);
+                    }
+                    break;  
+                }
+
             case TOKEN_GREATER:
-                fprintf(stdout,"GT ");
-                break;
+                if(flag_while == 0)
+                {
+                    fprintf(stdout,"GT ");
+                    break;
+                }
+                else
+                {
+                    for(unsigned int i = 0; i < strlen("GT "); i++){
+                        add_char_to_str(str, "GT "[i]);
+                    }  
+                    break;
+                }
+                
             case TOKEN_GREATER_EQ:
+                if(flag_while == 0)
+                {
                 fprintf(stdout,"EQ AND GT ");
                 break;
+                }
+                else
+                {
+                    for(unsigned int i = 0; i < strlen("EQ AND GT "); i++){
+                        add_char_to_str(str, "EQ AND GT"[i]);
+                    }
+                    break;
+                }
+ 
             case TOKEN_LESS:
-            fprintf(stdout,"LT" );
-                break;
+                if(flag_while == 0)
+                {
+                    fprintf(stdout,"LT" );
+                    break;
+                }
+                else
+                {
+                    for(unsigned int i = 0; i < strlen("LT "); i++){
+                        add_char_to_str(str, "LT "[i]);
+                    }
+                    break;
+                }
+
             case TOKEN_LESS_EQ:
-            fprintf(stdout,"LT AND EQ ");
-                break;
+                if(flag_while == 0)
+                {
+                    fprintf(stdout,"LT AND EQ ");
+                    break;
+                }
+                else
+                {
+                    for(unsigned int i = 0; i < strlen("LT AND EQ "); i++){
+                        add_char_to_str(str, "LT AND EQ"[i]);
+                    }
+                    break;
+                }
+
             default:
                 break;
         }
     }
-    void if_body(int *t){
-        
+
+
+    //эта и предыдушая фунуция выпишуь знак а потом выпишут куда нужно прыгать в случае успеха
+    //при сравнении значий valueforcounting и valueforounting1 
+    void if_body(int *t,struct dynamic_string *str){
+      if(flag_while == 0)
+      {
         fprintf(stdout,"LF@res LF@valueforcounting%d LF@valueforcounting1%d\n",*t,*t);
         fprintf(stdout,"JUMPIFNEQ $B0DY-EL%d LF@res bool@true\n", *t);
-    }
-    void found_else(int *t){    
-        fprintf(stdout, "JUMP $EXIT%d\n", *t);
-        fprintf(stdout, "LABEL B0DY-EL%d\n", *t);
-    }
-    void end_of_if(int *t){
-        fprintf(stdout,"BODY_EL%d\n", *t);
-    }    
-    void end_of_else(int *t){
-        fprintf(stdout,"LABEL EXIT%d\n", *t);  
-    }
-    void stack_operations(){
-        fprintf(stdout, "DEFVAR GT@valueforcounting\n");
-        fprintf(stdout, "MOVE GT@valueforcounting\n int@0");
-    }
-    void stack_func_sum(struct token_s *token_one, char *s){
+      }
+      else
+      {
+        for(unsigned int i = 0; i < strlen("LF@res LF@valueforcounting"); i++){
+            add_char_to_str(str, "LF@res LF@valueforcounting"[i]);
+        }
+        char temp16[100];
+        sprintf(temp16, "%d", *t);
+        for(unsigned int i = 0; i < strlen(temp16 ); i++){
+            add_char_to_str(str, temp16 [i]);
+        }
+        for(unsigned int i = 0; i < strlen("\nLF@res LF@valueforcounting1"); i++){
+            add_char_to_str(str, "\nLF@res LF@valueforcounting1"[i]);
+        }
+        char temp17[100];
+        sprintf(temp17, "%d", *t);
+        for(unsigned int i = 0; i < strlen(temp17); i++){
+            add_char_to_str(str, temp17[i]);
+        }
+        add_char_to_str(str, 10);
+        for(unsigned int i = 0; i < strlen("JUMPIFNEQ $B0DY-EL"); i++){
+            add_char_to_str(str, "JUMPIFNEQ $B0DY-EL"[i]);
+        }
+        char temp18[100];
+        sprintf(temp18, "%d", *t);
+        for(unsigned int i = 0; i < strlen(temp18); i++){
+            add_char_to_str(str, temp18[i]);
+        }
+        for(unsigned int i = 0; i < strlen(" LF@res bool@true\n"); i++){
+            add_char_to_str(str, " LF@res bool@true\n"[i]);
+        }
+      }
 
-        if(token_one->type == TOKEN_FLOAT)
-        {
-            //fprintf(stdout, "DEFVAR %s@%%%d", s , *count);
-            //fprintf(stdout, "MOVE %s@%%%d float@%d",s ,*count, token_one->attribute.float_val);
-            fprintf(stdout, "ADDS GF@valueforcouning float@%f", token_one->attribute.float_val);
-        }
-        if(token_one->type == TOKEN_INT)
-        {
-            //fprintf(stdout, "DEFVAR %s@%%%d", s , *count);
-            //fprintf(stdout, "MOVE %s@%%%d int@%d",s , *count, token_one->attribute.int_val);
-            fprintf(stdout, "ADDS GF@valueforcouning int@%d", token_one->attribute.int_val);
-        }
-        if(token_one->type == TOKEN_ID)
-        {
-            //fprintf(stdout, "DEFVAR %s@%%%d", s , *count);
-            //fprintf(stdout, "MOVE %s@%%%d int@%d",s , *count, token_one->attribute.int_val);
-            fprintf(stdout, "ADDS GF@valueforcouning %s@%s", s,token_one->attribute.string);
-        }
-        if(token_one->type == TOKEN_STRING)
-        {
-            //fprintf(stdout, "DEFVAR %s@%%%d", s , *count);
-            //fprintf(stdout, "MOVE %s@%%%d int@%d",s , *count, token_one->attribute.int_val);
-            fprintf(stdout, "ADDS GF@valueforcouning string@%s",token_one->attribute.string);
-        }    
+      
+
     }
-    void stack_func_mul(struct token_s *token_one, char *s){
-            if(token_one->type == TOKEN_FLOAT)
+
+    //Леха это уже все написано у тебя, названия функций не менял
+    // будет выписываться в случае того что сканер нашел else
+    void found_else(int *t,struct dynamic_string *str){    
+        if(flag_while == 0)
         {
-            //fprintf(stdout, "DEFVAR %s@%%%d", s , *count);
-            //fprintf(stdout, "MOVE %s@%%%d float@%d",s ,*count, token_one->attribute.float_val);
-            fprintf(stdout, "MULS GF@valueforcouning float@%f", token_one->attribute.float_val);
+            fprintf(stdout, "JUMP $EXIT%d\n", *t);
+            fprintf(stdout, "LABEL B0DY-EL%d\n", *t);
         }
-        if(token_one->type == TOKEN_INT)
+        else
         {
-            //fprintf(stdout, "DEFVAR %s@%%%d", s , *count);
-            //fprintf(stdout, "MOVE %s@%%%d int@%d",s , *count, token_one->attribute.int_val);
-            fprintf(stdout, "MULS GF@valueforcouning int@%d", token_one->attribute.int_val);
+            for(unsigned int i = 0; i < strlen("JUMP $EXIT"); i++){
+                add_char_to_str(str, "JUMP $EXIT"[i]);
+            } 
+            char temp16[100];
+            sprintf(temp16, "%d", *t);
+            for(unsigned int i = 0; i < strlen(temp16); i++){
+                add_char_to_str(str, temp16[i]);
+            }
+            add_char_to_str(str, 10);
+            for(unsigned int i = 0; i < strlen("LABEL B0DY-EL"); i++){
+                add_char_to_str(str, "LABEL B0DY-EL"[i]);
+            } 
+            char temp15[100];
+            sprintf(temp15, "%d", *t);
+            for(unsigned int i = 0; i < strlen(temp15); i++){
+                add_char_to_str(str, temp15[i]);
+            }
+            add_char_to_str(str, 10);
         }
-        if(token_one->type == TOKEN_ID)
-        {
-            //fprintf(stdout, "DEFVAR %s@%%%d", s , *count);
-            //fprintf(stdout, "MOVE %s@%%%d int@%d",s , *count, token_one->attribute.int_val);
-            fprintf(stdout, "MULS GF@valueforcouning %s@%s", s,token_one->attribute.string);
-        }
-        if(token_one->type == TOKEN_STRING)
-        {
-            //fprintf(stdout, "DEFVAR %s@%%%d", s , *count);
-            //fprintf(stdout, "MOVE %s@%%%d int@%d",s , *count, token_one->attribute.int_val);
-            fprintf(stdout, "MULS GF@valueforcouning string@%s",token_one->attribute.string);
-        }    
+        
+
     }
-    void stack_func_sub(struct token_s *token_one, char *s){
-            if(token_one->type == TOKEN_FLOAT)
+
+    //Конец if
+    void end_of_if(int *t,struct dynamic_string *str){
+        if(flag_while == 0)
         {
-            //fprintf(stdout, "DEFVAR %s@%%%d", s , *count);
-            //fprintf(stdout, "MOVE %s@%%%d float@%d",s ,*count, token_one->attribute.float_val);
-            fprintf(stdout, "SUBS GF@valueforcouning float@%f", token_one->attribute.float_val);
+            fprintf(stdout,"BODY_EL%d\n", *t);
         }
-        if(token_one->type == TOKEN_INT)
+        else
         {
-            //fprintf(stdout, "DEFVAR %s@%%%d", s , *count);
-            //fprintf(stdout, "MOVE %s@%%%d int@%d",s , *count, token_one->attribute.int_val);
-            fprintf(stdout, "SUBS GF@valueforcouning int@%d", token_one->attribute.int_val);
+            for(unsigned int i = 0; i < strlen("BODY_EL"); i++){
+                add_char_to_str(str, "BODY_EL"[i]);
+            } 
+            char temp[100];
+            sprintf(temp, "%d", *t);
+            for(unsigned int i = 0; i < strlen(temp); i++){
+                add_char_to_str(str, temp[i]);
+            }        
+            add_char_to_str(str, 10); 
         }
-        if(token_one->type == TOKEN_ID)
+        
+      
+    }   
+
+    //Конец подминки else 
+    void end_of_else(int *t,struct dynamic_string *str){
+        if(flag_while == 0)
         {
-            //fprintf(stdout, "DEFVAR %s@%%%d", s , *count);
-            //fprintf(stdout, "MOVE %s@%%%d int@%d",s , *count, token_one->attribute.int_val);
-            fprintf(stdout, "SUBS GF@valueforcouning %s@%s", s,token_one->attribute.string);
+            fprintf(stdout,"LABEL EXIT%d\n", *t);   
         }
-        if(token_one->type == TOKEN_STRING)
+        else
         {
-            //fprintf(stdout, "DEFVAR %s@%%%d", s , *count);
-            //fprintf(stdout, "MOVE %s@%%%d int@%d",s , *count, token_one->attribute.int_val);
-            fprintf(stdout, "SUBS GF@valueforcouning string@%s",token_one->attribute.string);
-        }    
+            for(unsigned int i = 0; i < strlen("LABEL EXIT"); i++){
+                add_char_to_str(str, "LABEL EXIT"[i]);
+            } 
+            char temp[100];
+            sprintf(temp, "%d", *t);
+            for(unsigned int i = 0; i < strlen(temp); i++){
+                add_char_to_str(str, temp[i]);
+            }        
+            add_char_to_str(str, 10); 
+        }
+        
+ 
+
     }
-    void stack_func_div(struct token_s *token_one, char *s){
-            if(token_one->type == TOKEN_FLOAT)
+
+
+    //Эта функция создает дополнительные переменные в которые будем записывать
+    //то что слева от знака и справа от знака %d для того если у нас if в if
+    void stack_operations(int *t,struct dynamic_string *str){
+        if(flag_while == 0)
         {
-            //fprintf(stdout, "DEFVAR %s@%%%d", s , *count);
-            //fprintf(stdout, "MOVE %s@%%%d float@%d",s ,*count, token_one->attribute.float_val);
-            fprintf(stdout, "DIVS GF@valueforcouning float@%f", token_one->attribute.float_val);
+            fprintf(stdout, "DEFVAR GT@valueforcounting%d\n",*t);
+            fprintf(stdout, "DEFVAR GT@valueforcounting1%d\n",*t);
+            fprintf(stdout, "MOVE GT@valueforcounting%d int@0\n", *t);
+            fprintf(stdout, "MOVE GT@valueforcounting1%d int@0\n", *t);
         }
-        if(token_one->type == TOKEN_INT)
+        else
         {
-            //fprintf(stdout, "DEFVAR %s@%%%d", s , *count);
-            //fprintf(stdout, "MOVE %s@%%%d int@%d",s , *count, token_one->attribute.int_val);
-            fprintf(stdout, "DIVS GF@valueforcouning int@%d", token_one->attribute.int_val);
-        }
-        if(token_one->type == TOKEN_ID)
-        {
-            //fprintf(stdout, "DEFVAR %s@%%%d", s , *count);
-            //fprintf(stdout, "MOVE %s@%%%d int@%d",s , *count, token_one->attribute.int_val);
-            fprintf(stdout, "DIVS GF@valueforcouning %s@%s", s,token_one->attribute.string);
-        }
-        if(token_one->type == TOKEN_STRING)
-        {
-            //fprintf(stdout, "DEFVAR %s@%%%d", s , *count);
-            //fprintf(stdout, "MOVE %s@%%%d int@%d",s , *count, token_one->attribute.int_val);
-            fprintf(stdout, "DIVS GF@valueforcouning string@%s",token_one->attribute.string);
-        }    
+            for(unsigned int i = 0; i < strlen("DEFVAR GT@valueforcounting"); i++){
+                add_char_to_str(str, "DEFVAR GT@valueforcounting"[i]);
+            } 
+            char temp[100];
+            sprintf(temp, "%d", *t);
+            for(unsigned int i = 0; i < strlen(temp); i++){
+                add_char_to_str(str, temp[i]);
+            } 
+            add_char_to_str(str, 10);
+            for(unsigned int i = 0; i < strlen("DEFVAR GT@valueforcounting1"); i++){
+                add_char_to_str(str, "DEFVAR GT@valueforcounting1"[i]);
+            } 
+            char temp1[100];
+            sprintf(temp1, "%d", *t);
+            for(unsigned int i = 0; i < strlen(temp1); i++){
+                add_char_to_str(str, temp1[i]);
+            }        
+            add_char_to_str(str, 10);
+            for(unsigned int i = 0; i < strlen("MOVE GT@valueforcounting"); i++){
+                add_char_to_str(str, "MOVE GT@valueforcounting"[i]);
+            } 
+            char temp2[100];
+            sprintf(temp2, "%d", *t);
+            for(unsigned int i = 0; i < strlen(temp2); i++){
+                add_char_to_str(str, temp2[i]);
+            }  
+            for(unsigned int i = 0; i < strlen(" int@\n"); i++){
+                add_char_to_str(str, " int@0\n"[i]);
+            } 
+            for(unsigned int i = 0; i < strlen("MOVE GT@valueforcounting1"); i++){
+                add_char_to_str(str, "MOVE GT@valueforcounting1"[i]);
+            } 
+            char temp3[100];
+            sprintf(temp3, "%d", *t);
+            for(unsigned int i = 0; i < strlen(temp3); i++){
+                add_char_to_str(str, temp3[i]);
+            }  
+            for(unsigned int i = 0; i < strlen(" int@0\n"); i++){
+                add_char_to_str(str, " int@0\n"[i]);
+            } 
     }
-    void stack_func_int_div(struct token_s *token_one){
-            
-        if(token_one->type == TOKEN_INT)
-        { 
-            fprintf(stdout,"POPS GF@%%tmp_op1\n");
-            fprintf(stdout,"INT2FLOATS\n");
-            fprintf(stdout,"PUSHS GF@%%tmp_op1\n");
-            fprintf(stdout,"INT2FLOATS\n");
-            fprintf(stdout,"DIVS\n");
-            fprintf(stdout,"FLOAT2INTS\n");
-        }
-        if(token_one->type == TOKEN_FLOAT)
-        {
-                fprintf(stdout,"POPS GF@%%tmp_op1\n");
-                fprintf(stdout,"PUSHS GF@%%tmp_op1\n");
-                fprintf(stdout,"DIVS\n");
-                fprintf(stdout,"FLOAT2INTS\n");
-        }
-            
-    }
+}
+
+
 /*
 *   end of if function
 *
@@ -497,89 +1276,620 @@ void print_function(struct token_s *token_write, char *s)
 
 
 
+//Я не работаю с засобникем если это не так, напишите мне
 
 
 
 
 
-
-
-
-
-
-
-// void create_stack_operation(struct token_s *token)
-// {	case TOKEN_EQUAL:
-// 			fprintf(stdout,"EQS\n");
-// 			break;
-            
-
-// 		case TOKEN_NOT_EQUAL:
-// 			ADD_INST("EQS\n");
-// 			ADD_INST("NOTS\n");
-// 			break;
-
-// 		case TOKEN_LESS_EQ:
-// 			ADD_INST("POPS GF@%%tmp_op1");
-// 			ADD_INST("POPS GF@%%tmp_op2");
-// 			ADD_INST("PUSHS GF@%%tmp_op2");
-// 			ADD_INST("PUSHS GF@%%tmp_op1");
-// 			ADD_INST("LTS");
-// 			ADD_INST("PUSHS GF@%%tmp_op2");
-// 			ADD_INST("PUSHS GF@%%tmp_op1");
-// 			ADD_INST("EQS");
-// 			ADD_INST("ORS");
-// 			break;
-
-// 		case TOKEN_LESS:
-// 			ADD_INST("LTS");
-// 			break;
-
-// 		case TOKEN_GREATER_EQ:
-// 			ADD_INST("POPS GF@%%tmp_op1");
-// 			ADD_INST("POPS GF@%%tmp_op2");
-// 			ADD_INST("PUSHS GF@%%tmp_op2");
-// 			ADD_INST("PUSHS GF@%%tmp_op1");
-// 			ADD_INST("GTS");
-// 			ADD_INST("PUSHS GF@%%tmp_op2");
-// 			ADD_INST("PUSHS GF@%%tmp_op1");
-// 			ADD_INST("EQS");
-// 			ADD_INST("ORS");
-// 			break;
-
-// 		case TOKEN_GREATER:
-// 			ADD_INST("GTS");
-// 			break;
-
-// 		default:
-// 			break;
-// 	}
-
-// 	return true;
-// }
-
-
-
-void generate_while_head_1()
+//Создает голову циклы while
+void generate_while_head_1(int *t, struct dynamic_string *str)
 {   
-    i++;
-    fprintf(stdout, "#WHILE CYCLE\n");
-    fprintf(stdout,"LABEL while%d\n", i);
-}
-void while_body(int *t){
+    if(flag_while == 0)
+    {
+        fprintf(stdout,"#WHILE CYCLE\n");
+        fprintf(stdout,"LABEL while%d\n", *t);
+    }
+    else
+    {
+        for(unsigned int i = 0; i < strlen("#WHILE CYCLE\n"); i++){
+            add_char_to_str(str, "#WHILE CYCLE\n"[i]);
+        }
+        for(unsigned int i = 0; i < strlen("LABEL while"); i++){
+            add_char_to_str(str, "LABEL while"[i]);
+        }
+        char temp[100];
+        sprintf(temp, "%d", *t);
+        for(unsigned int i = 0; i < strlen(temp); i++){
+            add_char_to_str(str, temp[i]);
+        }
+        add_char_to_str(str, 10);
+    }
     
-    fprintf(stdout,"LF@res LF@valueforcounting%d LF@valueforcounting1%d\n",*t,*t);
-    fprintf(stdout,"JUMPIFNEQ $B0DY-WHILE%d LF@res bool@true\n", *t);
+
 }
-void generate_while_end(int *t){
+
+//Создает тело функции 
+void while_body(int *t,struct dynamic_string *str){
+    if(flag_while == 0){
+        fprintf(stdout,"LF@res LF@valueforcounting%d LF@valueforcounting1%d\n",*t,*t);
+        fprintf(stdout,"JUMPIFNEQ $EXIT%d LF@res bool@true\n", *t);  
+    }else
+    {
+        for(unsigned int i = 0; i < strlen("LF@res LF@valueforcounting"); i++){
+            add_char_to_str(str, "LF@res LF@valueforcounting"[i]);
+        }
+        char temp11[100];
+        sprintf(temp11, "%d", *t);
+        for(unsigned int i = 0; i < strlen(temp11); i++){
+            add_char_to_str(str, temp11[i]);
+        }
+        for(unsigned int i = 0; i < strlen(" LF@valueforcounting1"); i++){
+            add_char_to_str(str, " LF@valueforcounting1"[i]);
+        }
+        char temp12[100];
+        sprintf(temp12, "%d", *t);
+        for(unsigned int i = 0; i < strlen(temp12); i++){
+            add_char_to_str(str, temp12[i]);
+        }
+        add_char_to_str(str, 10);
+        for(unsigned int i = 0; i < strlen("JUMPIFNEQ $EXIT"); i++){
+            add_char_to_str(str, "JUMPIFNEQ $EXIT"[i]);
+        }
+        char temp13[100];
+        sprintf(temp13, "%d", *t);
+        for(unsigned int i = 0; i < strlen(temp13); i++){
+            add_char_to_str(str, temp13[i]);
+        }
+        for(unsigned int i = 0; i < strlen(" LF@res bool@true\n"); i++){
+            add_char_to_str(str, " LF@res bool@true\n"[i]);
+        }
+
+    }
     
-    fprintf(stdout,"JUMP while%d\n", *t);
-    fprintf(stdout,"LABEL $EXIT%d\n", *t);
+
 }
 
 
-void generate_function_return(char *function_id)
-{
-	ADD_INST("MOVE LF@%%retval GF@%exp_result");
-	ADD_CODE("JUMP $"); ADD_CODE(function_id); ADD_CODE("%%return\n");
+//Создает конец цикла while
+void generate_while_end(int *t,struct dynamic_string *str){    
+    if(flag_while == 0)
+    {
+        fprintf(stdout,"JUMP while%d\n", *t);
+        fprintf(stdout,"LABEL $EXIT%d\n", *t);
+    }
+    else
+    {
+        for(unsigned int i = 0; i < strlen("JUMP while"); i++){
+            add_char_to_str(str, "JUMP while"[i]);
+        } 
+        char temp8[100];
+        sprintf(temp8, "%d", *t);
+        for(unsigned int i = 0; i < strlen(temp8); i++){
+            add_char_to_str(str, temp8[i]);
+        }
+        add_char_to_str(str, 10);
+        for(unsigned int i = 0; i < strlen("LABEL $EXIT"); i++){
+            add_char_to_str(str, "LABEL $EXIT"[i]);
+        } 
+        char temp9[100];
+        sprintf(temp9, "%d", *t);
+        for(unsigned int i = 0; i < strlen(temp9); i++){
+            add_char_to_str(str, temp9[i]);
+        }
+        add_char_to_str(str, 10);
+    }
+
 }
+
+
+//Создает цикл while для while(true)  или while(1)
+void while_for_true(int *t,struct dynamic_string *str){
+    if(flag_while == 0)
+    {
+        fprintf(stdout,"#WHILE CYCLE\n");
+        fprintf(stdout,"LABEL while%d\n",*t);
+    }
+    else
+    {
+        for(unsigned int i = 0; i < strlen("#WHILE CYCLE\n"); i++){
+            add_char_to_str(str, "#WHILE CYCLE\n"[i]);
+        }
+        for(unsigned int i = 0; i < strlen("LABEL while"); i++){
+            add_char_to_str(str, "LABEL while"[i]);
+        }
+        char temp[100];
+        sprintf(temp, "%d", *t);
+        for(unsigned int i = 0; i < strlen(temp); i++){
+            add_char_to_str(str, temp[i]);
+        }
+        add_char_to_str(str, 10);
+    }
+}
+
+
+//Создает конец для функции описанной выше
+void generate_while_for_true_end(int *t,struct dynamic_string *str){    
+    if(flag_while == 0)
+    {
+        fprintf(stdout,"JUMP while%d\n", *t);
+        fprintf(stdout,"LABEL $EXIT%d\n", *t);
+    }
+    else
+    {
+        for(unsigned int i = 0; i < strlen("JUMP while"); i++){
+            add_char_to_str(str, "JUMP while"[i]);
+        } 
+        char temp5[100];
+        sprintf(temp5, "%d", *t);
+        for(unsigned int i = 0; i < strlen(temp5); i++){
+            add_char_to_str(str, temp5[i]);
+        }
+        add_char_to_str(str, 10);
+        for(unsigned int i = 0; i < strlen("LABEL $EXIT"); i++){
+            add_char_to_str(str, "LABEL $EXIT"[i]);
+        } 
+        char temp6[100];
+        sprintf(temp6, "%d", *t);
+        for(unsigned int i = 0; i < strlen(temp6); i++){
+            add_char_to_str(str, temp6[i]);
+        }
+        add_char_to_str(str, 10);
+    }
+}
+
+
+//Функия посчитает и запишет в помоцную переменную valueforcouing все что вы туда пошлете(sum)
+void func_sum(struct token_s *token_one, char *s,struct dynamic_string *str){
+    if(token_one->type == TOKEN_FLOAT)
+    {   
+        if(flag_while == 0)
+        {
+            fprintf(stdout, "ADD GF@valueforcouning float@%a\n", token_one->attribute.float_val);
+        }
+        else
+        {
+            for(unsigned int i = 0; i < strlen("ADD GF@valueforcouning float@"); i++){
+                add_char_to_str(str, "ADD GF@valueforcouning float@"[i]);
+            } 
+            char temp[100];
+            sprintf(temp, "%f",  token_one->attribute.float_val);
+            for(unsigned int i = 0; i < strlen(temp); i++){
+                add_char_to_str(str, temp[i]);
+            }
+            add_char_to_str(str, 10);   
+        }   
+    }
+    if(token_one->type == TOKEN_INT)
+    {  
+
+        if(flag_while == 0)
+        {
+            fprintf(stdout, "DEFVAR LF@TMPF2INT\n");
+            fprintf(stdout, "MOVE LF@TMPF2INT int@%d\n", token_one->attribute.int_val);
+            fprintf(stdout, "INT2FLOAT TF@%%TMPF2INT TF@%%TMPF2INT\n");
+            fprintf(stdout, "ADD GF@valueforcouning TF@%%TMPF2INT\n");
+        }
+        else
+        {
+            for(unsigned int i = 0; i < strlen("DEFVAR LF@TMPF2INT\nMOVE LF@TMPF2INT int@"); i++){
+                add_char_to_str(str, "DEFVAR LF@TMPF2INT\nMOVE LF@TMPF2INT int@"[i]);
+            } 
+            char temp[100];
+            sprintf(temp, "%d",  token_one->attribute.int_val);
+            for(unsigned int i = 0; i < strlen(temp); i++){
+                add_char_to_str(str, temp[i]);
+            }
+            add_char_to_str(str, 10);   
+            for(unsigned int i = 0; i < strlen("INT2FLOAT TF@%%TMPF2INT TF@%%TMPF2INT\nADD GF@valueforcouning TF@%%TMPF2INT\n"); i++){
+                add_char_to_str(str, "INT2FLOAT TF@%%TMPF2INT TF@%%TMPF2INT\nADD GF@valueforcouning TF@%%TMPF2INT\n"[i]);
+            } 
+        }
+        
+    }
+    if(token_one->type == TOKEN_ID)
+    {
+        if(flag_while == 0)
+        {
+            fprintf(stdout, "ADD GF@valueforcouning %s@%s\n", s,token_one->attribute.string);
+        }else
+        {
+            for(unsigned int i = 0; i < strlen("ADD GF@valueforcouning "); i++){
+                add_char_to_str(str, "ADD GF@valueforcouning "[i]);
+            } 
+            for(unsigned int i = 0; i < strlen(s); i++){
+                add_char_to_str(str, s[i]);
+            }
+            for(unsigned int i = 0; i < strlen("@"); i++){
+                add_char_to_str(str, "@"[i]);
+            } 
+            for(unsigned int i = 0; i < strlen(token_one->attribute.string); i++){
+                add_char_to_str(str, token_one->attribute.string[i]);
+            }
+            add_char_to_str(str, 10);  
+        }
+        
+
+        
+    }
+    if(token_one->type == TOKEN_STRING)
+    {
+        if(flag_while == 0)
+        {
+             fprintf(stdout, "ADDS GF@valueforcouning string@%s\n",token_one->attribute.string);
+        }
+        else
+        {
+            for(unsigned int i = 0; i < strlen("ADD GF@valueforcouning string@"); i++){
+                add_char_to_str(str, "ADD GF@valueforcouning string@"[i]);
+            } 
+            for(unsigned int i = 0; i < strlen(token_one->attribute.string); i++){
+                add_char_to_str(str, token_one->attribute.string[i]);
+            }
+            add_char_to_str(str, 10);   
+        }   
+       
+    }    
+}
+
+//Функия посчитает и запишет в помоцную переменную valueforcouing все что вы туда пошлете(mul)
+void func_mul(struct token_s *token_one, char *s, struct dynamic_string *str){
+
+    if(token_one->type == TOKEN_FLOAT)
+    {   
+        if(flag_while == 0)
+        {
+            fprintf(stdout, "MUL GF@valueforcouning float@%a\n", token_one->attribute.float_val);
+        }
+        else
+        {
+            for(unsigned int i = 0; i < strlen("MUL GF@valueforcouning float@"); i++){
+                add_char_to_str(str, "MUL GF@valueforcouning float@"[i]);
+            } 
+            char temp[100];
+            sprintf(temp, "%f",  token_one->attribute.float_val);
+            for(unsigned int i = 0; i < strlen(temp); i++){
+                add_char_to_str(str, temp[i]);
+            }
+            add_char_to_str(str, 10);   
+        }   
+    }
+    if(token_one->type == TOKEN_INT)
+    {  
+
+        if(flag_while == 0)
+        {
+            fprintf(stdout, "DEFVAR LF@TMPF2INT\n");
+            fprintf(stdout, "MOVE LF@TMPF2INT int@%d\n", token_one->attribute.int_val);
+            fprintf(stdout, "INT2FLOAT TF@%%TMPF2INT TF@%%TMPF2INT\n");
+            fprintf(stdout, "MUL GF@valueforcouning TF@%%TMPF2INT\n");
+        }
+        else
+        {
+            for(unsigned int i = 0; i < strlen("DEFVAR LF@TMPF2INT\nMOVE LF@TMPF2INT int@"); i++){
+                add_char_to_str(str, "DEFVAR LF@TMPF2INT\nMOVE LF@TMPF2INT int@"[i]);
+            } 
+            char temp[100];
+            sprintf(temp, "%d",  token_one->attribute.int_val);
+            for(unsigned int i = 0; i < strlen(temp); i++){
+                add_char_to_str(str, temp[i]);
+            }
+            add_char_to_str(str, 10);   
+            for(unsigned int i = 0; i < strlen("INT2FLOAT TF@%%TMPF2INT TF@%%TMPF2INT\nMUL GF@valueforcouning TF@%%TMPF2INT\n"); i++){
+                add_char_to_str(str, "INT2FLOAT TF@%%TMPF2INT TF@%%TMPF2INT\nMUL GF@valueforcouning TF@%%TMPF2INT\n"[i]);
+            } 
+        }
+        
+    }
+    if(token_one->type == TOKEN_ID)
+    {
+        if(flag_while == 0)
+        {
+            fprintf(stdout, "ADD GF@valueforcouning %s@%s\n", s,token_one->attribute.string);
+        }else
+        {
+            for(unsigned int i = 0; i < strlen("ADD GF@valueforcouning "); i++){
+                add_char_to_str(str, "ADD GF@valueforcouning "[i]);
+            } 
+            for(unsigned int i = 0; i < strlen(s); i++){
+                add_char_to_str(str, s[i]);
+            }
+            for(unsigned int i = 0; i < strlen("@"); i++){
+                add_char_to_str(str, "@"[i]);
+            } 
+            for(unsigned int i = 0; i < strlen(token_one->attribute.string); i++){
+                add_char_to_str(str, token_one->attribute.string[i]);
+            }
+            add_char_to_str(str, 10);  
+        }
+        
+
+        
+    }
+    if(token_one->type == TOKEN_STRING)
+    {
+        if(flag_while == 0)
+        {
+             fprintf(stdout, "MUL GF@valueforcouning string@%s\n",token_one->attribute.string);
+        }
+        else
+        {
+            for(unsigned int i = 0; i < strlen("MUL GF@valueforcouning string@"); i++){
+                add_char_to_str(str, "MUL GF@valueforcouning string@"[i]);
+            } 
+            for(unsigned int i = 0; i < strlen(token_one->attribute.string); i++){
+                add_char_to_str(str, token_one->attribute.string[i]);
+            }
+            add_char_to_str(str, 10);   
+        }   
+       
+    }     
+}
+
+//Функия посчитает и запишет в помоцную переменную valueforcouing все что вы туда пошлете(sub)
+void func_sub(struct token_s *token_one, char *s,struct dynamic_string *str){
+
+    if(token_one->type == TOKEN_FLOAT)
+    {   
+        if(flag_while == 0)
+        {
+            fprintf(stdout, "SUB GF@valueforcouning float@%a\n", token_one->attribute.float_val);
+        }
+        else
+        {
+            for(unsigned int i = 0; i < strlen("SUB GF@valueforcouning float@"); i++){
+                add_char_to_str(str, "SUB GF@valueforcouning float@"[i]);
+            } 
+            char temp[100];
+            sprintf(temp, "%f",  token_one->attribute.float_val);
+            for(unsigned int i = 0; i < strlen(temp); i++){
+                add_char_to_str(str, temp[i]);
+            }
+            add_char_to_str(str, 10);   
+        }   
+    }
+    if(token_one->type == TOKEN_INT)
+    {  
+
+        if(flag_while == 0)
+        {
+            fprintf(stdout, "DEFVAR LF@TMPF2INT\n");
+            fprintf(stdout, "MOVE LF@TMPF2INT int@%d\n", token_one->attribute.int_val);
+            fprintf(stdout, "INT2FLOAT TF@%%TMPF2INT TF@%%TMPF2INT\n");
+            fprintf(stdout, "SUB GF@valueforcouning TF@%%TMPF2INT\n");
+        }
+        else
+        {
+            for(unsigned int i = 0; i < strlen("DEFVAR LF@TMPF2INT\nMOVE LF@TMPF2INT int@"); i++){
+                add_char_to_str(str, "DEFVAR LF@TMPF2INT\nMOVE LF@TMPF2INT int@"[i]);
+            } 
+            char temp[100];
+            sprintf(temp, "%d",  token_one->attribute.int_val);
+            for(unsigned int i = 0; i < strlen(temp); i++){
+                add_char_to_str(str, temp[i]);
+            }
+            add_char_to_str(str, 10);   
+            for(unsigned int i = 0; i < strlen("INT2FLOAT TF@%%TMPF2INT TF@%%TMPF2INT\nSUB GF@valueforcouning TF@%%TMPF2INT\n"); i++){
+                add_char_to_str(str, "INT2FLOAT TF@%%TMPF2INT TF@%%TMPF2INT\nSUB GF@valueforcouning TF@%%TMPF2INT\n"[i]);
+            } 
+        }
+        
+    }
+    if(token_one->type == TOKEN_ID)
+    {
+        if(flag_while == 0)
+        {
+            fprintf(stdout, "SUB GF@valueforcouning %s@%s\n", s,token_one->attribute.string);
+        }else
+        {
+            for(unsigned int i = 0; i < strlen("SUB GF@valueforcouning "); i++){
+                add_char_to_str(str, "SUB GF@valueforcouning "[i]);
+            } 
+            for(unsigned int i = 0; i < strlen(s); i++){
+                add_char_to_str(str, s[i]);
+            }
+            for(unsigned int i = 0; i < strlen("@"); i++){
+                add_char_to_str(str, "@"[i]);
+            } 
+            for(unsigned int i = 0; i < strlen(token_one->attribute.string); i++){
+                add_char_to_str(str, token_one->attribute.string[i]);
+            }
+            add_char_to_str(str, 10);  
+        }
+        
+
+        
+    }
+    if(token_one->type == TOKEN_STRING)
+    {
+        if(flag_while == 0)
+        {
+             fprintf(stdout, "SUB GF@valueforcouning string@%s\n",token_one->attribute.string);
+        }
+        else
+        {
+            for(unsigned int i = 0; i < strlen("SUB GF@valueforcouning string@"); i++){
+                add_char_to_str(str, "SUB GF@valueforcouning string@"[i]);
+            } 
+            for(unsigned int i = 0; i < strlen(token_one->attribute.string); i++){
+                add_char_to_str(str, token_one->attribute.string[i]);
+            }
+            add_char_to_str(str, 10);   
+        }   
+       
+    }      
+}
+
+
+//Функия посчитает и запишет в помоцную переменную valueforcouing все что вы туда пошлете(div)
+void func_div(struct token_s *token_one, char *s,struct dynamic_string *str){
+    if(token_one->type == TOKEN_FLOAT)
+    {   
+        if(flag_while == 0)
+        {
+            fprintf(stdout, "DIV GF@valueforcouning float@%a\n", token_one->attribute.float_val);
+        }
+        else
+        {
+            for(unsigned int i = 0; i < strlen("DIV GF@valueforcouning float@"); i++){
+                add_char_to_str(str, "DIV GF@valueforcouning float@"[i]);
+            } 
+            char temp[100];
+            sprintf(temp, "%f",  token_one->attribute.float_val);
+            for(unsigned int i = 0; i < strlen(temp); i++){
+                add_char_to_str(str, temp[i]);
+            }
+            add_char_to_str(str, 10);   
+        }   
+    }
+    if(token_one->type == TOKEN_INT)
+    {  
+
+        if(flag_while == 0)
+        {
+            fprintf(stdout, "DEFVAR LF@TMPF2INT\n");
+            fprintf(stdout, "MOVE LF@TMPF2INT int@%d\n", token_one->attribute.int_val);
+            fprintf(stdout, "INT2FLOAT TF@%%TMPF2INT TF@%%TMPF2INT\n");
+            fprintf(stdout, "DIV GF@valueforcouning TF@%%TMPF2INT\n");
+        }
+        else
+        {
+            for(unsigned int i = 0; i < strlen("DEFVAR LF@TMPF2INT\nMOVE LF@TMPF2INT int@"); i++){
+                add_char_to_str(str, "DEFVAR LF@TMPF2INT\nMOVE LF@TMPF2INT int@"[i]);
+            } 
+            char temp[100];
+            sprintf(temp, "%d",  token_one->attribute.int_val);
+            for(unsigned int i = 0; i < strlen(temp); i++){
+                add_char_to_str(str, temp[i]);
+            }
+            add_char_to_str(str, 10);   
+            for(unsigned int i = 0; i < strlen("INT2FLOAT TF@%%TMPF2INT TF@%%TMPF2INT\nDIV GF@valueforcouning TF@%%TMPF2INT\n"); i++){
+                add_char_to_str(str, "INT2FLOAT TF@%%TMPF2INT TF@%%TMPF2INT\nDIV GF@valueforcouning TF@%%TMPF2INT\n"[i]);
+            } 
+        }
+        
+    }
+    if(token_one->type == TOKEN_ID)
+    {
+        if(flag_while == 0)
+        {
+            fprintf(stdout, "DIV GF@valueforcouning %s@%s\n", s,token_one->attribute.string);
+        }else
+        {
+            for(unsigned int i = 0; i < strlen("DIV GF@valueforcouning "); i++){
+                add_char_to_str(str, "DIV GF@valueforcouning "[i]);
+            } 
+            for(unsigned int i = 0; i < strlen(s); i++){
+                add_char_to_str(str, s[i]);
+            }
+            for(unsigned int i = 0; i < strlen("@"); i++){
+                add_char_to_str(str, "@"[i]);
+            } 
+            for(unsigned int i = 0; i < strlen(token_one->attribute.string); i++){
+                add_char_to_str(str, token_one->attribute.string[i]);
+            }
+            add_char_to_str(str, 10);  
+        }
+        
+
+        
+    }
+    if(token_one->type == TOKEN_STRING)
+    {
+        if(flag_while == 0)
+        {
+             fprintf(stdout, "DIV GF@valueforcouning string@%s\n",token_one->attribute.string);
+        }
+        else
+        {
+            for(unsigned int i = 0; i < strlen("DIV GF@valueforcouning string@"); i++){
+                add_char_to_str(str, "DIV GF@valueforcouning string@"[i]);
+            } 
+            for(unsigned int i = 0; i < strlen(token_one->attribute.string); i++){
+                add_char_to_str(str, token_one->attribute.string[i]);
+            }
+            add_char_to_str(str, 10);   
+        }   
+       
+    }     
+}
+void func_int_div(struct token_s *token_one,struct dynamic_string *str){
+
+    if(flag_while == 0)
+    {
+        fprintf(stdout, "INT2FLOAT GF@valueforcouting GF@valueforcouting\n");
+    }
+    else
+    {
+        for(unsigned int i = 0; i < strlen("INT2FLOAT GF@valueforcouting GF@valueforcouting\n"); i++){
+            add_char_to_str(str, "INT2FLOAT GF@valueforcouting GF@valueforcouting\n"[i]);
+        } 
+    }
+    
+
+   
+    if(token_one->type == TOKEN_INT)
+    {
+        if(flag_while == 0)
+        {        
+            fprintf(stdout, "DEFVAR LF@TMPF2INT\n");
+            fprintf(stdout, "MOVE LF@TMPF2INT int@%d\n", token_one->attribute.int_val);
+            fprintf(stdout, "INT2FLOAT TF@%%TMPF2INT TF@%%TMPF2INT\n");
+            fprintf(stdout, "DIV GF@valueforcouning TF@%%TMPF2INT\n");
+        }
+        else
+        {
+        for(unsigned int i = 0; i < strlen("DEFVAR LF@TMPF2INT\nMOVE LF@TMPF2INT int@"); i++){
+            add_char_to_str(str, "DEFVAR LF@TMPF2INT\nMOVE LF@TMPF2INT int@"[i]);
+        } 
+        char temp[100];
+        sprintf(temp, "%d", token_one->attribute.int_val);
+        for(unsigned int i = 0; i < strlen(temp); i++){
+            add_char_to_str(str, temp[i]);
+        }
+        add_char_to_str(str, 10);
+        }
+       for(unsigned int i = 0; i < strlen("INT2FLOAT TF@%%TMPF2INT TF@%%TMPF2INT\nDIV GF@valueforcouning TF@%%TMPF2INT\n"); i++){
+            add_char_to_str(str, "INT2FLOAT TF@%%TMPF2INT TF@%%TMPF2INT\nDIV GF@valueforcouning TF@%%TMPF2INT\n"[i]);
+        } 
+        
+
+
+    }
+    if(token_one->type == TOKEN_FLOAT)
+    {
+        if(flag_while == 0)
+        {
+            fprintf(stdout, "DIV GF@valueforcouning float@%f\n",token_one->attribute.float_val);
+        }
+        else
+        {
+            for(unsigned int i = 0; i < strlen("DIV GF@valueforcouning float@"); i++){
+                add_char_to_str(str, "DIV GF@valueforcouning float@"[i]);
+            } 
+            char temp[100];
+            sprintf(temp, "%f", token_one->attribute.float_val);
+            for(unsigned int i = 0; i < strlen(temp); i++){
+                add_char_to_str(str, temp[i]);
+            }
+            add_char_to_str(str, 10);
+        }
+        
+        
+    }
+    if(flag_while == 0)
+    {
+        fprintf(stdout, "FLOAT2INTS\n");
+    }
+    else
+    {
+        for(unsigned int i = 0; i < strlen("FLOAT2INTS\n"); i++){
+            add_char_to_str(str, "FLOAT2INTS\n"[i]);
+        } 
+    }
+    
+
+      
+}
+
+

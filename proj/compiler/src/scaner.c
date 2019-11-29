@@ -39,29 +39,15 @@
 #define SCANNER_BRACKET 28
 #define SCANNER_EOF 100 // Scanner read last token
 
-/* Macros for freeing resources*/
-/*#define FREE_ALL(...)                                      \
-    do                                                     \
-    {                                                      \
-        unsigned int i = 0;                                \
-        void *pta[] = {__VA_ARGS__};                       \
-        for (i = 0; i < sizeof(pta) / sizeof(void *); i++) \
-        {                                                  \
-            free(pta[i]);                                  \
-        }                                                  \
-    } while (0)*/
-
-
-
 typedef struct stack tStack;
 
-int get_token(FILE *file, struct token_s *token, tStack *stack)
-// int get_token(struct token_s *token, tStack *stack)
+// int get_token(FILE *file, struct token_s *token, tStack *stack)
+int get_token(struct token_s *token, tStack *stack)
 {
 
-    if (!file){
-        SLOG("There is no input file.Rerun with file");
-    }
+    // if (!file){
+    //     SLOG("There is no input file.Rerun with file");
+    // }
 
     // string to writing down attribute
     struct dynamic_string *str;
@@ -71,24 +57,32 @@ int get_token(FILE *file, struct token_s *token, tStack *stack)
     static bool first_token = true;
     static int double_quot = 0;
     static int count_of_quot = 0;
-    int c; // for symbol
+    int c;
+    static int prev_sym;
     int space_cnt = 0;
      
     while (state != SCANNER_EOF)
     {
-        c = getc(file);
+        c = getchar();
+        if(c == -1 && prev_sym != '\n' && state == SCANNER_START){
+            token->type = TOKEN_EOL;
+            str_clean(str);
+            prev_sym = '\n';
+            ungetc(c, stdin);
+            return OK;            
+        }
+        else{
+            prev_sym = c;
+        }
 
         switch (state){
         case SCANNER_START:
-            if (c == -1)
-            {   
+            if (c == -1){   
                 token->type = TOKEN_EOF;
-                if (stackTop(stack))
-                {
+                if (stackTop(stack)){
                     token->type = TOKEN_DEDEND;
                     stackPop(stack);
                     str_clean(str);
-
                     return OK;
                 }
                 str_clean(str);
@@ -122,14 +116,13 @@ int get_token(FILE *file, struct token_s *token, tStack *stack)
                     break;    
                 }
                 if((stackTop(stack) != 0) && (c != '\n' && c != '\r')){
-                    ungetc(c, file);
+                    ungetc(c, stdin);
                     stackPop(stack);
                     token->type = TOKEN_DEDEND;
                     str_clean(str);
                     return OK;
                 }
             }
-
             if (c == '#'){
                 state = SCANNER_COMMENT;
                 break;
@@ -142,7 +135,7 @@ int get_token(FILE *file, struct token_s *token, tStack *stack)
             }
             else if (isdigit(c)){
                 state = SCANNER_INT_OR_FLOAT;
-                ungetc(c, file);
+                ungetc(c, stdin);
                 first_token = false;
                 break;
             }
@@ -170,12 +163,12 @@ int get_token(FILE *file, struct token_s *token, tStack *stack)
             }
             else if (c == '"'){
                 state = SCANNER_BLOCK_STRING_BEGIN;
-                ungetc(c, file);
+                ungetc(c, stdin);
                 break;
             }
             else if (c == '<' || c == '>'){
                 state = SCANNER_LESS_GREATER;
-                ungetc(c, file);
+                ungetc(c, stdin);
                 break;
             }
             else if (c == '='){
@@ -198,12 +191,12 @@ int get_token(FILE *file, struct token_s *token, tStack *stack)
                 return OK;
             }
             else if (c == '/'){
-                c = getc(file);
+                c = getchar();
                 if(c == '/'){
                     token->type = TOKEN_DIV_INT;
                 }
                 else{
-                    ungetc(c, file);
+                    ungetc(c, stdin);
                     token->type = TOKEN_DIVISION;
                 }
                 str_clean(str);
@@ -221,7 +214,7 @@ int get_token(FILE *file, struct token_s *token, tStack *stack)
             }
             else if (c == '(' || c == ')'){
                 state = SCANNER_BRACKET;
-                ungetc(c, file);
+                ungetc(c, stdin);
                 break;
             }
             break;
@@ -232,7 +225,7 @@ int get_token(FILE *file, struct token_s *token, tStack *stack)
                 }
             }
             else{
-                ungetc(c, file);
+                ungetc(c, stdin);
                 if (strcmp(str->str, "while") == 0){
                     token->type = TOKEN_KEY_WORD;
                     token->attribute.key_word = _WHILE_;
@@ -247,7 +240,6 @@ int get_token(FILE *file, struct token_s *token, tStack *stack)
                 }
                 else if(strcmp(str->str, "none") == 0){
                     token->type = TOKEN_NONE;
-                    // token->attribute.key_word = _NONE_;
                 }
                 else if(strcmp(str->str, "pass") == 0){
                     token->type = TOKEN_KEY_WORD;
@@ -286,21 +278,20 @@ int get_token(FILE *file, struct token_s *token, tStack *stack)
                     token->type = TOKEN_CHR;
                 }
                 else{
-                    for(;;c = getc(file)){ 
+                    for (c = getchar();; c = getchar()){
                         if(c == ' '){
                             continue;
                         }
                         else if(c == '('){
                             token->type = TOKEN_FNC;
+                            ungetc(c, stdin);
                             break;
                         }
                         else{
                             /* I dont know why, but if without this IF it 
-                            doesn't generate TOKEN_ASSIGN type*/ 
-                            if(c == '='){
-                                ungetc(c, file);
-                            }
+                            doesn't generate TOKEN_ASSIGN type */ 
                             token->type = TOKEN_ID;
+                            ungetc(c, stdin);
                             break;
                         }
                     }
@@ -316,7 +307,7 @@ int get_token(FILE *file, struct token_s *token, tStack *stack)
         case SCANNER_INT_OR_FLOAT:
             // if zero, then it can be only float number, or 0 as integer
             if(c == '0'){
-                c = getc(file);
+                c = getchar();
                 if (c == '.'){
                     add_char_to_str(str, '0');
                     add_char_to_str(str, c);
@@ -329,14 +320,14 @@ int get_token(FILE *file, struct token_s *token, tStack *stack)
                 }
                 else if (isdigit(c)){
                     str_clean(str);
-                    SLOG("ERROR. In the begining of number cant be more then one");
+                    // SLOG("ERROR. In the begining of number cant be more then one");
                 }
                 else{
                     if(isalpha(c)){
-                        SLOG("Wrong ID");
+                        //SLOG("Wrong ID");
                         return ERR_LEXER;
                     }
-                    ungetc(c,file);
+                    ungetc(c,stdin);
                     add_char_to_str(str, '0');
                     state = SCANNER_INT;
                 }
@@ -360,10 +351,10 @@ int get_token(FILE *file, struct token_s *token, tStack *stack)
             }
             else{
                 if(isalpha(c)){
-                    SLOG("Wrong indetificator");
+                    // SLOG("Wrong indetificator");
                     return ERR_LEXER; 
                 }
-                ungetc(c,file);
+                ungetc(c,stdin);
                 int num = atoi(str->str);
                 token->attribute.int_val = num;
                 token->type = TOKEN_INT;
@@ -381,11 +372,11 @@ int get_token(FILE *file, struct token_s *token, tStack *stack)
             }
             else{
                 if(isalpha(c)){
-                    SLOG("Wrong indetificator");
+                    // SLOG("Wrong indetificator");
                     return ERR_LEXER; 
                 }
 
-                ungetc(c, file);
+                ungetc(c, stdin);
                 token->attribute.float_val = strtof(str->str, NULL);
                 token->type = TOKEN_FLOAT;
                 str_clean(str);
@@ -401,11 +392,11 @@ int get_token(FILE *file, struct token_s *token, tStack *stack)
             }
             else{
                 if(isalpha(c)){
-                    SLOG("Wrong indetificator");
+                    // SLOG("Wrong indetificator");
                     return ERR_LEXER; 
                 }
 
-                ungetc(c, file);
+                ungetc(c, stdin);
                 token->attribute.float_val = strtof(str->str, NULL);
                 token->type = TOKEN_FLOAT;
                 str_clean(str);
@@ -433,7 +424,7 @@ int get_token(FILE *file, struct token_s *token, tStack *stack)
                 break;
             }
             else{
-                ungetc(c,file);
+                ungetc(c,stdin);
                 // INDENT OR DEDEND
                 first_token = false;
                 if(space_cnt > stackTop(stack)){
@@ -446,14 +437,14 @@ int get_token(FILE *file, struct token_s *token, tStack *stack)
                 }
                 else if (space_cnt < stackTop(stack)){
                     // DEDEND
-                    c = getc(file);
+                    c = getchar();
                     //  If it is a commnet line, so just skip it without DEDEND
                     if(c == '#'){
                         state = SCANNER_COMMENT;                                    
                         break;
                     }
                     else{
-                        ungetc(c, file);
+                        ungetc(c, stdin);
                     }
                     bool found =  false;
                     while (stackTop(stack) != 0){
@@ -492,14 +483,14 @@ int get_token(FILE *file, struct token_s *token, tStack *stack)
                 return OK;
             }
             else if (c == '\\'){
-                c = getc(file);
+                c = getchar();
                 // Hexadecimal value
                 if((c == 'x') || (c == 'X')){
                     char tmp[4];
                     tmp[0] = '0';
                     tmp[1] = (char)c;
                     for(int i = 2; i < 4; i++){
-                        c = getc(file);
+                        c = getchar();
                         if (isdigit(c) ||
                             (c == 'A') ||
                             (c == 'a') ||
@@ -517,7 +508,7 @@ int get_token(FILE *file, struct token_s *token, tStack *stack)
                             tmp[i] = (char)c;
                         }
                         else{
-                            SLOG("Hexadecimal value in string must be in format '\\xAB, where A and B are integer numbers");
+                           // SLOG("Hexadecimal value in string must be in format '\\xAB, where A and B are integer numbers");
                             return ERR_LEXER;
                         }
                     }
@@ -550,7 +541,7 @@ int get_token(FILE *file, struct token_s *token, tStack *stack)
             else if (c == '\n'){
                 str_clean(str);
                 str_clean(str);
-                SLOG("ERROR. String must be in one line!");
+                // SLOG("ERROR. String must be in one line!");
                 return ERR_LEXER;
             }
             else{
@@ -568,14 +559,14 @@ int get_token(FILE *file, struct token_s *token, tStack *stack)
                 double_quot = 0;
                 if(count_of_quot < 2){
                     if (c == '\\'){
-                        c = getc(file);
+                        c = getchar();
                         // Hexadecimal value
                         if((c == 'x') || (c == 'X')){
                             char tmp[4];
                             tmp[0] = '0';
                             tmp[1] = (char)c;
                             for(int i = 2; i < 4; i++){
-                                c = getc(file);
+                                c = getchar();
                                 if (isdigit(c) ||
                                 (c == 'A') ||
                                 (c == 'a') ||
@@ -593,7 +584,7 @@ int get_token(FILE *file, struct token_s *token, tStack *stack)
                                     tmp[i] = (char)c;
                                 }
                                 else{
-                                    SLOG("Hexadecimal value in string must be in format '\\xAB, where A and B are integer numbers");
+                                    // SLOG("Hexadecimal value in string must be in format '\\xAB, where A and B are integer numbers");
                                 }
                             }
                             char hex;
@@ -630,7 +621,7 @@ int get_token(FILE *file, struct token_s *token, tStack *stack)
                 }
                 else{
                     count_of_quot = 0;
-                    ungetc(c,file);
+                    ungetc(c,stdin);
                     token->type = TOKEN_STRING;
                     token->attribute.string = (char *)malloc(str->size);
                     strncpy(token->attribute.string, str->str, str->size);
@@ -641,7 +632,7 @@ int get_token(FILE *file, struct token_s *token, tStack *stack)
             }
             else{
                 str_clean(str);
-                SLOG("ERROR. Block string must start from '\"\"\"' !");
+                // SLOG("ERROR. Block string must start from '\"\"\"' !");
             }
             break;
         case SCANNER_COMMENT:
@@ -658,12 +649,12 @@ int get_token(FILE *file, struct token_s *token, tStack *stack)
             else{
                 token->type = TOKEN_LESS;
             }
-            c = getc(file);
+            c = getchar();
             if (c == '='){
                 token->type += 2; // look to scaner.h
             }
             else{
-                ungetc(c, file);
+                ungetc(c, stdin);
             }
             
             str_clean(str);
@@ -675,7 +666,7 @@ int get_token(FILE *file, struct token_s *token, tStack *stack)
                 token->type = TOKEN_EQUAL;
             }
             else{
-                ungetc(c,file);
+                ungetc(c,stdin);
                 token->type = TOKEN_ASSIGN;
             }
             str_clean(str);
@@ -696,7 +687,7 @@ int get_token(FILE *file, struct token_s *token, tStack *stack)
             }
             else{
                 str_clean(str);
-                SLOG("ERROR. After '!' can be only '=' !");
+                // SLOG("ERROR. After '!' can be only '=' !");
             }
             break;
         case SCANNER_BRACKET:
@@ -712,6 +703,10 @@ int get_token(FILE *file, struct token_s *token, tStack *stack)
             state = SCANNER_START;
             return OK; 
             break;
+        case SCANNER_EOL:
+            token->type = TOKEN_EOL;
+            str_clean(str);
+            return OK;
         case SCANNER_EOF:
             break;
         default:

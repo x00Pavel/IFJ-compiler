@@ -72,14 +72,15 @@
 int main(int arc, char **argv){
 
     (void)arc;
+    (void)argv;
     
     /* Input file */
-    FILE *file;
-    file = fopen(argv[1], "r");
-    if (!file){
-        fprintf(stderr, "Error in opening file %s\n", argv[0]);
-        return ERR_OTHER;
-    }
+    // FILE *file;
+    // file = fopen(argv[1], "r");
+    // if (!file){
+    //     fprintf(stderr, "Error in opening file %s\n", argv[0]);
+    //     return ERR_OTHER;
+    // }
 
     struct token_s *token = (struct token_s *)malloc(sizeof(struct token_s));
 
@@ -104,8 +105,9 @@ int main(int arc, char **argv){
     // generate_inserted_functions();
     create_functions(); // generate all inside functions
 
-    func_prog(file, token, stack, state, ret_code, hash_table, str);
-
+    // printf("IM HERE\n");
+    ret_code = func_prog(token, stack, state, ret_code, hash_table, str);
+    
     str_clean(str);
     htClearAll(hash_table);
     free(hash_table);
@@ -114,7 +116,7 @@ int main(int arc, char **argv){
         free(token->attribute.string);
     }
     free(token);
-    fclose(file);
+    // fclose(file);
 
-return 0;
+return ret_code;
 }

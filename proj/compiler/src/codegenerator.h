@@ -12,43 +12,65 @@
 
 #include <stdio.h>
 #include "parser.h"
+#include "dynamic_string.h"
 
-void define_variable(struct token_s *token);
-void id_is_equal_to(struct token_s *token_old, struct token_s *token);
-void print_function(struct token_s *token_write, char *s);
-void def_function_end();
-void def_function_call(struct token_s *token, int *counter, char *s);
-void define_function_begin(struct token_s *token);
-void retval_assign_function(struct token_s *token, char *s);
-void retval_function();
-void call_function(struct token_s *token);
-void function_call(struct token_s *token,int *counter, char *s);
-void token_function_begin_without_y(struct token_s *token_new);
-void token_function_begin_with_y();
-void assign_to_variable(struct token_s *token,struct token_s *token_a, char *s);
-void token_return (struct token_s *token, char *s);
-void define_variable_GF(struct token_s *token, char *s);
-void generate_if_start();
-void generate_if_head();
-void generate_while_head(struct token_s *token, char *s);
-void generate_while_head_1();
-void generate_main();
-void if_end();
-void if_else_body(struct token_s *token, char *s);
-void if_body(int * t);   
-void returnvalue1 (struct token_s *token, char *s);
-void select_operator(struct token_s *token);
-void generate_if_start(struct token_s *token, char *s);
-void change_int_and_float(struct token_s *token, struct token_s *token_a);
-void stack_operation(struct token_s *token);
-void end_of_if(int *t);
-void end_of_else(int *t);
-void found_else(int *t);
-void returnvalue1(struct token_s *token_right_side, char *s);
-void returnvalue(struct token_s *token_left_side, char *s);
-void generate_while_end(int *t);
-void call_inserted_functions(char *d);
+// int flag_while = 0;
+
+// #ifndef _PARSER_H
+
+/**
+ * \brief
+ * This funtions generates code of inserted functions 
+ * \return
+*/
 void create_functions();
-void create_returnvalue(char *s);
-void generate_function_return(char *function_id);
+
+/**
+ * \brief
+ * 
+ * \param[in] file  Source file
+ * \param[in] token Input token
+ * \param[in] stack Stack with count of whitespcase
+ * 
+ * \return
+*/
+void label_main();
+void end_main();
+void define_function_begin(struct token_s *token, struct dynamic_string *str);
+void retval_function(struct dynamic_string *str);
+void def_function_call(struct token_s *token, int *counter, char *s,struct dynamic_string *str);
+void def_function_end(struct dynamic_string *str);
+void define_variable_GF(struct token_s *token, char *s, struct dynamic_string *str);
+void assign_to_variable(struct token_s *token,struct token_s *token_a, char *s, struct dynamic_string *str);
+void assign_to_y(struct token_s *token, char *s,struct dynamic_string *str);
+void token_function_begin_with_y(struct dynamic_string *str);
+void function_call(struct token_s *token,int *counter, char *s,struct dynamic_string *str);
+void call_function(struct token_s *token,struct dynamic_string *str);
+void call_inserted_functions(char *d,struct dynamic_string *str);
+void retval_assign_function(struct token_s *token, char *s,struct dynamic_string *str);
+void print_float(struct token_s *token_write,struct dynamic_string *str);
+void print_int(struct token_s *token_write,struct dynamic_string *str);
+void print_string(struct token_s *token_write,struct dynamic_string *str);
+void print_none(struct dynamic_string *str);
+void print_id(struct token_s *token_write,tHTItem *item, struct dynamic_string *str);
+void print_space(struct dynamic_string *str);
+void print_end(struct dynamic_string *str);
+void generate_if_head(struct dynamic_string *str);
+void create_returnvalue(struct dynamic_string *str,char *s, int *t);
+void select_operator(struct token_s *token,struct dynamic_string *str);
+void if_body(int *t,struct dynamic_string *str);
+void found_else(int *t,struct dynamic_string *str);
+void end_of_if(int *t,struct dynamic_string *str);
+void end_of_else(int *t,struct dynamic_string *str);
+void stack_operations(int *t,struct dynamic_string *str);
+void generate_while_head_1(int *t, struct dynamic_string *str);
+void while_body(int *t,struct dynamic_string *str);
+void generate_while_end(int *t,struct dynamic_string *str);
+void while_for_true(int *t,struct dynamic_string *str);
+void generate_while_for_true_end(int *t,struct dynamic_string *str);
+void func_sum(struct token_s *token_one, char *s,struct dynamic_string *str);
+void func_mul(struct token_s *token_one, char *s, struct dynamic_string *str);
+void func_sub(struct token_s *token_one, char *s,struct dynamic_string *str);
+void func_div(struct token_s *token_one, char *s,struct dynamic_string *str);
+void func_int_div(struct token_s *token_one,struct dynamic_string *str);
 #endif 

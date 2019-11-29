@@ -1,7 +1,7 @@
 /**
  * \file src/scanner.h
  * \author Pavel Yadlouski (xyadlo00@stud.fit.vutbr.cz)
- * \brief Implementation of scanner
+ * \brief Header of scanner \file ./scaner.c
  * \date 2019
 */
 #ifndef _SCANNER_H
@@ -10,12 +10,12 @@
 #include "stack.h"
 
 /* Macros for log*/
-#define SLOG(msg) \
-    _log(stdout, __FILE__, __LINE__, msg);\
-
-inline void _log(FILE *fd, char *file, int line, char *msg){
-    fprintf(fd, "%s:%d %s\n", file, line, msg);
-}
+/* #define SLOG(msg) \
+    _log(stdout, __FILE__, __LINE__, msg);
+*/
+// inline void _log(FILE *fd, char *file, int line, char *msg){
+//     fprintf(fd, "%s:%d %s\n", file, line, msg);
+// }
 
 /**
  * \brief Enumeration of avaliable key words
@@ -120,7 +120,7 @@ typedef struct token* token_ptr;
  * \return #ERR_INTERNAL in case of error as malloc etc.
  * \return #ERR_LEXER in case of lexical error 
 */
-int get_token(FILE *file, struct token_s *token, tStack *stack);
+int get_token(struct token_s *token, tStack *stack);
 // int get_token(struct token_s *token, tStack *stack);
 
 #endif //_SCANNER_H

@@ -1,2 +1,2 @@
-def foo(s):
+def foo():
 	a = 0

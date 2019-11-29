@@ -13,7 +13,19 @@
 #include "scaner.h"
 #include "symtable.h"
 #include "dynamic_string.h"
+#include "errors.h"
+#include "codegenerator.h"
+#include "stack.h"
+#include "preced_analyze.h"
+// #include "ifj2019_old.h"
 
+static int flag_while = 0;
+// static void my_func(){
+//     (void)flag_while;
+//     if(flag_while){
+//         my_func();
+//     }
+// }
 /**
  * \brief
  * 
@@ -25,35 +37,7 @@
  * 
  * \return
 */
-int func_for_id(FILE *file, struct token_s *token, tStack *stack, table_s *hash_table, int *count_of_params);
-
-/**
- * \brief
- * 
- * \param[in] file  Source file
- * \param[in] token Input token
- * \param[in] stack Stack with count of whitespcase
- * \param[in] hash_table Table of symbols
- * \param[in] flag_def Flag for def/use of function
- * \param[in] count_of_params Number of paramaters in function
- * 
- * \return
-*/
-int func_for_FNC(FILE *file, struct token_s *token, tStack *stack, table_s *hash_table, bool flag_def, int *count_of_params);
-
-/**
- * \brief
- * 
- * \param[in] file  Source file
- * \param[in] token Input token
- * \param[in] stack Stack with count of whitespcase
- * \param[in] hash_table Table of symbols
- * \param[in] flag_def Flag for def/use of function
- * \param[in] count_of_params Number of paramaters in function
- * 
- * \return
-*/
-int func_for_atributes(FILE *file, struct token_s *token, tStack *stack, int *count_of_params, table_s *hash_table, bool flag_def);
+int func_for_id(struct token_s *token, tStack *stack, table_s *hash_table, int *count_of_params, struct dynamic_string *str_1);
 
 /**
  * \brief
@@ -67,7 +51,35 @@ int func_for_atributes(FILE *file, struct token_s *token, tStack *stack, int *co
  * 
  * \return
 */
-int check_next_token(FILE *file, struct token_s *token, tStack *stack, int *count_of_params, table_s *hash_table, bool flag_def);
+int func_for_FNC(struct token_s *token, tStack *stack, table_s *hash_table, bool flag_def, int *count_of_params, struct dynamic_string *str_1);
+
+/**
+ * \brief
+ * 
+ * \param[in] file  Source file
+ * \param[in] token Input token
+ * \param[in] stack Stack with count of whitespcase
+ * \param[in] hash_table Table of symbols
+ * \param[in] flag_def Flag for def/use of function
+ * \param[in] count_of_params Number of paramaters in function
+ * 
+ * \return
+*/
+int func_for_atributes(struct token_s *token_for_time, struct token_s *token, tStack *stack, int *count_of_params, table_s *hash_table, bool flag_def, struct dynamic_string *str_1);
+
+/**
+ * \brief
+ * 
+ * \param[in] file  Source file
+ * \param[in] token Input token
+ * \param[in] stack Stack with count of whitespcase
+ * \param[in] hash_table Table of symbols
+ * \param[in] flag_def Flag for def/use of function
+ * \param[in] count_of_params Number of paramaters in function
+ * 
+ * \return
+*/
+int check_next_token(struct token_s *token_for_time, struct token_s *token, tStack *stack, int *count_of_params, table_s *hash_table, bool flag_def, struct dynamic_string *str_1);
 
 /**
  * \brief
@@ -82,7 +94,7 @@ int check_next_token(FILE *file, struct token_s *token, tStack *stack, int *coun
  * 
  * \return
 */
-int func_prog(FILE *file, struct token_s *token, tStack *stack, int state, int ret_code, table_s *hash_table, struct dynamic_string *str);
+int func_prog(struct token_s *token, tStack *stack, int state, int ret_code, table_s *hash_table, struct dynamic_string *str_1);
 
 /**
  * \brief
@@ -96,7 +108,7 @@ int func_prog(FILE *file, struct token_s *token, tStack *stack, int state, int r
  * 
  * \return
 */
-int func_cond_mb(FILE *file, struct token_s *token, tStack *stack, int count_of_brackets, table_s *hash_table, int *count_of_params);
+int func_cond_mb(struct token_s *token, tStack *stack, int count_of_brackets, table_s *hash_table, int *count_of_params, struct dynamic_string *str_1);
 
 /**
  * \brief
@@ -109,7 +121,7 @@ int func_cond_mb(FILE *file, struct token_s *token, tStack *stack, int count_of_
  * 
  * \return
 */
-int func_mb_ret(FILE *file, struct token_s *token, tStack *stack, table_s *hash_table, int *count_of_params);
+int func_mb_ret(struct token_s *token, tStack *stack, table_s *hash_table, int *count_of_params, struct dynamic_string *str_1);
 
 
 #endif 

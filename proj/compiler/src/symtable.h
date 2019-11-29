@@ -29,6 +29,7 @@ typedef char* tKey;
 typedef struct tHTItem{
 	tKey key;				 /*< Key - name of id                 */
 	token_t type;			 /*< Token type                       */
+	token_t ret_val;		 /*< Type of return value */
 	int param_count;         /*< Count of paramters for functions */
 	bool id_declared;        /*< Flag for declared identeficators */
 	struct tHTItem* ptrnext; /*< Pointer to next node             */
