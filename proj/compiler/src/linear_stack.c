@@ -433,6 +433,7 @@ void DLCopy(tDLList *L, int *val)
 }
 
 void get_element(tDLList *L, struct tDLElem *val){
+    (void)val;
     if (L->Act == NULL){
         DLError();
     }
