@@ -70,7 +70,7 @@
 // #endif
 
 int main(int arc, char **argv){
-
+    (void)flag_while;
     (void)arc;
     (void)argv;
     

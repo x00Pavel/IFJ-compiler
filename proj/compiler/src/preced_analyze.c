@@ -14,6 +14,7 @@
 #include "linear_stack.h"
 #include "errors.h"
 
+
 char prec_table[18][18] = {
 /*    +    -    *    /   //   <=  >=   <   >   =   !=  (     )    i    f    s   id    $    */
     {'>', '>', '<', '<', '<', '>','>','>','>','>','>', '<', '>', '<', '<', '<', '<', '>'}, // +
@@ -184,7 +185,9 @@ void reduce_rule(tDLList *list, int symbol, int top, struct token_s *prev_token)
         }
         // printf("rule: E -> E - E\n");
         DLPred(list);
-        DLCopy(list, &tmp);
+        DLPred(list);
+        DLPred(list);
+        DLPostDelete(list);
         DLPostDelete(list);
         DLPostDelete(list);
         DLActualize(list, ID_NT);
@@ -416,7 +419,7 @@ void reduce_rule(tDLList *list, int symbol, int top, struct token_s *prev_token)
 
 int preced_analyze(struct token_s *token, table_s *hash_table, int bracket_cnt, struct dynamic_string *str)
 {
-
+    (void)flag_while;
     (void)str;
     (void)hash_table;
     tDLList *list = (tDLList *)malloc(sizeof(tDLList));
@@ -478,6 +481,12 @@ int preced_analyze(struct token_s *token, table_s *hash_table, int bracket_cnt, 
             reduce_rule(list, symbol, top, prev_token);
             break;
         default:
+            end_scan = false;
+            free(scanner_stack);
+            // free(prev_token->attribute.string);
+            free(prev_token);
+            DLDisposeList(list);
+            free(list);
             return ERR;
             break;
         }
@@ -526,6 +535,18 @@ int preced_analyze(struct token_s *token, table_s *hash_table, int bracket_cnt, 
                 get_token(token, scanner_stack);
                 if(token->type != TOKEN_EOL){
                     fprintf(stderr, "ERROR AFTER DDOT - NOT EOL\n");
+                    end_scan = false;
+                    free(scanner_stack);
+                    // free(prev_token->attribute.string);
+                    free(prev_token);
+                    DLDisposeList(list);
+                    free(list);
+                    end_scan = false;
+                    free(scanner_stack);
+                    // free(prev_token->attribute.string);
+                    free(prev_token);
+                    DLDisposeList(list);
+                    free(list);
                     return ERR_SYNTAX;
                 }
             }
@@ -534,6 +555,12 @@ int preced_analyze(struct token_s *token, table_s *hash_table, int bracket_cnt, 
             if(!htSearch(hash_table, token->attribute.string)){
                 if (!search_everywhere(hash_table, token->attribute.string)){
                     fprintf(stderr, "ID is not in hash table\n");
+                    end_scan = false;
+                    free(scanner_stack);
+                    // free(prev_token->attribute.string);
+                    free(prev_token);
+                    DLDisposeList(list);
+                    free(list);
                     return ERR_PARAM;
                 }
             }

@@ -3,7 +3,9 @@
 #define _PRECED_ANALYZE_H
 #include "scaner.h"
 #include "symtable.h"
-
+#ifndef _DYNAMIC_STRING_H
+    #include "dynamic_string.h"
+#endif
 /**
  * \brief Enumeration of avaliable symbols in table
 */
