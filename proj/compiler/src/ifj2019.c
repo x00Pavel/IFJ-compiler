@@ -5,8 +5,9 @@
 #include <ctype.h>
 
 #include "errors.h"
-#include "./stack/c202.h"
-#include "./hash_table/c016.h"
+#include "stack.h"
+#include "symtable.h"
+#include "preced_analyze.h"
 #ifndef _SCANNER_H
     #include "scanner.h"
 #endif
@@ -101,9 +102,12 @@ main(int arc, char **argv)
         return ERR_INTERNAL;
     }
     htInit(ht);
+    int cnt = 0;
+    int ret_code = get_token(file, token, stack);
+    (void)ret_code;
+    preced_analyze(file, token, ht, cnt);
 
-    int ret_code = 0;
-
+    /*
     while (ret_code != -1){
         ret_code = get_token(file, token, stack);
         
@@ -115,7 +119,8 @@ main(int arc, char **argv)
             if (token->type == TOKEN_ID || token->type == TOKEN_STRING || (token->type ==  TOKEN_FNC)){
                 free(token->attribute.string);
             }
-            return ret_code;
+            break;
+            // return ret_code;
         }
         if(token->type == TOKEN_EOF){
             printf("%s\n", types[token->type]);
@@ -142,10 +147,9 @@ main(int arc, char **argv)
         }
         
     }
-
-    htPrintTable(ht);
-
-    htClearAll(ht->hash_table);
+*/
+    // htPrintTable(ht);
+    htClearAll(ht);
     free(ht);
     free(stack);
     free(token);
