@@ -77,14 +77,15 @@ main(int arc, char **argv)
 {
 
     (void)arc;
+    (void)argv;
     /* Input file */
-    FILE *file;
-    file = fopen(argv[1], "r");
+    // FILE *file;
+    // file = fopen(argv[1], "r");
     
-    if (!file){
-        fprintf(stderr, "Error in opening file %s\n", argv[0]);
-        return ERR_OTHER;
-    }
+    // if (!file){
+    //     fprintf(stderr, "Error in opening file %s\n", argv[0]);
+    //     return ERR_OTHER;
+    // }
 
     struct token_s *token = (struct token_s *)malloc(sizeof(struct token_s));
     
@@ -103,13 +104,14 @@ main(int arc, char **argv)
     }
     htInit(ht);
     int cnt = 0;
-    int ret_code = get_token(file, token, stack);
+    int ret_code = get_token(token, stack);
+    htInsert(ht, "a", TOKEN_ID);
     (void)ret_code;
-    preced_analyze(file, token, ht, cnt);
+    preced_analyze(token, ht, cnt, NULL);
 
-    /*
+    /*int ret_code = 0;
     while (ret_code != -1){
-        ret_code = get_token(file, token, stack);
+        ret_code = get_token(token, stack);
         
         if(token->type == TOKEN_FNC || token->type == TOKEN_ID){
             htInsert(ht, token->attribute.string, token->type);
@@ -147,14 +149,12 @@ main(int arc, char **argv)
         }
         
     }
-*/
-    // htPrintTable(ht);
+    htPrintTable(ht);*/
     htClearAll(ht);
     free(ht);
     free(stack);
     free(token);
-    fclose(file);
-
+    
     return 0;
 }
 

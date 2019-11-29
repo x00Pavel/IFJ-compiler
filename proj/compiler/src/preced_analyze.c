@@ -91,11 +91,12 @@ tab_symbol token_to_element(struct token_s *token)
     case TOKEN_DIV_INT:
         return DIV_INT;
     case TOKEN_DDOT:
+    case TOKEN_EOL:
         return DLR;
     case TOKEN_EQUAL:
         return EQ;
     case TOKEN_NOT_EQUAL:
-        return  NE;
+        return NE;
     case TOKEN_GREATER:
         return GT;
     case TOKEN_LESS:
@@ -506,7 +507,7 @@ int preced_analyze(struct token_s *token, table_s *hash_table, int bracket_cnt, 
         case TOKEN_R_BRACKET:
             bracket_cnt--;
             break;
-        case TOKEN_EOL:
+        // case TOKEN_EOL:
         case TOKEN_EOF:
             fprintf(stderr, "Error in precedence analyzes\n");
             end = true;
@@ -517,10 +518,18 @@ int preced_analyze(struct token_s *token, table_s *hash_table, int bracket_cnt, 
         }
 
         if (!end_scan){
-            if (token->type == TOKEN_ID ){
+            if (token->type == TOKEN_ID || token->type == TOKEN_STRING)
+            {
                 free(token->attribute.string);
             }
             get_token(token, scanner_stack);
+            if(token->type == TOKEN_DDOT){
+                get_token(token, scanner_stack);
+                if(token->type != TOKEN_EOL){
+                    fprintf(stderr, "ERROR AFTER DDOT - NOT EOL\n");
+                    return ERR_SYNTAX;
+                }
+            }
         }
         if(token->type == TOKEN_ID){
             if(!htSearch(hash_table, token->attribute.string)){
