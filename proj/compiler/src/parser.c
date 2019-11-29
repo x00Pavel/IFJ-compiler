@@ -28,28 +28,34 @@ int func_mb_ret(struct token_s *token, tStack *stack, table_s *hash_table, int *
 
     switch (token->type){
     case TOKEN_NONE: // --------------------------------------- HERE
-        return 1; // we R ok
+        return OK; // we R ok
         break;
     case TOKEN_FNC:
         item = htSearch(hash_table, token->attribute.string);
                 if(item){
                     if(item->type == TOKEN_ID){
-                        return -1; // ERROR, FNC WITH THE SAME NAME AS ID
+                        return ERR_UNDEF; // ERROR, FNC WITH THE SAME NAME AS ID
                     }else if(item->type == TOKEN_FNC){
-                        func_for_FNC(token, stack, hash_table, false, count_of_params, str_1);
+                        ret_code = func_for_FNC(token, stack, hash_table, false, count_of_params, str_1);
+                        if(ret_code != OK){
+                            return ret_code;
+                        }
                         if(item->param_count != *count_of_params){
-                            return -1; // ERROR, no same count of params
+                            return ERR_INCOMPATIBLE; // ERROR, no same count of params
                         }
                     }
                 }else{
                     item = search_everywhere(hash_table, token->attribute.string);
                     if(item){
                         if(item->type == TOKEN_ID){
-                            return -1; // ERROR, FNC WITH THE SAME NAME AS ID
+                            return ERR_UNDEF; // ERROR, FNC WITH THE SAME NAME AS ID
                         }else if(item->type == TOKEN_FNC){
-                            func_for_FNC(token, stack, hash_table, false, count_of_params, str_1);
+                            ret_code = func_for_FNC(token, stack, hash_table, false, count_of_params, str_1);
+                            if(ret_code != OK){
+                                return ret_code;
+                            }
                             if(item->param_count != *count_of_params){
-                                return -1; // no same counf of params
+                                return ERR_INCOMPATIBLE; // no same counf of params
                             }
                         }
                     }else{
@@ -63,7 +69,10 @@ int func_mb_ret(struct token_s *token, tStack *stack, table_s *hash_table, int *
                         item = htSearch(glob_hash_table, token->attribute.string);
                         item->id_declared = false;
 
-                        func_for_FNC(token, stack, hash_table, false, count_of_params, str_1);
+                        ret_code = func_for_FNC(token, stack, hash_table, false, count_of_params, str_1);
+                        if(ret_code){
+                            return ret_code;
+                        }
                         item->param_count = *count_of_params;
                     }
                 } 
@@ -87,10 +96,10 @@ int func_mb_ret(struct token_s *token, tStack *stack, table_s *hash_table, int *
         break;
 
     default:
-        return -1; // something else
+        return ERR_SYNTAX; // something else
         break;
     }
-return 1;
+return OK;
 }
 
 int func_cond_mb(struct token_s *token, tStack *stack, int count_of_brackets, table_s *hash_table, int * count_of_params, struct dynamic_string *str_1){
@@ -151,7 +160,7 @@ int func_cond_mb(struct token_s *token, tStack *stack, int count_of_brackets, ta
                 }
             *count_of_params = 0;
         }else{
-            // printf("IM HERE\n");
+            printf("IM IN FUNC COND MB\n");
             ret_code = preced_analyze(token, hash_table, 0, str_1);
             printf("GENERACE OPERACI\n");
             if(ret_code != OK){
@@ -526,7 +535,12 @@ int func_for_id(struct token_s *token, tStack *stack, table_s *hash_table, int *
                 retval_assign_function(&token_for_time, "GF", str_1);
             }
             free(token_for_time.attribute.string);
-            // ADD GET TOKEN ??? EOL -------------------------------------------------------------
+            ret_code = get_token(token, stack);
+            if(ret_code != OK)
+                return ret_code;
+            if(token->type != TOKEN_EOL){
+                return ERR_SYNTAX;
+            }
             break;
 
         case TOKEN_ID:
@@ -557,10 +571,13 @@ int func_for_id(struct token_s *token, tStack *stack, table_s *hash_table, int *
                         return ERR_UNDEF; // finded FNC, not ID
                     }
                 }
+            printf("ALOPRO\n");
             ret_code = preced_analyze(token, hash_table, 0, str_1);
             if(ret_code != OK){
+                printf("IM NE OK   ret_code: %d\n", ret_code);
                 return ret_code;
             }
+            printf("IM OK\n");
             // PRECEDENCNI ANALYZA
             // printf("JA TUT\n");
 
@@ -570,7 +587,7 @@ int func_for_id(struct token_s *token, tStack *stack, table_s *hash_table, int *
                 retval_assign_function(&token_for_time, "GF", str_1);
             }
             free(token_for_time.attribute.string);
-            free(token->attribute.string); // INSIDE PA
+            //free(token->attribute.string); // INSIDE PA
             break;
 
         case TOKEN_LEN: // ADD SOME CODEGENERATOR FUNCTIONS FOR END ----------------------------------------
@@ -931,7 +948,7 @@ int func_prog(struct token_s *token, tStack *stack, int state, int ret_code, tab
                         define_variable_GF(token, "GF", str_1);
                     }
                 }
-
+                printf("KUKU \n");
                 ret_code = func_for_id(token, stack, hash_table, &count_of_params, str_1);
                 if(ret_code != OK)
                     return ret_code;
@@ -1205,13 +1222,13 @@ int func_prog(struct token_s *token, tStack *stack, int state, int ret_code, tab
                     // if(token->type != TOKEN_DDOT){
                     //     return -1; // must be :
                     // }
-                    //printf("im here\n");
-                    ret_code = get_token(token, stack);
-                    if(ret_code != OK)
-                        return ret_code;
-                    //printf("%d\n", token->type);
-                    if(token->type != TOKEN_EOL)
-                        return ERR_SYNTAX; // must be end of line
+                    // //printf("im here\n");
+                    // ret_code = get_token(token, stack);
+                    // if(ret_code != OK)
+                    //     return ret_code;
+                    // //printf("%d\n", token->type);
+                    // if(token->type != TOKEN_EOL)
+                    //     return ERR_SYNTAX; // must be end of line
                     ret_code = get_token(token, stack);
                     if(ret_code != OK)
                         return ret_code;
@@ -1320,23 +1337,27 @@ int func_prog(struct token_s *token, tStack *stack, int state, int ret_code, tab
                         free(local_hash_table_while);
                         return ret_code;
                     }
+                    
+                    // printf("TOKEN_TYPE %d \n", token->type);
+
                     count_of_params = 0;
                     // ret_code = get_token(token, stack);
                     // if(token->type != TOKEN_DDOT)
                     //     return -1; // must be :
-                    ret_code = get_token(token, stack);
-                    if(ret_code != OK){
-                        str_clean(str);
-                        htClearAll(local_hash_table_while);
-                        free(local_hash_table_while);
-                        return ret_code;
-                    }
-                    if(token->type != TOKEN_EOL){
-                        str_clean(str);
-                        htClearAll(local_hash_table_while);
-                        free(local_hash_table_while);
-                        return ERR_SYNTAX; // must be end of line
-                    }
+                    // ret_code = get_token(token, stack);
+                    // if(ret_code != OK){
+                    //     str_clean(str);
+                    //     htClearAll(local_hash_table_while);
+                    //     free(local_hash_table_while);
+                    //     return ret_code;
+                    // }
+                    
+                    // if(token->type != TOKEN_EOL){
+                    //     str_clean(str);
+                    //     htClearAll(local_hash_table_while);
+                    //     free(local_hash_table_while);
+                    //     return ERR_SYNTAX; // must be end of line
+                    // }
                     ret_code = get_token(token, stack);
                     if(ret_code != OK){
                         str_clean(str);
@@ -1351,20 +1372,26 @@ int func_prog(struct token_s *token, tStack *stack, int state, int ret_code, tab
                         return ERR_SYNTAX; // must be INDENT
                     }
                     while_body(&actual_while, str_1);
+                    // printf("TOKEN_TYPE %d \n", token->type);
                     flag_while++;
+                    // printf("IM HERE BRO\n");
                     ret_code = func_prog(token, stack, state, ret_code, local_hash_table_while, str); // inside while
+                    // printf("BUT NOT HERE\n");
+                    printf("ret_code %d\n", ret_code);
                     if(ret_code != OK){
                         str_clean(str);
                         htClearAll(local_hash_table_while);
                         free(local_hash_table_while);
                         return ret_code;
                     }
+                    printf("IM HERE BRO\n");
                     if(token->type != TOKEN_DEDEND){
                         str_clean(str);
                         htClearAll(local_hash_table_while);
                         free(local_hash_table_while);
                         return ERR_SYNTAX; // must be DEDENT
                     }
+                    printf("IM HERE BRO\n");
                     flag_while--;
                     generate_while_end(&actual_while, str_1);
 
