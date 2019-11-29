@@ -67,6 +67,6 @@ typedef enum
  * \return false in case of any error
  * 
 */
-int preced_analyze(FILE *file, struct token_s *token, table_s *hash_table, int bracket_cnt);
+int preced_analyze(struct token_s *token, table_s *hash_table, int bracket_cnt);
 
 #endif

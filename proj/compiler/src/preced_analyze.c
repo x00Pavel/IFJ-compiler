@@ -271,7 +271,7 @@ void reduce_rule(tDLList *list, int symbol, int top){
     }
 }
 
-int preced_analyze(FILE *file, struct token_s *token, table_s *hash_table, int bracket_cnt){
+int preced_analyze(struct token_s *token, table_s *hash_table, int bracket_cnt){
     (void)hash_table;
     tDLList *list = (tDLList *) malloc(sizeof(tDLList));
     DLInitList(list);
@@ -347,7 +347,7 @@ int preced_analyze(FILE *file, struct token_s *token, table_s *hash_table, int b
             if(token->type == TOKEN_ID){
                 free(token->attribute.string);
             }
-            get_token(file, token, scanner_stack);
+            get_token(token, scanner_stack);
         }
         if (token->type == TOKEN_R_BRACKET){
             bracket_cnt++;
