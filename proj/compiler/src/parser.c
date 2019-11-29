@@ -160,13 +160,13 @@ int func_cond_mb(struct token_s *token, tStack *stack, int count_of_brackets, ta
                 }
             *count_of_params = 0;
         }else{
-            printf("IM IN FUNC COND MB\n");
+            // printf("IM IN FUNC COND MB\n");
             ret_code = preced_analyze(token, hash_table, 0, str_1);
-            printf("GENERACE OPERACI\n");
+            // printf("GENERACE OPERACI\n");
             if(ret_code != OK){
                 return ret_code;
             }
-            printf("IM HERE\n");
+            // printf("IM HERE\n");
             // PRECEDENCNI ANALYZA
         }
         if(count_of_brackets != 0){
@@ -571,13 +571,14 @@ int func_for_id(struct token_s *token, tStack *stack, table_s *hash_table, int *
                         return ERR_UNDEF; // finded FNC, not ID
                     }
                 }
-            printf("ALOPRO\n");
+            // printf("ALOPRO\n");
             ret_code = preced_analyze(token, hash_table, 0, str_1);
             if(ret_code != OK){
-                printf("IM NE OK   ret_code: %d\n", ret_code);
+                free(token_for_time.attribute.string);
+                // printf("IM NE OK   ret_code: %d\n", ret_code);
                 return ret_code;
             }
-            printf("IM OK\n");
+            // printf("IM OK\n");
             // PRECEDENCNI ANALYZA
             // printf("JA TUT\n");
 
@@ -948,7 +949,7 @@ int func_prog(struct token_s *token, tStack *stack, int state, int ret_code, tab
                         define_variable_GF(token, "GF", str_1);
                     }
                 }
-                printf("KUKU \n");
+                // printf("KUKU\n");
                 ret_code = func_for_id(token, stack, hash_table, &count_of_params, str_1);
                 if(ret_code != OK)
                     return ret_code;
@@ -1240,7 +1241,7 @@ int func_prog(struct token_s *token, tStack *stack, int state, int ret_code, tab
                     //printf("ja tutu\n");
                     if(token->type != TOKEN_DEDEND)
                         return ERR_SYNTAX; // must be DEDENT
-                    htClearAll(local_hash_table_if);
+                    htClearAll(local_hash_table_if, false);
                     free(local_hash_table_if);
 
                     ret_code = get_token(token, stack);
@@ -1258,52 +1259,52 @@ int func_prog(struct token_s *token, tStack *stack, int state, int ret_code, tab
 
                                 ret_code = get_token(token, stack);
                                 if(ret_code != OK){
-                                    htClearAll(local_hash_table_else);
+                                    htClearAll(local_hash_table_else, false);
                                     free(local_hash_table_else);
                                     return ret_code;
                                 }
                                 if(token->type != TOKEN_DDOT){
-                                    htClearAll(local_hash_table_else);
+                                    htClearAll(local_hash_table_else, false);
                                     free(local_hash_table_else);
                                     return ERR_SYNTAX; // must be :
                                 }
                                 ret_code = get_token(token, stack);
                                 if(ret_code != OK){
-                                    htClearAll(local_hash_table_else);
+                                    htClearAll(local_hash_table_else, false);
                                     free(local_hash_table_else);
                                     return ret_code;
                                 }
                                 if(token->type != TOKEN_EOL){
-                                    htClearAll(local_hash_table_else);
+                                    htClearAll(local_hash_table_else, false);
                                     free(local_hash_table_else);
                                     return ERR_SYNTAX; // must be end of line
                                 }
                                 ret_code = get_token(token, stack);
                                 if(ret_code != OK){
-                                    htClearAll(local_hash_table_else);
+                                    htClearAll(local_hash_table_else, false);
                                     free(local_hash_table_else);
                                     return ret_code;
                                 }
                                 if(token->type != TOKEN_INDEND){
-                                    htClearAll(local_hash_table_else);
+                                    htClearAll(local_hash_table_else, false);
                                     free(local_hash_table_else);
                                     return ERR_SYNTAX; // must be INDENT
                                 }
                                 found_else(&actual_if, str_1);
                                 ret_code = func_prog(token, stack, state, ret_code, local_hash_table_else, str_1); // inside if
                                 if(ret_code != OK){
-                                    htClearAll(local_hash_table_else);
+                                    htClearAll(local_hash_table_else, false);
                                     free(local_hash_table_else);
                                     return ret_code;
                                 }
                                 if(token->type != TOKEN_DEDEND){
-                                    htClearAll(local_hash_table_else);
+                                    htClearAll(local_hash_table_else, false);
                                     free(local_hash_table_else);
                                     return ERR_SYNTAX; // must be DEDENT
                                 }
                                 end_of_else(&actual_if, str_1);
                                 // if_end(); // NO NEED I THINK
-                                htClearAll(local_hash_table_else);
+                                htClearAll(local_hash_table_else, false);
                                 free(local_hash_table_else);
                             }else{
                                 end_of_if(&actual_if, str_1);
@@ -1333,7 +1334,7 @@ int func_prog(struct token_s *token, tStack *stack, int state, int ret_code, tab
                     ret_code = func_cond_mb(token, stack, count_of_brackets, local_hash_table_while, &count_of_params, str_1);
                     if(ret_code != OK){
                         str_clean(str);
-                        htClearAll(local_hash_table_while);
+                        htClearAll(local_hash_table_while, false);
                         free(local_hash_table_while);
                         return ret_code;
                     }
@@ -1361,13 +1362,13 @@ int func_prog(struct token_s *token, tStack *stack, int state, int ret_code, tab
                     ret_code = get_token(token, stack);
                     if(ret_code != OK){
                         str_clean(str);
-                        htClearAll(local_hash_table_while);
+                        htClearAll(local_hash_table_while, false);
                         free(local_hash_table_while);
                         return ret_code;
                     }
                     if(token->type != TOKEN_INDEND){
                         str_clean(str);
-                        htClearAll(local_hash_table_while);
+                        htClearAll(local_hash_table_while, false);
                         free(local_hash_table_while);
                         return ERR_SYNTAX; // must be INDENT
                     }
@@ -1377,26 +1378,26 @@ int func_prog(struct token_s *token, tStack *stack, int state, int ret_code, tab
                     // printf("IM HERE BRO\n");
                     ret_code = func_prog(token, stack, state, ret_code, local_hash_table_while, str); // inside while
                     // printf("BUT NOT HERE\n");
-                    printf("ret_code %d\n", ret_code);
+                    // printf("ret_code %d\n", ret_code);
                     if(ret_code != OK){
                         str_clean(str);
-                        htClearAll(local_hash_table_while);
+                        htClearAll(local_hash_table_while, false);
                         free(local_hash_table_while);
                         return ret_code;
                     }
-                    printf("IM HERE BRO\n");
+                    // printf("IM HERE BRO\n");
                     if(token->type != TOKEN_DEDEND){
                         str_clean(str);
-                        htClearAll(local_hash_table_while);
+                        htClearAll(local_hash_table_while, false);
                         free(local_hash_table_while);
                         return ERR_SYNTAX; // must be DEDENT
                     }
-                    printf("IM HERE BRO\n");
+                    // printf("IM HERE BRO\n");
                     flag_while--;
                     generate_while_end(&actual_while, str_1);
 
                     str_clean(str);
-                    htClearAll(local_hash_table_while);
+                    htClearAll(local_hash_table_while, false);
                     free(local_hash_table_while);
                     break;
 
@@ -1488,7 +1489,7 @@ int func_prog(struct token_s *token, tStack *stack, int state, int ret_code, tab
                     if(item){
                         if(item->type == TOKEN_ID){
                             free(token->attribute.string);
-                            htClearAll(local_hash_table_def);
+                            htClearAll(local_hash_table_def, false);
                             free(local_hash_table_def);
                             return ERR_UNDEF;
                         }else{
@@ -1497,19 +1498,19 @@ int func_prog(struct token_s *token, tStack *stack, int state, int ret_code, tab
                                 ret_code = func_for_FNC(token, stack, local_hash_table_def, flag_def, &count_of_params, str_1);
                                 if(ret_code != OK){
                                     free(token->attribute.string);
-                                    htClearAll(local_hash_table_def);
+                                    htClearAll(local_hash_table_def, false);
                                     free(local_hash_table_def);
                                     return ret_code;
                                 }
                                 if(item->param_count != count_of_params){
                                     free(token->attribute.string);
-                                    htClearAll(local_hash_table_def);
+                                    htClearAll(local_hash_table_def, false);
                                     free(local_hash_table_def);
                                     return ERR_INCOMPATIBLE; // ERROR, no same count of params
                                 }
                             }else{
                                 free(token->attribute.string);
-                                htClearAll(local_hash_table_def);
+                                htClearAll(local_hash_table_def, false);
                                 free(local_hash_table_def);
                                 return ERR_UNDEF; // try to daclare fnc with the same name
                             }
@@ -1521,7 +1522,7 @@ int func_prog(struct token_s *token, tStack *stack, int state, int ret_code, tab
                         ret_code = func_for_FNC(token, stack, local_hash_table_def, flag_def, &count_of_params, str_1);
                         if(ret_code != OK){
                             free(token->attribute.string);
-                            htClearAll(local_hash_table_def);
+                            htClearAll(local_hash_table_def, false);
                             free(local_hash_table_def);
                             return ret_code;
                         }
@@ -1531,50 +1532,50 @@ int func_prog(struct token_s *token, tStack *stack, int state, int ret_code, tab
                     count_of_params = 0;
                     ret_code = get_token(token, stack);
                     if(ret_code != OK){
-                        htClearAll(local_hash_table_def);
+                        htClearAll(local_hash_table_def, false);
                         free(local_hash_table_def);
                         return ret_code;
                     }
                     if(token->type != TOKEN_DDOT){
-                        htClearAll(local_hash_table_def);
+                        htClearAll(local_hash_table_def, false);
                         free(local_hash_table_def);
                         return ERR_SYNTAX; // must be :
                     }
                     ret_code = get_token(token, stack);
                     if(ret_code != OK){
-                        htClearAll(local_hash_table_def);
+                        htClearAll(local_hash_table_def, false);
                         free(local_hash_table_def);
                         return ret_code;
                     }
                     if(token->type != TOKEN_EOL){
-                        htClearAll(local_hash_table_def);
+                        htClearAll(local_hash_table_def, false);
                         free(local_hash_table_def);
                         return ERR_SYNTAX; // must be end of line
                     }
                     ret_code = get_token(token, stack);
                     if(ret_code != OK){
-                        htClearAll(local_hash_table_def);
+                        htClearAll(local_hash_table_def, false);
                         free(local_hash_table_def);
                         return ret_code;
                     }
                     if(token->type != TOKEN_INDEND){
-                        htClearAll(local_hash_table_def);
+                        htClearAll(local_hash_table_def, false);
                         free(local_hash_table_def);
                         return ERR_SYNTAX; // must be INDENT
                     }
                     ret_code = func_prog(token, stack, state, ret_code, local_hash_table_def, str); // inside func
                     if(ret_code != OK){
-                        htClearAll(local_hash_table_def);
+                        htClearAll(local_hash_table_def, false);
                         free(local_hash_table_def);
                         return ret_code;
                     }
                     if(token->type != TOKEN_DEDEND){
-                        htClearAll(local_hash_table_def);
+                        htClearAll(local_hash_table_def, false);
                         free(local_hash_table_def);
                         return ERR_SYNTAX; // must be DEDENT
                     }
                     def_function_end(str_1);
-                    htClearAll(local_hash_table_def);
+                    htClearAll(local_hash_table_def, false);
                     free(local_hash_table_def);
                     break;
                 

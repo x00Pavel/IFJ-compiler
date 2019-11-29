@@ -1193,12 +1193,12 @@ void print_end(struct dynamic_string *str){
     void end_of_else(int *t,struct dynamic_string *str){
         if(flag_while == 0)
         {
-            fprintf(stdout,"LABEL EXIT%d\n", *t);   
+            fprintf(stdout,"LABEL $EXIT%d\n", *t);   
         }
         else
         {
-            for(unsigned int i = 0; i < strlen("LABEL EXIT"); i++){
-                add_char_to_str(str, "LABEL EXIT"[i]);
+            for(unsigned int i = 0; i < strlen("LABEL $EXIT"); i++){
+                add_char_to_str(str, "LABEL $EXIT"[i]);
             } 
             char temp[100];
             sprintf(temp, "%d", *t);

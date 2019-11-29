@@ -109,7 +109,7 @@ int main(int arc, char **argv){
     ret_code = func_prog(token, stack, state, ret_code, hash_table, str);
     
     str_clean(str);
-    htClearAll(hash_table);
+    htClearAll(hash_table, true);
     free(hash_table);
     free(stack);
     if(token->type == TOKEN_STRING || token->type == TOKEN_ID || token->type == TOKEN_FNC){
