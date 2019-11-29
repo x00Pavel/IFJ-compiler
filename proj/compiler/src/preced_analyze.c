@@ -540,6 +540,7 @@ int preced_analyze(struct token_s *token, table_s *hash_table, int bracket_cnt, 
         }
     } while (!end);
 
+    end_scan = false;
     free(scanner_stack);
     // free(prev_token->attribute.string);
     free(prev_token);

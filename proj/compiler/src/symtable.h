@@ -54,7 +54,7 @@ tHTItem *search_everywhere(table_s *ptrht, tKey key);
 
 void htDelete(table_s *ptrht, tKey key);
 
-void htClearAll(table_s *hash_table);
+int htClearAll(table_s *hash_table, bool ok);
 
 void htPrintItem(tHTItem *ptritem);
 
