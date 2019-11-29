@@ -288,13 +288,12 @@ int get_token(struct token_s *token, tStack *stack)
                             break;
                         }
                         else{
-                            /* I dont know why, but if without this IF it 
-                            doesn't generate TOKEN_ASSIGN type */ 
                             ungetc(c, stdin);
+                            token->type = TOKEN_ID;
                             break;
                         }
                     }
-                    token->type = TOKEN_ID;
+                    
                     token->attribute.string = (char *)malloc(str->size);
                     strncpy(token->attribute.string, str->str, str->size);
                 }
