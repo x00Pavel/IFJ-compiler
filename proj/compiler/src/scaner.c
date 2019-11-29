@@ -107,11 +107,10 @@ int get_token(struct token_s *token, tStack *stack)
                     state = SCANNER_START;
                 }
                 break;
-                
             }
             else if (first_token){
                 /* If it is a new line and previous was INDEND*/
-                if(c == '#'){
+                if(c == '#' || c == '"'){
                     state = SCANNER_COMMENT;
                     break;    
                 }
