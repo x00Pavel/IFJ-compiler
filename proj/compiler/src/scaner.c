@@ -107,11 +107,10 @@ int get_token(struct token_s *token, tStack *stack)
                     state = SCANNER_START;
                 }
                 break;
-                
             }
             else if (first_token){
                 /* If it is a new line and previous was INDEND*/
-                if(c == '#'){
+                if(c == '#' || c == '"'){
                     state = SCANNER_COMMENT;
                     break;    
                 }
@@ -288,12 +287,13 @@ int get_token(struct token_s *token, tStack *stack)
                             break;
                         }
                         else{
-                            ungetc(c, stdin);
+                            /* I dont know why, but if without this IF it 
+                            doesn't generate TOKEN_ASSIGN type */ 
                             token->type = TOKEN_ID;
+                            ungetc(c, stdin);
                             break;
                         }
                     }
-                    
                     token->attribute.string = (char *)malloc(str->size);
                     strncpy(token->attribute.string, str->str, str->size);
                 }
@@ -319,11 +319,12 @@ int get_token(struct token_s *token, tStack *stack)
                 }
                 else if (isdigit(c)){
                     str_clean(str);
-                    SLOG("ERROR. In the begining of number cant be more then one");
+                    // SLOG("ERROR. In the begining of number zero cant be more then one");
+                    return ERR_LEXER;
                 }
                 else{
                     if(isalpha(c)){
-                        SLOG("Wrong ID");
+                        // SLOG("Wrong ID");
                         return ERR_LEXER;
                     }
                     ungetc(c,stdin);
@@ -507,7 +508,7 @@ int get_token(struct token_s *token, tStack *stack)
                             tmp[i] = (char)c;
                         }
                         else{
-                            SLOG("Hexadecimal value in string must be in format '\\xAB, where A and B are integer numbers");
+                           // SLOG("Hexadecimal value in string must be in format '\\xAB, where A and B are integer numbers");
                             return ERR_LEXER;
                         }
                     }
@@ -540,7 +541,7 @@ int get_token(struct token_s *token, tStack *stack)
             else if (c == '\n'){
                 str_clean(str);
                 str_clean(str);
-                SLOG("ERROR. String must be in one line!");
+                // SLOG("ERROR. String must be in one line!");
                 return ERR_LEXER;
             }
             else{
@@ -583,7 +584,7 @@ int get_token(struct token_s *token, tStack *stack)
                                     tmp[i] = (char)c;
                                 }
                                 else{
-                                    SLOG("Hexadecimal value in string must be in format '\\xAB, where A and B are integer numbers");
+                                    // SLOG("Hexadecimal value in string must be in format '\\xAB, where A and B are integer numbers");
                                 }
                             }
                             char hex;
@@ -631,7 +632,7 @@ int get_token(struct token_s *token, tStack *stack)
             }
             else{
                 str_clean(str);
-                SLOG("ERROR. Block string must start from '\"\"\"' !");
+                // SLOG("ERROR. Block string must start from '\"\"\"' !");
             }
             break;
         case SCANNER_COMMENT:
@@ -686,7 +687,7 @@ int get_token(struct token_s *token, tStack *stack)
             }
             else{
                 str_clean(str);
-                SLOG("ERROR. After '!' can be only '=' !");
+                // SLOG("ERROR. After '!' can be only '=' !");
             }
             break;
         case SCANNER_BRACKET:

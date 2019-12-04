@@ -10,7 +10,7 @@
 #include "stack.h"
 
 /* Macros for log*/
-#define SLOG(msg) \
+ #define SLOG(msg) \
     _log(stdout, __FILE__, __LINE__, msg);
 
 inline void _log(FILE *fd, char *file, int line, char *msg){
