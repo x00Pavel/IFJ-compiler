@@ -14,6 +14,15 @@
 #include "linear_stack.h"
 #include "errors.h"
 
+#define PLUS_OP 1
+#define MINUS_OP 2
+#define MUL_OP 3
+#define GEN_VAR 4
+#define DIV_OP 5
+#define DIV_INT_OP 6
+#define GT_OP 7
+#define LS_OP 8
+
 char prec_table[18][18] = {
 /*    +    -    *    /   //   <=  >=   <   >   =   !=  (     )    i    f    s   id    $    */
     {'>', '>', '<', '<', '<', '>','>','>','>','>','>', '<', '>', '<', '<', '<', '<', '>'}, // +
@@ -35,6 +44,16 @@ char prec_table[18][18] = {
     {'>', '>', '>', '>', '>', '>','>','>','>','>','>', ' ', '>', ' ', ' ', ' ', ' ', '>'}, // id
     {'<', '<', '<', '<', '<', '<','<','<','<','<','<', '<', ' ', '<', '<', '<', '<', ' '}  // $
 };
+/*
+void clean(){
+    end_scan = false;
+    free(scanner_stack);
+    // free(prev_token->attribute.string);
+    free(prev_token);
+    DLDisposeList(list);
+    free(list);
+}
+*/
 
 char *symbols[] = {
     "PLUS",    /*< +  */
@@ -71,6 +90,10 @@ typedef enum
     E        /*< Error */
 } tab_operator;
 
+struct token_s *prev_token;
+int i;
+int array_rules[100];
+
 tab_symbol token_to_element(struct token_s *token)
 {
     switch (token->type)
@@ -90,13 +113,13 @@ tab_symbol token_to_element(struct token_s *token)
         return DIV;
     case TOKEN_DIV_INT:
         return DIV_INT;
-    case TOKEN_DDOT:
+    // case TOKEN_DDOT:
     case TOKEN_EOL:
         return DLR;
     case TOKEN_EQUAL:
         return EQ;
     case TOKEN_NOT_EQUAL:
-        return NE;
+        return  NE;
     case TOKEN_GREATER:
         return GT;
     case TOKEN_LESS:
@@ -146,22 +169,22 @@ bool check_operand(tDLList *list){
     return true;
 }
 
-void reduce_rule(tDLList *list, int symbol, int top, struct token_s *prev_token)
+int reduce_rule(tDLList *list, int symbol, int top, struct token_s *prev_token)
 {
     if (symbol == DLR){
         end_scan = true;
     }
     // printf("reduce\t");
     int tmp = top_term(list);
+    int rule = 0;
     switch (tmp){
     case S:
         DLPostDelete(list);
-        printf("rule E->i\n");
         DLActualize(list, ID_NT);
         break;
     case PLUS: // $ < E + E <- top
         if(!check_operand(list)){
-            return;
+            return -1;
         }
         // printf("rule: E -> E + E\n");
         DLPred(list);
@@ -177,14 +200,18 @@ void reduce_rule(tDLList *list, int symbol, int top, struct token_s *prev_token)
         // func_sum(зкум)
             // (token, prev_token);
             // free(prev_token->attribute.string);
-            break;
+        array_rules[i] = PLUS_OP;
+        i++;
+        break;
     case MINUS:
         if(!check_operand(list)){
-            return;
+            return -1;
         }
         // printf("rule: E -> E - E\n");
         DLPred(list);
-        DLCopy(list, &tmp);
+        DLPred(list);
+        DLPred(list);
+        DLPostDelete(list);
         DLPostDelete(list);
         DLPostDelete(list);
         DLActualize(list, ID_NT);
@@ -193,10 +220,12 @@ void reduce_rule(tDLList *list, int symbol, int top, struct token_s *prev_token)
         // else{
         //     printf()
         // }
+        array_rules[i] = MINUS_OP;
+        i++;
         break;
     case MUL:
         if (!check_operand(list)){
-            return;
+            return -1;
         }
         DLPred(list);
         DLPred(list);
@@ -207,10 +236,12 @@ void reduce_rule(tDLList *list, int symbol, int top, struct token_s *prev_token)
         DLPostDelete(list);
         DLPostDelete(list);
         DLActualize(list, ID_NT);
+        array_rules[i] = MUL_OP;
+        i++;
         break;
     case DIV:
         if(!check_operand(list)){
-            return;
+            return -1;
         }
         DLPred(list);
         DLPred(list);
@@ -221,10 +252,12 @@ void reduce_rule(tDLList *list, int symbol, int top, struct token_s *prev_token)
         DLPostDelete(list);
         DLPostDelete(list);
         DLActualize(list, ID_NT);
+        array_rules[i] = DIV_OP;
+        i++;
         break;
     case DIV_INT:
         if (!check_operand(list)){
-            return;
+            return -1;
         }
         DLPred(list);
         DLPred(list);
@@ -277,12 +310,14 @@ void reduce_rule(tDLList *list, int symbol, int top, struct token_s *prev_token)
             DLPostDelete(list);
             // printf("rule E->i\n");
             DLActualize(list, ID_NT);
-            break;
         }
         else{
             fprintf(stderr,"error. before ID can be only <\n");
-            return;
+            return -1;
         }
+        array_rules[i] = GEN_VAR;
+        i++;
+        break;
     case RB:
         // #ifdef DEBUG
         // printf("rule: E -> (E)\n");
@@ -297,7 +332,7 @@ void reduce_rule(tDLList *list, int symbol, int top, struct token_s *prev_token)
         break;
     case GT:
         if (!check_operand(list)){
-            return;
+            return -1;
         }
         // #ifdef DEBUG
         // printf("rule: E -> E > E\n");
@@ -309,10 +344,12 @@ void reduce_rule(tDLList *list, int symbol, int top, struct token_s *prev_token)
         DLPostDelete(list);
         DLPostDelete(list);
         DLActualize(list, ID_NT);
+        array_rules[i] = GT_OP;
+        i++;
         break;
     case GE:
         if (!check_operand(list)){
-            return;
+            return -1;
         }
         // #ifdef DEBUG
         // printf("rule: E -> E >= E\n");
@@ -327,7 +364,7 @@ void reduce_rule(tDLList *list, int symbol, int top, struct token_s *prev_token)
         break;
     case LS:
         if (!check_operand(list)){
-            return;
+            return -1;
         }
         // #ifdef DEBUG 
         // printf("rule: E -> E < E\n");
@@ -342,7 +379,7 @@ void reduce_rule(tDLList *list, int symbol, int top, struct token_s *prev_token)
         break;
     case LE:
         if (!check_operand(list)){
-            return;
+            return -1;
         }
         // #ifdef DEBUG
         // printf("rule: E -> E <= E\n");
@@ -357,7 +394,7 @@ void reduce_rule(tDLList *list, int symbol, int top, struct token_s *prev_token)
         break;
     case NE:
         if (!check_operand(list)){
-            return;
+            return -1;
         }
         // #ifdef DEBUG
         //     printf("rule: E -> E != E\n");
@@ -372,7 +409,7 @@ void reduce_rule(tDLList *list, int symbol, int top, struct token_s *prev_token)
         break;
     case EQ:
         if (!check_operand(list)){
-            return;
+            return -1;
         }
         // #ifdef DEBUG
         //     printf("rule: E -> E == E\n");
@@ -391,11 +428,9 @@ void reduce_rule(tDLList *list, int symbol, int top, struct token_s *prev_token)
         break;
     }
     if (symbol == DLR){
-        return;
+        return rule;
     }
-    else
-    {
-
+    else{
         tmp = top_term(list);
         switch (prec_table[tmp][symbol])
         {
@@ -412,13 +447,18 @@ void reduce_rule(tDLList *list, int symbol, int top, struct token_s *prev_token)
             break;
         }
     }
+    return 0;
 }
 
 int preced_analyze(struct token_s *token, table_s *hash_table, int bracket_cnt, struct dynamic_string *str)
 {
-
+    // (void)flag_while;
     (void)str;
     (void)hash_table;
+    
+    i = 0;
+    int rule;
+    int ret_code = 0;
     tDLList *list = (tDLList *)malloc(sizeof(tDLList));
     DLInitList(list);
     DLInsertFirst(list, DLR);
@@ -427,10 +467,9 @@ int preced_analyze(struct token_s *token, table_s *hash_table, int bracket_cnt, 
     tStack *scanner_stack = (tStack *)malloc(sizeof(tStack));
     stackInit(scanner_stack);
     stackPush(scanner_stack, 0);
-
     int top;
     int symbol;
-    struct token_s *prev_token = (struct token_s *)malloc(sizeof(struct token_s));
+    prev_token = (struct token_s *)malloc(sizeof(struct token_s));
 
     // stackstack_operations(t, str);
     do
@@ -457,15 +496,13 @@ int preced_analyze(struct token_s *token, table_s *hash_table, int bracket_cnt, 
             break;
         case '<':
             DLCopyLast(list, &top_nt);
-            if (top_nt == ID_NT)
-            {
+            if (top_nt == ID_NT){
                 DLPreInsert(list, S);
                 DLPostInsert(list, symbol);
                 DLSucc(list);
             }
-            else
-            {
-                //  #ifdef DEBUG     
+            else{
+                // #ifdef DEBUG     
                 //     printf("insert to the top: %s\n", symbols[symbol]);
                 // #endif            
                 DLPostInsert(list, S);
@@ -475,9 +512,16 @@ int preced_analyze(struct token_s *token, table_s *hash_table, int bracket_cnt, 
             }
             break;
         case '>':
-            reduce_rule(list, symbol, top, prev_token);
+            
+            rule = reduce_rule(list, symbol, top, prev_token);
             break;
         default:
+            end_scan = false;
+            free(scanner_stack);
+            // free(prev_token->attribute.string);
+            free(prev_token);
+            DLDisposeList(list);
+            free(list);
             return ERR;
             break;
         }
@@ -493,10 +537,10 @@ int preced_analyze(struct token_s *token, table_s *hash_table, int bracket_cnt, 
         //     prev_token->attribute.string = (char *)malloc(sizeof(char) * strlen(token->attribute.string) + 1);
         //     strcpy(prev_token->attribute.string, token->attribute.string);
         //     break;
-        // case TOKEN_INT:
-        //     prev_token->type = TOKEN_INT;
-        //     prev_token->attribute.int_val = token->attribute.int_val;
-        //     break;
+        case TOKEN_INT:
+            prev_token->type = TOKEN_INT;
+            prev_token->attribute.int_val = token->attribute.int_val;
+            break;
         // case TOKEN_FLOAT:
         //     prev_token->type =  TOKEN_FLOAT; 
         //     prev_token->attribute.float_val = token->attribute.float_val;
@@ -518,16 +562,27 @@ int preced_analyze(struct token_s *token, table_s *hash_table, int bracket_cnt, 
         }
 
         if (!end_scan){
-            if (token->type == TOKEN_ID || token->type == TOKEN_STRING)
-            {
+            if (token->type == TOKEN_ID || token->type == TOKEN_STRING){
                 free(token->attribute.string);
             }
-            get_token(token, scanner_stack);
+            ret_code = get_token(token, scanner_stack);
+            if(ret_code != OK){
+                return ret_code;
+            }
             if(token->type == TOKEN_DDOT){
-                get_token(token, scanner_stack);
+                ret_code = get_token(token, scanner_stack);
+                if(ret_code != OK){
+                    return ret_code;
+                }    
                 if(token->type != TOKEN_EOL){
                     fprintf(stderr, "ERROR AFTER DDOT - NOT EOL\n");
-                    return ERR_SYNTAX;
+                    end_scan = false;
+                    free(scanner_stack);
+                    // free(prev_token->attribute.string);
+                    free(prev_token);
+                    DLDisposeList(list);
+                    free(list);
+                    return ERR_OTHER;
                 }
             }
         }
@@ -535,12 +590,26 @@ int preced_analyze(struct token_s *token, table_s *hash_table, int bracket_cnt, 
             if(!htSearch(hash_table, token->attribute.string)){
                 if (!search_everywhere(hash_table, token->attribute.string)){
                     fprintf(stderr, "ID is not in hash table\n");
-                    return ERR_PARAM;
+                    end_scan = false;
+                    free(scanner_stack);
+                    // free(prev_token->attribute.string);
+                    free(prev_token);
+                    DLDisposeList(list);
+                    free(list);
+                    return ERR_UNDEF;
                 }
             }
         }
+        else if(token->type == TOKEN_FNC){
+            // here would be code from parese for Function call 
+        }
     } while (!end);
 
+    for(int a = 0; a < i; a++){
+        printf("%d --> ", array_rules[a]);
+    }
+    printf("the end\n");
+    end_scan = false;
     free(scanner_stack);
     // free(prev_token->attribute.string);
     free(prev_token);
