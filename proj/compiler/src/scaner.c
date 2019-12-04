@@ -319,11 +319,12 @@ int get_token(struct token_s *token, tStack *stack)
                 }
                 else if (isdigit(c)){
                     str_clean(str);
-                    // SLOG("ERROR. In the begining of number cant be more then one");
+                    // SLOG("ERROR. In the begining of number zero cant be more then one");
+                    return ERR_LEXER;
                 }
                 else{
                     if(isalpha(c)){
-                        //SLOG("Wrong ID");
+                        // SLOG("Wrong ID");
                         return ERR_LEXER;
                     }
                     ungetc(c,stdin);
@@ -350,7 +351,7 @@ int get_token(struct token_s *token, tStack *stack)
             }
             else{
                 if(isalpha(c)){
-                    // SLOG("Wrong indetificator");
+                    SLOG("Wrong indetificator");
                     return ERR_LEXER; 
                 }
                 ungetc(c,stdin);
@@ -371,7 +372,7 @@ int get_token(struct token_s *token, tStack *stack)
             }
             else{
                 if(isalpha(c)){
-                    // SLOG("Wrong indetificator");
+                    SLOG("Wrong indetificator");
                     return ERR_LEXER; 
                 }
 
@@ -391,7 +392,7 @@ int get_token(struct token_s *token, tStack *stack)
             }
             else{
                 if(isalpha(c)){
-                    // SLOG("Wrong indetificator");
+                    SLOG("Wrong indetificator");
                     return ERR_LEXER; 
                 }
 
