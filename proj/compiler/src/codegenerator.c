@@ -32,6 +32,38 @@ void create_functions(){
 	fprintf(stdout,"POPFRAME\n");
 	fprintf(stdout,"RETURN\n\n");
 
+    fprintf(stdout, "#INPUTS\n");
+	fprintf(stdout, "PUSHFRAME\n");
+	fprintf(stdout, "LABEL inputs\n");
+    fprintf(stdout, "DEFVAR LF@%%HELPER\n");
+	fprintf(stdout, "DEFVAR LF@%%retval\n"); 
+	fprintf(stdout, "DEFVAR LF@%%var\n");
+	fprintf(stdout, "READ LF@%%var LF@%%1\n");
+	fprintf(stdout, "DEFVAR LF@%%symb1\n");
+	fprintf(stdout, "STRLEN LF@%%symb1 LF@%%1\n");
+	fprintf(stdout, "DEFVAR LF@%%symb2\n");
+	fprintf(stdout, "MOVE LF@%%symb2 string@''\n");
+	fprintf(stdout, "SETCHAR LF@%%HELPER LF@%%symb1 LF@%%symb2\n");
+	fprintf(stdout, "MOVE LF@%%retval LF@%%HELPER\n");
+
+
+    fprintf(stdout, "#INPUTI\n");
+    fprintf(stdout, "PUSHFRAME\n");
+    fprintf(stdout, "LABEL inputi\n");
+    fprintf(stdout, "DEFVAR LF@$$var\n");
+    fprintf(stdout, "DEFVAR LF@%%retval\n");
+    fprintf(stdout, "MOVE LF@$$var LF@%%1\n");
+    frpintf(stdout, "FLOAT2INT LF@$$retval LF@$$var\n");
+
+
+    
+    fprintf(stdout, "#INPUTF\n");
+    fprintf(stdout, "PUSHFRAME\n");
+    fprintf(stdout, "LABEL inputf\n");
+    fprintf(stdout, "DEFVAR LF@$$var\n");
+    fprintf(stdout, "DEFVAR LF@%%retval\n");
+    fprintf(stdout, "MOVE LF@$$var LF@%%1\n");
+    frpintf(stdout, "INT2FLOAT LF@$$retval LF@$$var\n");
 
     
     fprintf(stdout,"#SUBSTRFUNCTION\n");
@@ -300,12 +332,10 @@ void end_main(){
     }
     
         
-    }
+}
 /*
 *End define variables in all scopes
 */
-
-
 
 //y = a + b + c эта функиция приржадит все что спарава к у
 void assign_to_variable(struct token_s *token,struct token_s *token_a, char *s, struct dynamic_string *str){
@@ -816,7 +846,7 @@ void assign_to_y(struct token_s *token, char *s,struct dynamic_string *str){
 
 
 //принт флоута
-void print_float(struct token_s *token_write,struct dynamic_string *str){
+void print_float(struct token_s *token_write    ,struct dynamic_string *str){
     if(flag_while == 0){
         fprintf(stdout,"WRITE float@%a",token_write->attribute.float_val);
     }else{
@@ -877,11 +907,11 @@ void print_none(struct dynamic_string *str){
 
 
 //Функия для принта переменной с ее значением 
-void print_id(struct token_s *token_write,tHTItem *item, struct dynamic_string *str){
-    if(item->ret_val == TOKEN_INT)
-    {
-        if(flag_while == 0){
-           fprintf(stdout,"WRITE int@%d",token_write->attribute.int_val); 
+void print_id(struct token_s *token_write,char *s, struct dynamic_string *str){
+    //if(item->ret_val == TOKEN_INT)
+    //{
+        if(flag_while == 0){ 
+           fprintf(stdout,"WRITE %s@%%%s\n",s,token_write->attribute.string); 
         }else{
             for(unsigned int i = 0; i < strlen("WRITE int@"); i++){
                 add_char_to_str(str, "WRITE int@"[i]);
@@ -893,7 +923,7 @@ void print_id(struct token_s *token_write,tHTItem *item, struct dynamic_string *
             }
         }        
         
-    }
+    /*}
     if(item->ret_val == TOKEN_FLOAT)
     {
        
@@ -922,7 +952,7 @@ void print_id(struct token_s *token_write,tHTItem *item, struct dynamic_string *
                 add_char_to_str(str, token_write->attribute.string[i]);
             }
         }   
-    }
+    }*/
 
 }
 //принт пробела
@@ -1516,7 +1546,7 @@ void func_sum(struct token_s *token_one, char *s,struct dynamic_string *str){
     {
         if(flag_while == 0)
         {
-             fprintf(stdout, "ADDS GF@valueforcouning string@%s\n",token_one->attribute.string);
+             fprintf(stdout, "ADD    GF@valueforcouning string@%s\n",token_one->attribute.string);
         }
         else
         {
@@ -1891,5 +1921,6 @@ void func_int_div(struct token_s *token_one,struct dynamic_string *str){
 
       
 }
+
 
 
