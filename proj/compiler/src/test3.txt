@@ -1,4 +1,3 @@
-""" Program 3: Prace s retezci a vestavenymi funkcemi """
 s1 = 'Toto je nejaky text'
 s2 = s1 + ', ktery jeste trochu obohatime'
 print(s1, '\n', s2)

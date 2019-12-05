@@ -1,0 +1,6 @@
+a = 10
+b = 7
+while a < 0:
+	a = a - 1
+	while b > 0:
+		b = b - 3

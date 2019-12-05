@@ -1,19 +1,19 @@
 # author: Yadlouski Pavel
 
 PROJ=ifj2019
-SCANNER=scaner
-STRING=dynamic_string
-SCTACK=stack
-TABLE=symtable
-PARSER=parser
-CODEGENERATOR=codegenerator
-PREC_ANALYZE=preced_analyze
-LINSTACK=linear_stack
+SCANNER=scaner.c
+STRING=dynamic_string.c
+SCTACK=stack.c
+TABLE=symtable.c
+PARSER=parser.c
+CODEGENERATOR=codegenerator.c
+PREC_ANALYZE=preced_analyze.c
+LINSTACK=linear_stack.c
 CFLAGS= -Wconversion -Wunreachable-code -Wextra -Wall -O -g
-#CFLAGS= -O -g
+
 
 main: ${PROJ}.c 
-	gcc ${CFLAGS} -D DEBUG -o ${PROJ} ${PROJ}.c ${SCANNER}.c ${STRING}.c ${SCTACK}.c ${TABLE}.c ${LINSTACK}.c ${PARSER}.c ${CODEGENERATOR}.c ${PREC_ANALYZE}.c 
+	gcc ${CFLAGS} -D DEBUG -o ${PROJ} ${PROJ}.c ${SCANNER} ${STRING} ${SCTACK} ${TABLE} ${LINSTACK} ${PARSER} ${CODEGENERATOR} ${PREC_ANALYZE} 
 rel: ${PROJ}.c
 	gcc ${CFLAGS} -o ${PROJ} ${PROJ}.c ${SCANNER} ${STRING} ${SCTACK}
 
@@ -36,8 +36,3 @@ t3:
 t4:
 	./${PROJ} < test.txt
 
-clean:
-	rm ifj2019 xyadlo00.zip 
-
-zip:
-	zip xyadlo00.zip ${PROJ}.c ${SCANNER}.c ${STRING}.c ${SCTACK}.c ${TABLE}.c ${LINSTACK}.c ${PARSER}.c ${CODEGENERATOR}.c ${PREC_ANALYZE}.c ${SCANNER}.h ${STRING}.h ${SCTACK}.h ${TABLE}.h ${LINSTACK}.h ${PARSER}.h ${CODEGENERATOR}.h ${PREC_ANALYZE}.h Makefile errors.h
