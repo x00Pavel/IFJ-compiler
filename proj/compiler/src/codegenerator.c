@@ -1249,10 +1249,12 @@ void print_end(struct dynamic_string *str){
     void stack_operations(int *t,struct dynamic_string *str){
         if(flag_while == 0)
         {
-            fprintf(stdout, "DEFVAR GT@retval%d\n",*t);
-            fprintf(stdout, "DEFVAR GT@retval1%d\n",*t);
-            fprintf(stdout, "MOVE GT@retval%d int@0\n", *t);
-            fprintf(stdout, "MOVE GT@retval1%d int@0\n", *t);
+            fprintf(stdout, "DEFVAR GT@retval1\n");
+            fprintf(stdout, "DEFVAR GT@retval2\n");
+        
+            
+            fprintf(stdout, "MOVE GT@retval1 int@0\n");
+            fprintf(stdout, "MOVE GT@retval2 int@0\n");
         }
         else
         {
@@ -1343,26 +1345,26 @@ void generate_while_head_1(int *t, struct dynamic_string *str)
 //Создает тело функции 
 void while_body(int *t,struct dynamic_string *str){
     if(flag_while == 0){
-        fprintf(stdout,"LF@res LF@retval%d LF@retval1%d\n",*t,*t);
+        fprintf(stdout,"LF@res LF@retval1 LF@retval2\n");
         fprintf(stdout,"JUMPIFNEQ $EXIT%d LF@res bool@true\n", *t);  
     }else
     {
-        for(unsigned int i = 0; i < strlen("LF@res LF@retval"); i++){
-            add_char_to_str(str, "LF@res LF@retval"[i]);
+        for(unsigned int i = 0; i < strlen("LF@res LF@retval1"); i++){
+            add_char_to_str(str, "LF@res LF@retval1"[i]);
         }
-        char temp11[100];
-        sprintf(temp11, "%d", *t);
-        for(unsigned int i = 0; i < strlen(temp11); i++){
-            add_char_to_str(str, temp11[i]);
+       // char temp11[100];
+    //sprintf(temp11, "%d", *t);
+      //  for(unsigned int i = 0; i < strlen(temp11); i++){
+        //    add_char_to_str(str, temp11[i]);
+       // }
+        for(unsigned int i = 0; i < strlen(" LF@retval2"); i++){
+            add_char_to_str(str, " LF@retval2"[i]);
         }
-        for(unsigned int i = 0; i < strlen(" LF@retval1"); i++){
-            add_char_to_str(str, " LF@retval1"[i]);
-        }
-        char temp12[100];
-        sprintf(temp12, "%d", *t);
-        for(unsigned int i = 0; i < strlen(temp12); i++){
-            add_char_to_str(str, temp12[i]);
-        }
+        //char temp12[100];
+        //sprintf(temp12, "%d", *t);
+        //for(unsigned int i = 0; i < strlen(temp12); i++){
+         //   add_char_to_str(str, temp12[i]);
+        //}
         add_char_to_str(str, 10);
         for(unsigned int i = 0; i < strlen("JUMPIFNEQ $EXIT"); i++){
             add_char_to_str(str, "JUMPIFNEQ $EXIT"[i]);
