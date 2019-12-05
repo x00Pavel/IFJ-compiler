@@ -6,295 +6,410 @@
  * 
  * \date 2019
 */
-
 #include <stdio.h>
 #include <assert.h>
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
 
-#include "errors.h"
-#include "scaner.h"
 #include "parser.h"
-#include "codegenerator.h"
-#include "stack.h"
+// #include "errors.h"
+// #include "codegenerator.h"
+// #include "stack.h"
+// #include "dynamic_string.h"
+// #include "ifj2019_old.h"
 
-int func_mb_ret(FILE *file, struct token_s *token, tStack *stack, table_s *hash_table)
-{
+// flag_while = 0;
+int count_of_if = 0;
+int flag_while = 0;
 
-    switch (token->type)
-    {
-    case TOKEN_NONE:
-        return 1; // we R ok
+int func_mb_ret(struct token_s *token, tStack *stack, table_s *hash_table, int *count_of_params, struct dynamic_string *str_1){
+    // tHTItem *item;
+    int ret_code = 0;
+
+    switch (token->type){
+    case TOKEN_NONE: // --------------------------------------- HERE
+        return OK; // we R ok
+        break;
+    // case TOKEN_FNC:
+    //     item = htSearch(hash_table, token->attribute.string);
+    //             if(item){
+    //                 if(item->type == TOKEN_ID){
+    //                     free(token->attribute.string);
+    //                     return ERR_UNDEF; // ERROR, FNC WITH THE SAME NAME AS ID
+    //                 }else if(item->type == TOKEN_FNC){
+    //                     ret_code = func_for_FNC(token, stack, hash_table, false, count_of_params, str_1);
+    //                     if(ret_code != OK){
+    //                         return ret_code;
+    //                     }
+    //                     if(item->param_count != *count_of_params){
+    //                         return ERR_INCOMPATIBLE; // ERROR, no same count of params
+    //                     }
+    //                 }
+    //             }else{
+    //                 item = search_everywhere(hash_table, token->attribute.string);
+    //                 if(item){
+    //                     if(item->type == TOKEN_ID){
+    //                         free(token->attribute.string);
+    //                         return ERR_UNDEF; // ERROR, FNC WITH THE SAME NAME AS ID
+    //                     }else if(item->type == TOKEN_FNC){
+    //                         ret_code = func_for_FNC(token, stack, hash_table, false, count_of_params, str_1);
+    //                         if(ret_code != OK){
+    //                             return ret_code;
+    //                         }
+    //                         if(item->param_count != *count_of_params){
+    //                             return ERR_INCOMPATIBLE; // no same counf of params
+    //                         }
+    //                     }
+    //                 }else{
+    //                     table_s *glob_hash_table = hash_table;
+
+    //                     while(glob_hash_table->prev_hash_table != NULL){
+    //                         glob_hash_table = glob_hash_table->prev_hash_table;
+    //                     }
+
+    //                     htInsert(glob_hash_table, token->attribute.string, token->type);
+    //                     item = htSearch(glob_hash_table, token->attribute.string);
+    //                     item->id_declared = false;
+
+    //                     ret_code = func_for_FNC(token, stack, hash_table, false, count_of_params, str_1);
+    //                     if(ret_code){
+    //                         return ret_code;
+    //                     }
+    //                     item->param_count = *count_of_params;
+    //                 }
+    //             } 
+    //     *count_of_params = 0; // free string inside function
+        // ret_code = get_token(token, stack);
+        // if(ret_code != OK)
+        //     return ret_code;
+        // if(token->type != TOKEN_EOL)
+        //     return ERR_SYNTAX; // must be EOL
         break;
     case TOKEN_FNC:
-        tHTItem *item = htSearch(hash_table, token->attribute.string);
-        if (item)
-        {
-            if (item->type == TOKEN_ID)
-                return -1; // ERROR, FNC WITH THE SAME NAME AS ID
-        }
-        else
-        {
-            item = find_key(hash_table, token->attribute.string);
-            if (item)
-            {
-                if (item->type == TOKEN_ID)
-                    return -1; // ERROR, FNC WITH THE SAME NAME AS ID
-            }
-            else
-            {
-                table_s *glob_hash_table = hash_table;
-
-                while (glob_hash_table->prev_hash_table != NULL)
-                {
-                    glob_hash_table = glob_hash_table->prev_hash_table;
-                }
-
-                htInsert(glob_hash_table, token->attribute.string, token->type);
-                item = htSearch(glob_hash_table, token->attribute.string);
-                item->id_declared = false;
-            }
-        }                                                    //----------------------------------------------------------- CONT FROM HERE
-        func_for_FNC(file, token, stack, hash_table, false); // free string inside function
-        break;
     case TOKEN_ID:
         // must be free string mb inside precedencni analyzy
     case TOKEN_INT:
     case TOKEN_STRING:
     case TOKEN_FLOAT:
+        ret_code = preced_analyze(token, hash_table, count_of_params, str_1, stack);
+        if(ret_code != OK){
+            return ret_code;
+        }
         // PRECEDENCNI ANALYZA
         break;
 
     default:
+        return ERR_SYNTAX; // something else
         break;
     }
-    return 1;
+return OK;
 }
 
-int func_cond_mb(FILE *file, struct token_s *token, tStack *stack, int count_of_brackets, table_s *hash_table)
-{
-    get_token(file, token, stack);
-    if (token->type == TOKEN_L_BRACKET)
-    {
-        count_of_brackets++;
-        func_cond_mb(file, token, stack, count_of_brackets, hash_table);
-    }
-    if (token->type == TOKEN_FNC)
-    {
-        tHTItem *item = htSearch(hash_table, token->attribute.string);
-        if (item)
-        {
-            if (item->type == TOKEN_ID)
-                return -1; // ERROR, FNC WITH THE SAME NAME AS ID
-        }
-        else
-        {
-            item = find_key(hash_table, token->attribute.string);
-            if (item)
-            {
-                if (item->type == TOKEN_ID)
-                    return -1; // ERROR, FNC WITH THE SAME NAME AS ID
+int func_cond_mb(struct token_s *token, tStack *stack, int count_of_brackets, table_s *hash_table, int * count_of_params, struct dynamic_string *str_1){
+    int ret_code = 0;
+    (void)count_of_brackets;
+    ret_code = get_token(token, stack);
+    // printf("Ttype: %d\n", token->type);
+    if(ret_code != OK)
+        return ret_code;
+    // if(token->type == TOKEN_L_BRACKET){
+    //     count_of_brackets++;
+    //     ret_code = func_cond_mb(token, stack, count_of_brackets, hash_table, count_of_params, str_1);
+    //     if(ret_code != OK)
+    //         return ret_code;
+    //     }
+    // if(token->type == TOKEN_FNC){
+    //         tHTItem *item = htSearch(hash_table, token->attribute.string);
+    //             if(item){
+    //                 if(item->type == TOKEN_ID){
+    //                     free(token->attribute.string);
+    //                     return ERR_UNDEF; // ERROR, FNC WITH THE SAME NAME AS ID
+    //                 }else if(item->type == TOKEN_FNC){
+    //                     ret_code = func_for_FNC(token, stack, hash_table, false, count_of_params, str_1);
+    //                     if(ret_code != OK)
+    //                         return ret_code;
+    //                     if(item->param_count != *count_of_params){
+    //                         return ERR_INCOMPATIBLE; // ERROR, no same count of params
+    //                     }
+    //                 }
+    //             }else{
+    //                 item = search_everywhere(hash_table, token->attribute.string);
+    //                 if(item){
+    //                     if(item->type == TOKEN_ID){
+    //                         return ERR_UNDEF; // ERROR, FNC WITH THE SAME NAME AS ID
+    //                     }else if(item->type == TOKEN_FNC){
+    //                         ret_code = func_for_FNC(token, stack, hash_table, false, count_of_params, str_1);
+    //                         if(ret_code != OK)
+    //                             return ret_code;
+    //                         if(item->param_count != *count_of_params){
+    //                             return ERR_INCOMPATIBLE; // no same counf of params
+    //                         }
+    //                     }
+    //                 }else{
+    //                     table_s *glob_hash_table = hash_table;
+
+    //                     while(glob_hash_table->prev_hash_table != NULL){
+    //                         glob_hash_table = glob_hash_table->prev_hash_table;
+    //                     }
+
+    //                     htInsert(glob_hash_table, token->attribute.string, token->type);
+    //                     item = htSearch(glob_hash_table, token->attribute.string);
+    //                     item->id_declared = false;
+
+    //                     ret_code = func_for_FNC(token, stack, hash_table, false, count_of_params, str_1);
+    //                     if(ret_code != OK)
+    //                         return ret_code;
+    //                     item->param_count = *count_of_params;
+    //                 }
+    //             }
+    //         *count_of_params = 0;
+    //     }else{
+            // printf("IM IN FUNC COND MB\n");
+            ret_code = preced_analyze(token, hash_table, count_of_params, str_1, stack);
+            // printf("GENERACE OPERACI\n");
+            if(ret_code != OK){
+                return ret_code;
             }
-            else
-            {
-                table_s *glob_hash_table = hash_table;
-
-                while (glob_hash_table->prev_hash_table != NULL)
-                {
-                    glob_hash_table = glob_hash_table->prev_hash_table;
-                }
-
-                htInsert(glob_hash_table, token->attribute.string, token->type);
-                item = htSearch(glob_hash_table, token->attribute.string);
-                item->id_declared = false;
-            }
-        }
-        func_for_FNC(file, token, stack, hash_table, false);
-    }
-    else
-    {
-        // PRECEDENCNI ANALYZA
-    }
-    if (count_of_brackets != 0)
-    {
-        get_token(file, token, stack);
-        if (token->type == TOKEN_R_BRACKET)
-        {
-            count_of_brackets--;
-            return 1;
-        }
-        else
-        {
-            return -1; // MUST BE THE SAME NUMBER OF BRACKETS
-        }
-    }
-    return 1; // WE R OK
+            // printf("IM HERE\n");
+            // PRECEDENCNI ANALYZA
+        // }
+        // if(count_of_brackets != 0){
+        //     ret_code = get_token(token, stack);
+        //     if(ret_code != OK)
+        //         return ret_code;
+        //     if(token->type == TOKEN_R_BRACKET){
+        //         count_of_brackets--;
+        //         return OK; 
+        //     }else{
+        //         return ERR_SYNTAX; // MUST BE THE SAME NUMBER OF BRACKETS
+        //     }
+        // }
+    return OK; // WE R OK
 }
 
-int check_next_token(FILE *file, struct token_s *token, tStack *stack, int *count_of_params, table_s *hash_table, bool flag_def)
-{
-    get_token(file, token, stack);
-    if (token->type == TOKEN_COMA)
-    {
-        get_token(file, token, stack);
-        func_for_atributes(file, token, stack, count_of_params, hash_table, flag_def);
+int check_next_token(struct token_s *token_for_time, struct token_s *token, tStack *stack, int *count_of_params, table_s *hash_table, bool flag_def, struct dynamic_string *str_1){
+    int ret_code = 0;
+    ret_code = get_token(token, stack);
+    if(ret_code != OK)
+        return ret_code;
+    if(token->type == TOKEN_COMA){
+        print_space(str_1);
+        ret_code = get_token(token, stack);
+        if(ret_code != OK)
+            return ret_code;
+        ret_code = func_for_atributes(token_for_time, token, stack, count_of_params, hash_table, flag_def, str_1);
+        if(ret_code != OK)
+            return ret_code;
+    }else if(token->type == TOKEN_R_BRACKET){
+        return OK; // WE R OK
     }
-    else if (token->type == TOKEN_R_BRACKET)
-    {
-        return 1; // WE R OK
-    }
-    return -1; // ERROR, dostali jsme neco jineho nez "," nebo ")"
+return ERR_SYNTAX; // ERROR, dostali jsme neco jineho nez "," nebo ")"
 }
 
-int func_for_atributes(FILE *file, struct token_s *token, tStack *stack, int *count_of_params, table_s *hash_table, bool flag_def)
-{
+int func_for_atributes(struct token_s *token_for_time, struct token_s *token, tStack *stack, int *count_of_params, table_s *hash_table, bool flag_def, struct dynamic_string *str_1){
     (*count_of_params)++;
-    switch (token->type)
-    {
+    int ret_code = 0;
+    tHTItem *item;
+    switch (token->type){
     case TOKEN_ID:
         // CHECK HASH
         // IF DEF = DEF ID, IF CALL = USE ID
-        if (flag_def == true)
-        { // if DEF FUNC, DEF ID
-            tHTItem *item = htSearch(hash_table, token->attribute.string);
-            if (item)
-            {              // naslo
-                return -1; // atributes have the same names
-            }
-            else
-            { // nenaslo
-                item = find_key(hash_table, token->attribute.string);
-                if (item)
-                {
-                    if (item->type == TOKEN_FNC)
-                    {
-                        return -1; // TRY TO DEFINE ID WITH THE SAME NAME AS FNC
+        if(flag_def == true){ // if DEF FUNC, DEF ID
+            item = htSearch(hash_table, token->attribute.string);
+                if(item){ // naslo
+                    return ERR_UNDEF; // atributes have the same names
+                }else{ // nenaslo
+                    item = search_everywhere(hash_table, token->attribute.string);
+                    if(item){
+                        if(item->type == TOKEN_FNC){
+                            return ERR_UNDEF; // TRY TO DEFINE ID WITH THE SAME NAME AS FNC
+                        }   
+                    }
+                    htInsert(hash_table, token->attribute.string, token->type);
+                    item = htSearch(hash_table, token->attribute.string);
+                    item->id_declared = true;
+                }
+        }else{ // IF CALL FUNC, USE ID
+            item = htSearch(hash_table, token->attribute.string);
+                if(!item){ // nenaslo
+                    item = search_everywhere(hash_table, token->attribute.string);
+                    if(!item){
+                        return ERR_UNDEF; // id was not defined
+                    }else{
+                        if(item->type == TOKEN_FNC){
+                            return ERR_UNDEF; // finded FNC, not ID
+                        }else if(item->type == TOKEN_ID){
+                            htInsert(hash_table, token->attribute.string, token->type);
+                            item = htSearch(hash_table, token->attribute.string);
+                            item->id_declared = false;
+                        }
+                    }
+                }else{
+                    if(item->type == TOKEN_FNC){
+                        return ERR_UNDEF; // finded FNC, not ID
                     }
                 }
-                htInsert(hash_table, token->attribute.string, token->type);
+        }
+        if(flag_def){
+            def_function_call(token, count_of_params, "LF", str_1);
+        }else{
+            if(token_for_time->type == TOKEN_PRINT){
                 item = htSearch(hash_table, token->attribute.string);
-                item->id_declared = true;
-            }
-        }
-        else
-        { // IF CALL FUNC, USE ID
-            tHTItem *item = htSearch(hash_table, token->attribute.string);
-            if (!item)
-            { // nenaslo
-                item = find_key(hash_table, token->attribute.string);
-                if (!item)
-                {
-                    return -1; // id was not defined
+                if(item){
+                    print_id(token, "LF", str_1);
+                }else{
+                    print_id(token, "GF", str_1);
                 }
-                else
-                {
-                    if (item->type == TOKEN_FNC)
-                    {
-                        return -1; // finded FNC, not ID
-                    }
-                }
-            }
-            else
-            {
-                if (item->type == TOKEN_FNC)
-                {
-                    return -1; // finded FNC, not ID
+            }else{
+                if(hash_table->prev_hash_table){
+                    function_call(token, count_of_params, "TF", str_1);
                 }
             }
         }
-        token_function_body(token, count_of_params);
         free(token->attribute.string);
-        check_next_token(file, token, stack, count_of_params, hash_table, flag_def);
+        ret_code = check_next_token(token_for_time, token, stack, count_of_params, hash_table, flag_def, str_1); 
+        if(ret_code != OK)
+            return ret_code;
         break;
     case TOKEN_INT:
-        token_function_body(token, count_of_params);
-        check_next_token(file, token, stack, count_of_params, hash_table, flag_def);
+        if(flag_def){
+            return ERR_PARAM; // ERROR
+        }else{
+            if(token_for_time->type == TOKEN_PRINT){
+                print_int(token, str_1);
+            }else{
+                // if(hash_table->prev_hash_table){
+                //     function_call(token, count_of_params, "LF");
+                // }else{
+                function_call(token, count_of_params, "TF", str_1);
+                // }
+            }
+        }
+        ret_code = check_next_token(token_for_time, token, stack, count_of_params, hash_table, flag_def, str_1);
+        if(ret_code != OK)
+            return ret_code;
         break;
     case TOKEN_FLOAT:
-        token_function_body(token, count_of_params);
-        check_next_token(file, token, stack, count_of_params, hash_table, flag_def);
+        if(flag_def){
+            return ERR_PARAM; // ERROR
+        }else{
+            if(token_for_time->type == TOKEN_PRINT){
+                print_float(token, str_1);
+            }else{
+                // if(hash_table->prev_hash_table){
+                //     function_call(token, count_of_params, "LF");
+                // }else{
+                function_call(token, count_of_params, "TF", str_1);
+                // }
+            }
+        }
+        ret_code = check_next_token(token_for_time, token, stack, count_of_params, hash_table, flag_def, str_1);
+        if(ret_code != OK)
+            return ret_code;
         break;
     case TOKEN_STRING:
-        token_function_body(token, count_of_params);
+        if(flag_def){
+            free(token->attribute.string);
+            return ERR_PARAM; // ERROR
+        }else{
+            if(token_for_time->type == TOKEN_PRINT){
+                print_string(token, str_1);
+            }else{
+                // if(hash_table->prev_hash_table){
+                //     function_call(token, count_of_params, "LF");
+                // }else{
+                function_call(token, count_of_params, "TF", str_1);
+                // }
+            }
+        }
         free(token->attribute.string);
-        check_next_token(file, token, stack, count_of_params, hash_table, flag_def);
+        ret_code = check_next_token(token_for_time, token, stack, count_of_params, hash_table, flag_def, str_1);
+        if(ret_code != OK)
+            return ret_code;
         break;
-        // MB NEED CASE TOKEN_FNC ----------------------------------------------------------
     default:
-        return -1; // neco jineho nez int/string/float/id
+        return ERR_SYNTAX; // neco jineho nez int/string/float/id
         break;
     }
-    return 1; // WE R OK
+return OK; // WE R OK
 }
 
-int func_for_FNC(FILE *file, struct token_s *token, tStack *stack, table_s *hash_table, bool flag_def)
-{
-
-    int count_of_params = 0;
-
+int func_for_FNC(struct token_s *token, tStack *stack, table_s *hash_table, bool flag_def, int *count_of_params, struct dynamic_string *str_1){
+    
+    int ret_code = 0;
+    *count_of_params = 0;
+    
     struct token_s token_for_time; // token_for_time
-
-    token_for_time.type = token->type;
-    token_for_time.attribute = token->attribute;
-    if (token->type == TOKEN_FNC)
-    {
-        token_for_time.attribute.string = (char *)malloc(sizeof(char) * strlen(token->attribute.string) + 1);
+    
+    token_for_time.type=token->type;
+    token_for_time.attribute=token->attribute;
+    if(token->type == TOKEN_FNC){
+        token_for_time.attribute.string = (char *) malloc(sizeof(char) * strlen(token->attribute.string) + 1);
         strcpy(token_for_time.attribute.string, token->attribute.string);
         free(token->attribute.string);
+    }    
+
+    ret_code = get_token(token, stack);
+    if(ret_code != OK){
+        free(token_for_time.attribute.string);
+        return ret_code;
     }
 
-    get_token(file, token, stack);
-
-    if (token->type == TOKEN_L_BRACKET)
-    {
-        get_token(file, token, stack);
-        if (token->type == TOKEN_R_BRACKET)
-        {
-            if (token_for_time.type == TOKEN_FNC || token_for_time.type == TOKEN_INPUT_I || token_for_time.type == TOKEN_INPUT_S || token_for_time.type == TOKEN_INPUT_F)
-            {
-                return 1; // nastala ")"
-            }
-            else if (token_for_time.type == TOKEN_PRINT)
-            {
-                return -1; // print nesmi byt bez parametru
-            }
+    if(token->type == TOKEN_L_BRACKET){
+        ret_code = get_token(token, stack);
+        if(ret_code != OK){
+            free(token_for_time.attribute.string);
+            return ret_code;
         }
-        else
-        {
-            func_for_atributes(file, token, stack, &count_of_params, hash_table, flag_def);
-            if (token_for_time.type == TOKEN_FNC)
-            {
-                token_function_end(&token_for_time);
+        if(token->type == TOKEN_R_BRACKET){
+            if(token_for_time.type == TOKEN_FNC){
+                if(!flag_def)
+                    call_function(&token_for_time, str_1);
                 free(token_for_time.attribute.string);
+                return OK; // nastala ")"
+            }else if(token_for_time.type == TOKEN_INPUT_I || token_for_time.type == TOKEN_INPUT_S || token_for_time.type == TOKEN_INPUT_F){
+                return OK;
+            }else if(token_for_time.type == TOKEN_PRINT){
+                return ERR_SYNTAX; // print nesmi byt bez parametru
             }
-            if (token_for_time.type == TOKEN_PRINT)
-            {
-                // GENERACE CILOVEHO KODU
+        }else{
+            ret_code = func_for_atributes(&token_for_time, token, stack, count_of_params, hash_table, flag_def, str_1);
+            if(ret_code != OK){
+                if(token_for_time.type == TOKEN_FNC)
+                    free(token_for_time.attribute.string);
+                return ret_code;
             }
-            if (token_for_time.type == TOKEN_INPUT_I || token_for_time.type == TOKEN_INPUT_S || token_for_time.type == TOKEN_INPUT_F)
-            {
-                return -1; // INPUT NESMI MIT PARAMETRY
+            if(token_for_time.type == TOKEN_FNC){
+                if(!flag_def)
+                    call_function(&token_for_time, str_1);
+                free(token_for_time.attribute.string);
+            }else if(token_for_time.type == TOKEN_PRINT){ // RDY
+                print_end(str_1);
+            }else if(token_for_time.type == TOKEN_INPUT_I || token_for_time.type == TOKEN_INPUT_S || token_for_time.type == TOKEN_INPUT_F){
+                return ERR_SYNTAX; // INPUT NESMI MIT PARAMETRY
+            }else{
+                return ERR_SYNTAX;
             }
         }
+    }else{
+        return ERR_SYNTAX; // ERROR
     }
-    else
-    {
-        return -1; // ERROR
-    }
-    return 1; // WE R OK
+return OK; // WE R OK
 }
 
-int func_for_id(FILE *file, struct token_s *token, tStack *stack, table_s *hash_table)
-{
-    //printf("SRABOTAL func_for_id \n");
-    struct token_s token_for_time; // token_for_time
+int func_for_id(struct token_s *token, tStack *stack, table_s *hash_table, int *count_of_params, struct dynamic_string *str_1){
+    //printf("SRABOTAL func_for_id \n"); 
+    tHTItem *item;
+    int tmp_int = 0;
+    int ret_code = 0;
 
-    token_for_time.type = token->type;
-    token_for_time.attribute = token->attribute;
-    if (token->type == TOKEN_ID)
-    {
-        token_for_time.attribute.string = (char *)malloc(sizeof(char) * strlen(token->attribute.string) + 1);
+    struct token_s token_for_time; // token_for_time
+    
+    token_for_time.type=token->type;
+    token_for_time.attribute=token->attribute;
+    if(token->type == TOKEN_ID){
+        token_for_time.attribute.string = (char *) malloc(sizeof(char) * strlen(token->attribute.string) + 1);
         strcpy(token_for_time.attribute.string, token->attribute.string);
     }
 
@@ -303,478 +418,1222 @@ int func_for_id(FILE *file, struct token_s *token, tStack *stack, table_s *hash_
 
     free(token->attribute.string);
     //printf("must be a: %s\n", token_for_time.attribute.string);
-    get_token(file, token, stack);
-    if (token->type == TOKEN_ASSIGN)
-    {
-        //printf("SRABOTAL = \n");
-        get_token(file, token, stack);
+    ret_code = get_token(token, stack);
+    if(ret_code != OK){
+        free(token_for_time.attribute.string);
+        return ret_code;
+    }
+    if(token->type == TOKEN_ASSIGN){
+        // printf("SRABOTAL = \n"); 
+        ret_code = get_token(token, stack);
+        if(ret_code != OK){
+            free(token_for_time.attribute.string);
+            return ret_code;
+        }
         //printf("T_tupe:%d\n", token->type);
-        switch (token->type)
-        {
-        case TOKEN_INT: // ------------------------------------------------------- ADD ID
-            //printf("SRABOTAL int \n");
-            // move int to ID
-            // precedencni analyza
-            //define_variable(&token_for_time);
-            id_is_equal_to(&token_for_time, token);
-            free(token_for_time.attribute.string); // --------------------- precedencni analyza
+        switch (token->type){
+        case TOKEN_INT:
+            ret_code = preced_analyze(token, hash_table, 0, str_1, stack);
+            if(ret_code != OK){
+                return ret_code;
+            }
+            // printf("GENERACE OPERACI\n"); // ------------------------------------------------ 
+            if(hash_table->prev_hash_table){
+                retval_assign_function(&token_for_time, "LF", str_1);
+            }else{
+                retval_assign_function(&token_for_time, "GF", str_1);
+            }
+            free(token_for_time.attribute.string);
             break;
         case TOKEN_STRING:
-            // move string to ID
-            // precedencni analyza
-            id_is_equal_to(&token_for_time, token);
-            free(token_for_time.attribute.string); // --------------------- precedencni analyza
+            ret_code = preced_analyze(token, hash_table, 0, str_1, stack);
+            if(ret_code != OK){
+                return ret_code;
+            }
+            if(hash_table->prev_hash_table){
+                retval_assign_function(&token_for_time, "LF", str_1);
+            }else{
+                retval_assign_function(&token_for_time, "GF", str_1);
+            }
+            free(token_for_time.attribute.string);
+            free(token->attribute.string); // INSIDE PREC ANALY
             break;
         case TOKEN_FLOAT:
-            // move float to ID
-            // precedencni analyza
-            id_is_equal_to(&token_for_time, token);
-            free(token_for_time.attribute.string); // --------------------- precedencni analyza
+            // PRECEDENCNI ANALYZA
+            ret_code = preced_analyze(token, hash_table, 0, str_1, stack);
+            if(ret_code != OK){
+                return ret_code;
+            }
+            if(hash_table->prev_hash_table){
+                retval_assign_function(&token_for_time, "LF", str_1);
+            }else{
+                retval_assign_function(&token_for_time, "GF", str_1);
+            }
+            free(token_for_time.attribute.string);
             break;
-        case TOKEN_NONE:
-            //printf("SRABOTAL NONE \n");
-            // move NONE to ID
-            // def_and_move(&token_for_time, &(*token));
-            id_is_equal_to(&token_for_time, token);
+        case TOKEN_NONE: // ----------------------------------------- ASK RAUL about ID = NONE
+            if(hash_table->prev_hash_table){
+                retval_assign_function(&token_for_time, "LF", str_1);
+            }else{
+                retval_assign_function(&token_for_time, "GF", str_1);
+            }
             free(token_for_time.attribute.string);
             break;
         case TOKEN_FNC:
-            token_function_begin_with_y(token, &token_for_time);
-            tHTItem *item = htSearch(hash_table, token->attribute.string);
-            if (item)
-            {
-                if (item->type == TOKEN_ID)
-                    return -1; // ERROR, FNC WITH THE SAME NAME AS ID
-            }
-            else
-            {
-                item = find_key(hash_table, token->attribute.string);
-                if (item)
-                {
-                    if (item->type == TOKEN_ID)
-                        return -1; // ERROR, FNC WITH THE SAME NAME AS ID
-                }
-                else
-                {
-                    table_s *glob_hash_table = hash_table;
-
-                    while (glob_hash_table->prev_hash_table != NULL)
-                    {
-                        glob_hash_table = glob_hash_table->prev_hash_table;
+            token_function_begin_with_y(str_1);
+            item = htSearch(hash_table, token->attribute.string);
+                if(item){
+                    if(item->type == TOKEN_ID){
+                        free(token_for_time.attribute.string);
+                        free(token->attribute.string);
+                        return ERR_UNDEF; // ERROR, FNC WITH THE SAME NAME AS ID
+                    }else if(item->type == TOKEN_FNC){
+                        ret_code = func_for_FNC(token, stack, hash_table, false, count_of_params, str_1);
+                        if(ret_code != OK){
+                            free(token_for_time.attribute.string);
+                            return ret_code;
+                        }
+                        if(item->param_count != *count_of_params){
+                            free(token_for_time.attribute.string);
+                            return ERR_INCOMPATIBLE; // ERROR, no same count of params
+                        }
                     }
+                }else{
+                    item = search_everywhere(hash_table, token->attribute.string);
+                    if(item){
+                        if(item->type == TOKEN_ID){
+                            free(token_for_time.attribute.string);
+                            free(token->attribute.string);
+                            return ERR_UNDEF; // ERROR, FNC WITH THE SAME NAME AS ID
+                        }else if(item->type == TOKEN_FNC){
+                            ret_code = func_for_FNC(token, stack, hash_table, false, count_of_params, str_1);
+                            if(ret_code != OK){
+                                free(token_for_time.attribute.string);
+                                return ret_code;
+                            }
+                            if(item->param_count != *count_of_params){
+                                free(token_for_time.attribute.string);
+                                return ERR_INCOMPATIBLE; // no same counf of params
+                            }
+                        }
+                    }else{
+                        table_s *glob_hash_table = hash_table;
 
-                    htInsert(glob_hash_table, token->attribute.string, token->type);
-                    item = htSearch(glob_hash_table, token->attribute.string);
-                    item->id_declared = false;
+                        while(glob_hash_table->prev_hash_table != NULL){
+                            glob_hash_table = glob_hash_table->prev_hash_table;
+                        }
+
+                        htInsert(glob_hash_table, token->attribute.string, token->type);
+                        item = htSearch(glob_hash_table, token->attribute.string);
+                        item->id_declared = false;
+
+                        ret_code = func_for_FNC(token, stack, hash_table, false, count_of_params, str_1);
+                        if(ret_code != OK){
+                            free(token_for_time.attribute.string);
+                            return ret_code;
+                        }
+                        item->param_count = *count_of_params;
+                    }
                 }
+
+            // asigment_of_function_with_y(&token_for_time); // IDK 
+            *count_of_params = 0;
+
+            if(hash_table->prev_hash_table){
+                retval_assign_function(&token_for_time, "LF", str_1);
+            }else{
+                retval_assign_function(&token_for_time, "GF", str_1);
             }
-            func_for_FNC(file, token, stack, hash_table, false);
-            asigment_of_function_with_y(&token_for_time);
             free(token_for_time.attribute.string);
+            ret_code = get_token(token, stack);
+            if(ret_code != OK)
+                return ret_code;
+            if(token->type != TOKEN_EOL){
+                return ERR_SYNTAX;
+            }
             break;
 
         case TOKEN_ID:
-            // -------------------------------------------------------------- ADD CODE
+            // printf("naslo ID\n");
+            item = htSearch(hash_table, token->attribute.string);
+                if(!item){ // nenaslo
+                    item = search_everywhere(hash_table, token->attribute.string);
+                    if(!item){
+                        // printf("ID WAS NOT DEFINED\n");
+                        free(token->attribute.string);
+                        free(token_for_time.attribute.string);
+                        return ERR_UNDEF; // id was not defined
+                    }else{
+                        if(item->type == TOKEN_FNC){
+                            free(token->attribute.string);
+                            free(token_for_time.attribute.string);
+                            return ERR_UNDEF; // finded FNC, not ID
+                        }else if(item->type == TOKEN_ID){
+                            htInsert(hash_table, token->attribute.string, token->type);
+                            item = htSearch(hash_table, token->attribute.string);
+                            item->id_declared = false;
+                        }
+                    }
+                }else{
+                    if(item->type == TOKEN_FNC){
+                        free(token->attribute.string);
+                        free(token_for_time.attribute.string);
+                        return ERR_UNDEF; // finded FNC, not ID
+                    }
+                }
+            // printf("ALOPRO\n");
+            ret_code = preced_analyze(token, hash_table, 0, str_1, stack);
+            if(ret_code != OK){
+                free(token_for_time.attribute.string);
+                // printf("IM NE OK   ret_code: %d\n", ret_code);
+                return ret_code;
+            }
+            // printf("IM OK\n");
+            // PRECEDENCNI ANALYZA
+            // printf("JA TUT\n");
+
+            if(hash_table->prev_hash_table){
+                retval_assign_function(&token_for_time, "LF", str_1);
+            }else{
+                retval_assign_function(&token_for_time, "GF", str_1);
+            }
+            free(token_for_time.attribute.string);
+            //free(token->attribute.string); // INSIDE PA
             break;
+
+        case TOKEN_LEN: // ADD SOME CODEGENERATOR FUNCTIONS FOR END ----------------------------------------
+                // GENERACE CILOVEHO KODU
+                ret_code = get_token(token, stack);
+                if(ret_code != OK){
+                    free(token_for_time.attribute.string);
+                    return ret_code;
+                }
+                if(token->type != TOKEN_L_BRACKET){
+                    free(token_for_time.attribute.string);
+                    return ERR_SYNTAX; // MUST BE L BRACKET
+                }
+                ret_code = get_token(token, stack);
+                if(ret_code != OK){
+                    free(token_for_time.attribute.string);
+                    return ret_code;
+                }
+                if(token->type != TOKEN_STRING){
+                    free(token_for_time.attribute.string);
+                    return ERR_SYNTAX; // MUST BE STRING
+                }
+                tmp_int = 0;
+                function_call(token, &tmp_int, "TF", str_1);
+                call_inserted_functions("len", str_1);
+                free(token->attribute.string);
+                ret_code = get_token(token, stack);
+                if(ret_code != OK){
+                    free(token_for_time.attribute.string);
+                    return ret_code;
+                }
+                if (token->type != TOKEN_R_BRACKET){
+                    free(token_for_time.attribute.string);
+                    return ERR_SYNTAX; // MUST BE R BRACKET
+                }
+                ret_code = get_token(token, stack);
+                if(ret_code != OK){
+                    free(token_for_time.attribute.string);
+                    return ret_code;
+                }
+                if(token->type != TOKEN_EOL && token->type != TOKEN_EOF && token->type != TOKEN_DEDEND){
+                    free(token_for_time.attribute.string);
+                    return ERR_SYNTAX; // ERROR MUST BE EOL or EOF or DEDENT
+                }
+                if(hash_table->prev_hash_table){
+                    retval_assign_function(&token_for_time, "LF", str_1);
+                }else{
+                    retval_assign_function(&token_for_time, "GF", str_1);
+                }
+                free(token_for_time.attribute.string);
+                break;
+
+            case TOKEN_SUBSTR: // CILOVY KOD BUDE KONTROLOVAT VSECHNO, JA JEN MAM PREDAT TAM VSECHNY PARAMETRY
+                ret_code = get_token(token, stack);
+                if(ret_code != OK){
+                    free(token_for_time.attribute.string);
+                    return ret_code;
+                }
+                if(token->type != TOKEN_L_BRACKET){
+                    free(token_for_time.attribute.string);
+                    return ERR_SYNTAX; // MUST BE L BRACKET
+                }
+                ret_code = get_token(token, stack);
+                if(ret_code != OK){
+                    free(token_for_time.attribute.string);
+                    return ret_code;
+                }
+                if(token->type != TOKEN_STRING){
+                    free(token_for_time.attribute.string);
+                    return ERR_SYNTAX; // MUST BE STRING
+                }
+                tmp_int = 0;
+                function_call(token, &tmp_int, "TF", str_1);
+                free(token->attribute.string);
+                ret_code = get_token(token, stack);
+                if(ret_code != OK){
+                    free(token_for_time.attribute.string);
+                    return ret_code;
+                }
+                if(token->type != TOKEN_COMA){
+                    free(token_for_time.attribute.string);
+                    return ERR_SYNTAX; // MUST BE something , something
+                }
+                ret_code = get_token(token, stack);
+                if(ret_code != OK){
+                    free(token_for_time.attribute.string);
+                    return ret_code;
+                }
+                if(token->type != TOKEN_INT){
+                    free(token_for_time.attribute.string);
+                    return ERR_SYNTAX; // MUST BE INDEX - ZACATEK RETEZCE (INT)
+                }
+                tmp_int = 1;
+                function_call(token, &tmp_int, "TF", str_1);
+                ret_code = get_token(token, stack);
+                if(ret_code != OK){
+                    free(token_for_time.attribute.string);
+                    return ret_code;
+                }
+                if(token->type != TOKEN_COMA){
+                    free(token_for_time.attribute.string);
+                    return ERR_SYNTAX; // MUST BE something , something
+                }
+                ret_code = get_token(token, stack);
+                if(ret_code != OK){
+                    free(token_for_time.attribute.string);
+                    return ret_code;
+                }
+                if(token->type != TOKEN_INT){
+                    free(token_for_time.attribute.string);
+                    return ERR_SYNTAX; // MUST BE RANGE OF NEW STRING
+                }
+                tmp_int = 2;
+                function_call(token, &tmp_int, "TF", str_1);
+                ret_code = get_token(token, stack);
+                if(ret_code != OK){
+                    free(token_for_time.attribute.string);
+                    return ret_code;
+                }
+                if(token->type != TOKEN_R_BRACKET){
+                    free(token_for_time.attribute.string);
+                    return ERR_SYNTAX; // MUST BE R BRACKET
+                }
+                call_inserted_functions("substr", str_1);
+                ret_code = get_token(token, stack);
+                if(ret_code != OK){
+                    free(token_for_time.attribute.string);
+                    return ret_code;
+                }
+                if(token->type != TOKEN_EOL && token->type != TOKEN_EOF && token->type != TOKEN_DEDEND){
+                    free(token_for_time.attribute.string);
+                    return ERR_SYNTAX; // ERROR MUST BE EOL or EOF or DEDENT
+                }
+                if(hash_table->prev_hash_table){
+                    retval_assign_function(&token_for_time, "LF", str_1);
+                }else{
+                    retval_assign_function(&token_for_time, "GF", str_1);
+                }
+                free(token_for_time.attribute.string);
+                break;
+
+            case TOKEN_ORD: // RDY
+                ret_code = get_token(token, stack);
+                if(ret_code != OK){
+                    free(token_for_time.attribute.string);
+                    return ret_code;
+                }
+                if(token->type != TOKEN_L_BRACKET){
+                    free(token_for_time.attribute.string);
+                    return ERR_SYNTAX; // MUST BE L BRACKET
+                }
+                ret_code = get_token(token, stack);
+                if(ret_code != OK){
+                    free(token_for_time.attribute.string);
+                    return ret_code;
+                }
+                if(token->type != TOKEN_STRING){
+                    free(token_for_time.attribute.string);
+                    return ERR_SYNTAX; // MUST BE STRING
+                }
+                tmp_int = 2;
+                function_call(token, &tmp_int, "TF", str_1);
+                free(token->attribute.string);
+                ret_code = get_token(token, stack);
+                if(ret_code != OK){
+                    free(token_for_time.attribute.string);
+                    return ret_code;
+                }
+                if(token->type != TOKEN_COMA){
+                    free(token_for_time.attribute.string);
+                    return ERR_SYNTAX; // MUST BE string , int
+                }
+                ret_code = get_token(token, stack);
+                if(ret_code != OK){
+                    free(token_for_time.attribute.string);
+                    return ret_code;
+                }
+                if(token->type != TOKEN_INT){
+                    free(token_for_time.attribute.string);
+                    return ERR_SYNTAX; // MUST BE RANGE OF NEW STRING
+                }
+                tmp_int = 1;
+                function_call(token, &tmp_int, "TF", str_1);
+                call_inserted_functions("ord", str_1);
+                ret_code = get_token(token, stack);
+                if(ret_code != OK){
+                    free(token_for_time.attribute.string);
+                    return ret_code;
+                }
+                if (token->type != TOKEN_R_BRACKET){
+                    free(token_for_time.attribute.string);
+                    return ERR_SYNTAX; // MUST BE R BRACKET
+                }
+                ret_code = get_token(token, stack);
+                if(ret_code != OK){
+                    free(token_for_time.attribute.string);
+                    return ret_code;
+                }
+                if(token->type != TOKEN_EOL && token->type != TOKEN_EOF && token->type != TOKEN_DEDEND){
+                    free(token_for_time.attribute.string);
+                    return ERR_SYNTAX; // ERROR MUST BE EOL or EOF or DEDENT
+                }
+                if(hash_table->prev_hash_table){
+                    retval_assign_function(&token_for_time, "LF", str_1);
+                }else{
+                    retval_assign_function(&token_for_time, "GF", str_1);
+                }
+                free(token_for_time.attribute.string);
+                //GENERACE CILOVEHO KODU
+                break;
+
+            case TOKEN_CHR: // RDY
+                ret_code = get_token(token, stack);
+                if(ret_code != OK){
+                    free(token_for_time.attribute.string);
+                    return ret_code;
+                }
+                if(token->type != TOKEN_L_BRACKET){
+                    free(token_for_time.attribute.string);
+                    return ERR_SYNTAX; // MUST BE L BRACKET
+                }
+                ret_code = get_token(token, stack);
+                if(ret_code != OK){
+                    free(token_for_time.attribute.string);
+                    return ret_code;
+                }
+                if(token->type != TOKEN_INT){
+                    free(token_for_time.attribute.string);
+                    return ERR_SYNTAX;
+                }
+                tmp_int = 0;
+                function_call(token, &tmp_int, "TF", str_1);
+                call_inserted_functions("chr", str_1);
+                ret_code = get_token(token, stack);
+                if(ret_code != OK){
+                    free(token_for_time.attribute.string);
+                    return ret_code;
+                }
+                if(token->type != TOKEN_R_BRACKET){
+                    free(token_for_time.attribute.string);
+                    return ERR_SYNTAX;
+                }
+                ret_code = get_token(token, stack);
+                if(ret_code != OK){
+                    free(token_for_time.attribute.string);
+                    return ret_code;
+                }
+                if(token->type != TOKEN_EOL && token->type != TOKEN_EOF && token->type != TOKEN_DEDEND){
+                    free(token_for_time.attribute.string);
+                    return ERR_SYNTAX; // ERROR MUST BE EOL or EOF or DEDENT
+                }
+                if(hash_table->prev_hash_table){
+                    retval_assign_function(&token_for_time, "LF", str_1);
+                }else{
+                    retval_assign_function(&token_for_time, "GF", str_1);
+                }
+                free(token_for_time.attribute.string);
+                break;
         default:
             free(token_for_time.attribute.string);
-            return -1;
+            return ERR_SYNTAX;
             break;
         }
-    }
-    else
-    {
+    }else{
         free(token_for_time.attribute.string);
-        return -1; // ERROR must be =
+        return ERR_SYNTAX; // ERROR must be =
     }
-    // mb need free
-    return 1; // WE R OK
+return OK; // WE R OK
 }
 
-int func_prog(FILE *file, struct token_s *token, tStack *stack, int state, int ret_code, table_s *hash_table)
-{
+int func_prog(struct token_s *token, tStack *stack, int state, int ret_code, table_s *hash_table, struct dynamic_string *str_1){
 
     int count_of_brackets = 0;
+    int count_of_params = 0;
+    int token_checked = 0;
+    int actual_if = 0;
+    int actual_while = 0;
+
+    tHTItem *item;
+    // table_s *local_hash_table_if;
+    // table_s *local_hash_table_while;
+    // table_s *local_hash_table_else;
+    table_s *local_hash_table_def;
+
+    struct dynamic_string *str;
 
     bool flag_def = false;
 
-    int substr_i = 0;
-    int substr_n = 0;
-    char *substr_s;
+    int tmp_int = 0;
 
-    while (ret_code != -1)
-    {
-
-        ret_code = get_token(file, token, stack);
-        state = token->type;
-
-        if (ret_code != OK)
-        {
-            if (token->type == TOKEN_ID || token->type == TOKEN_STRING || (token->type == TOKEN_FNC))
-            {
-                free(token->attribute.string);
+    (void)str_1;
+    // printf("IM HERE\n");
+    while (ret_code == OK){
+        // printf("IM HERE\n");
+            if(!token_checked){
+            ret_code = get_token(token, stack);
+            // printf("IM HERE\n");
+            // printf("TYPE: %d\n", token->type);
+            // printf("KWTYPE: %d\n", token->attribute.key_word);
             }
-            break;
-        }
+            token_checked = 0;
+            state = token->type;      
 
+            if (ret_code != OK){
+                if (token->type == TOKEN_ID || token->type == TOKEN_STRING || (token->type ==  TOKEN_FNC)){
+                    free(token->attribute.string);
+                }
+                break;
+            }
+        
         //printf("T_type:%d\n", token->type);
         //printf("T_att:%d\n",token->attribute);
 
-        switch (state)
-        {
+        switch (state){
 
-        case TOKEN_EOF:
-            // if (token->attribute.string != NULL){
-            //     free(token->attribute.string);
-            // } // MB NEED
-            return 1;
-            break;
+            case TOKEN_EOF:
+                // if (token->attribute.string != NULL){
+                //     free(token->attribute.string);
+                // } // MB NEED 
+                return OK;
+                break;
+            
+            case TOKEN_DEDEND:
+                return OK;
+                break;
 
-        case TOKEN_DEDEND:
-            return 1;
-            break;
+            case TOKEN_EOL:
+                break;
 
-        case TOKEN_ID: // DEF ID
-            // check HASH TABLE
-            tHTItem *item = htSearch(hash_table, token->attribute.string);
-            if (item)
-            { // naslo
-                if (item->type == TOKEN_FNC)
-                {
-                    return -1; // TRY TO DEFINE ID WITH THE SAME NAME AS FNC
-                }
-                if (item->id_declared == false)
-                {
-                    return -1; // ERROR, DECLARED AFTER USED
-                }
-            }
-            else
-            { // nenaslo
-                item = find_key(hash_table, token->attribute.string);
-                if (item)
-                {
-                    if (item->type == TOKEN_FNC)
-                    {
-                        return -1; // TRY TO DEFINE ID WITH THE SAME NAME AS FNC
-                    }
-                }
-                htInsert(hash_table, token->attribute.string, token->type);
+            case TOKEN_ID: // DEF ID // RDY
+                // check HASH TABLE
+                
                 item = htSearch(hash_table, token->attribute.string);
-                item->id_declared = true;
-            }
-
-            func_for_id(file, token, stack, hash_table);
-
-            get_token(file, token, stack);
-            if (token->type != TOKEN_EOL && token->type != TOKEN_EOF && token->type != TOKEN_DEDEND)
-                return -1; // ERROR MUST BE EOL or EOF or DEDENT
-            break;
-
-        case TOKEN_FNC: // call FNC
-            // check HASH TABLE
-            flag_def = false;
-            tHTItem *item = htSearch(hash_table, token->attribute.string);
-            if (item)
-            {
-                if (item->type == TOKEN_ID)
-                    return -1; // ERROR, FNC WITH THE SAME NAME AS ID
-            }
-            else
-            {
-                item = find_key(hash_table, token->attribute.string);
-                if (item)
-                {
-                    if (item->type == TOKEN_ID)
-                        return -1; // ERROR, FNC WITH THE SAME NAME AS ID
-                }
-                else
-                {
-                    table_s *glob_hash_table = hash_table;
-
-                    while (glob_hash_table->prev_hash_table != NULL)
-                    {
-                        glob_hash_table = glob_hash_table->prev_hash_table;
+                if(item){ // naslo
+                    if(item->type == TOKEN_FNC){
+                        free(token->attribute.string);
+                        return ERR_SYNTAX; // TRY TO DEFINE ID WITH THE SAME NAME AS FNC
                     }
-
-                    htInsert(glob_hash_table, token->attribute.string, token->type);
-                    item = htSearch(glob_hash_table, token->attribute.string);
-                    item->id_declared = false;
-                }
-            }
-
-            func_for_FNC(file, token, stack, hash_table, flag_def);
-
-            get_token(file, token, stack);
-            if (token->type != TOKEN_EOL && token->type != TOKEN_EOF && token->type != TOKEN_DEDEND)
-                return -1; // ERROR MUST BE EOL or EOF or DEDENT
-
-            break;
-
-        case TOKEN_PRINT:
-        case TOKEN_INPUT_I:
-        case TOKEN_INPUT_S:
-        case TOKEN_INPUT_F:
-            flag_def = false;
-            func_for_FNC(file, token, stack, hash_table, flag_def);
-
-            get_token(file, token, stack);
-            if (token->type != TOKEN_EOL && token->type != TOKEN_EOF && token->type != TOKEN_DEDEND)
-                return -1; // ERROR MUST BE EOL or EOF or DEDENT
-            break;
-
-        case TOKEN_LEN:
-            // GENERACE CILOVEHO KODU
-            get_token(file, token, stack);
-            if (token->type != TOKEN_L_BRACKET)
-                return -1; // MUST BE L BRACKET
-            get_token(file, token, stack);
-            if (token->type != TOKEN_STRING)
-                return -1; // MUST BE STRING
-            get_token(file, token, stack);
-            if (token->type != TOKEN_R_BRACKET)
-            {
-                return -1; // MUST BE R BRACKET
-            }
-            get_token(file, token, stack);
-            if (token->type != TOKEN_EOL && token->type != TOKEN_EOF && token->type != TOKEN_DEDEND)
-                return -1; // ERROR MUST BE EOL or EOF or DEDENT
-            break;
-
-        case TOKEN_SUBSTR: // CILOVY KOD BUDE KONTROLOVAT VSECHNO, JA JEN MAM PREDAT TAM VSECHNY PARAMETRY
-            get_token(file, token, stack);
-            if (token->type != TOKEN_L_BRACKET)
-                return -1; // MUST BE L BRACKET
-            get_token(file, token, stack);
-            if (token->type != TOKEN_STRING)
-            {
-                return -1; // MUST BE STRING
-            }
-            else
-            {
-                substr_s = (char *)malloc(sizeof(char) * strlen(token->attribute.string) + 1);
-            }
-            get_token(file, token, stack);
-            if (token->type != TOKEN_COMA)
-                free(substr_s);
-            return -1; // MUST BE something , something
-            get_token(file, token, stack);
-            if (token->type != TOKEN_INT)
-            {
-                free(substr_s);
-                return -1; // MUST BE INDEX - ZACATEK RETEZCE (INT)
-            }
-            else
-            {
-                substr_i = token->attribute.int_val;
-            }
-            get_token(file, token, stack);
-            if (token->type != TOKEN_COMA)
-                free(substr_s);
-            return -1; // MUST BE something , something
-            get_token(file, token, stack);
-            if (token->type != TOKEN_INT)
-            {
-                free(substr_s);
-                return -1; // MUST BE RANGE OF NEW STRING
-            }
-            else
-            {
-                substr_n = token->attribute.int_val;
-            }
-            get_token(file, token, stack);
-            if (token->type != TOKEN_R_BRACKET)
-            {
-                free(substr_s);
-                return -1; // MUST BE R BRACKET
-            }
-            get_token(file, token, stack);
-            if (token->type != TOKEN_EOL && token->type != TOKEN_EOF && token->type != TOKEN_DEDEND)
-                free(substr_s);
-            return -1; // ERROR MUST BE EOL or EOF or DEDENT
-            // GENERACE CILOVEHO KODU
-            free(substr_s);
-            break;
-
-        case TOKEN_ORD:
-
-            break;
-
-        case TOKEN_CHR:
-
-            break;
-
-        case TOKEN_KEY_WORD:
-            switch (token->attribute.key_word)
-            {
-            case _IF_:
-
-                count_of_brackets = 0;
-                func_cond_mb(file, token, stack, count_of_brackets, hash_table);
-                get_token(file, token, stack);
-                if (token->type != TOKEN_DDOT)
-                    return -1; // must be :
-                get_token(file, token, stack);
-                if (token->type != TOKEN_EOL)
-                    return -1; // must be end of line
-                get_token(file, token, stack);
-                if (token->type != TOKEN_INDEND)
-                    return -1;                                              // must be INDENT
-                func_prog(file, token, stack, state, ret_code, hash_table); // inside if
-                if (token->type != TOKEN_DEDEND)
-                    return -1; // must be DEDENT
-                break;
-
-            case _WHILE_:
-
-                count_of_brackets = 0;
-                func_cond_mb(file, token, stack, count_of_brackets, hash_table);
-                get_token(file, token, stack);
-                if (token->type != TOKEN_DDOT)
-                    return -1; // must be :
-                get_token(file, token, stack);
-                if (token->type != TOKEN_EOL)
-                    return -1; // must be end of line
-                get_token(file, token, stack);
-                if (token->type != TOKEN_INDEND)
-                    return -1;                                              // must be INDENT
-                func_prog(file, token, stack, state, ret_code, hash_table); // inside if
-                if (token->type != TOKEN_DEDEND)
-                    return -1; // must be DEDENT
-                break;
-
-            case _ELSE_:
-
-                get_token(file, token, stack);
-                if (token->type != TOKEN_DDOT)
-                    return -1; // must be :
-                get_token(file, token, stack);
-                if (token->type != TOKEN_EOL)
-                    return -1; // must be end of line
-                get_token(file, token, stack);
-                if (token->type != TOKEN_INDEND)
-                    return -1;                                              // must be INDENT
-                func_prog(file, token, stack, state, ret_code, hash_table); // inside if
-                if (token->type != TOKEN_DEDEND)
-                    return -1; // must be DEDENT
-                break;
-
-            case _NONE_:
-                // NO NEED HERE ___ THINK
-                break;
-
-            case _PASS_:
-                get_token(file, token, stack);
-                if (token->type != TOKEN_EOL)
-                    return -1; // ERROR MUST BE EOL
-                break;
-
-            case _RETURN_:
-                get_token(file, token, stack);
-                if (token->type == TOKEN_EOL)
-                {
-                    return 1; // WE R OK
-                }
-                else
-                {
-                    func_mb_ret(file, token, stack, hash_table);
-                    get_token(file, token, stack);
-                    if (token->type != TOKEN_EOL)
-                        return -1; // must be EOL
-                }
-                break;
-
-            case _DEF_:
-                flag_def = true;
-                get_token(file, token, stack);
-                if (token->type != TOKEN_FNC)
-                    return -1; // must be name of FUNC
-                //CHECK HASH TABLE
-                if (hash_table->prev_hash_table)
-                {
-                    return -1; // DEF CAN BE ONLY IN GLOBAL FRAME
-                }
-                tHTItem *item = htSearch(hash_table, token->attribute.string);
-                if (item)
-                {
-                    if (item->id_declared == false)
-                    {
-                        item->id_declared = true;
+                    if(item->id_declared == false ){
+                        free(token->attribute.string);
+                        return ERR_SYNTAX; // ERROR, DECLARED AFTER USED
                     }
-                    else
-                    {
-                        return -1; // try to daclare fnc with the same name
+                }else{ // nenaslo
+                    item = search_everywhere(hash_table, token->attribute.string);
+                    if(item){
+                        if(item->type == TOKEN_FNC){
+                            free(token->attribute.string);
+                            return ERR_UNDEF; // TRY TO DEFINE ID WITH THE SAME NAME AS FNC
+                        }   
                     }
-                }
-                else
-                {
                     htInsert(hash_table, token->attribute.string, token->type);
                     item = htSearch(hash_table, token->attribute.string);
                     item->id_declared = true;
+
+                    if(hash_table->prev_hash_table){
+                        define_variable_GF(token, "LF", str_1);
+                    }else{
+                        define_variable_GF(token, "GF", str_1);
+                    }
+                }
+                // printf("KUKU\n");
+                ret_code = func_for_id(token, stack, hash_table, &count_of_params, str_1);
+                if(ret_code != OK)
+                    return ret_code;
+                // printf("IM HERE\n");
+                count_of_params = 0;
+                // ret_code = get_token(token, stack);
+                // if(ret_code != OK)
+                //     return ret_code;
+                // if(token->type != TOKEN_EOL && token->type != TOKEN_EOF && token->type != TOKEN_DEDEND)
+                //     return ERR_SYNTAX; // ERROR MUST BE EOL or EOF or DEDENT
+                break;
+            
+            case TOKEN_FNC: // call FNC // RDY
+                // check HASH TABLE
+                token_function_begin_with_y(str_1);
+                flag_def = false;
+                item = htSearch(hash_table, token->attribute.string);
+                if(item){
+                    if(item->type == TOKEN_ID){
+                        free(token->attribute.string);
+                        return ERR_UNDEF; // ERROR, FNC WITH THE SAME NAME AS ID
+                    }else if(item->type == TOKEN_FNC){
+                        ret_code = func_for_FNC(token, stack, hash_table, flag_def, &count_of_params, str_1);
+                        if(ret_code != OK)
+                            return ret_code;
+                        if(item->param_count != count_of_params){
+                            return ERR_INCOMPATIBLE; // ERROR, no same count of params
+                        }
+                    }
+                }else{
+                    item = search_everywhere(hash_table, token->attribute.string);
+                    if(item){
+                        if(item->type == TOKEN_ID){
+                            free(token->attribute.string);
+                            return ERR_UNDEF; // ERROR, FNC WITH THE SAME NAME AS ID
+                        }else if(item->type == TOKEN_FNC){
+                            ret_code = func_for_FNC(token, stack, hash_table, flag_def, &count_of_params, str_1);
+                            if(ret_code != OK)
+                                return ret_code;
+                            if(item->param_count != count_of_params){
+                                return ERR_INCOMPATIBLE; // ERROR, no same count of params
+                            }
+                        }
+                    }else{
+                        table_s *glob_hash_table = hash_table;
+
+                        while(glob_hash_table->prev_hash_table != NULL){
+                            glob_hash_table = glob_hash_table->prev_hash_table;
+                        }
+
+                        htInsert(glob_hash_table, token->attribute.string, token->type);
+                        item = htSearch(glob_hash_table, token->attribute.string);
+                        item->id_declared = false;
+
+                        ret_code = func_for_FNC(token, stack, hash_table, flag_def, &count_of_params, str_1);
+                        if(ret_code != OK)
+                            return ret_code;
+                        item->param_count = count_of_params;
+                    }
                 }
 
-                table_s *local_hash_table = (table_s *)malloc(sizeof(table_s));
-                if (!local_hash_table)
-                    return ERR_INTERNAL;
-                htInit(local_hash_table);
+                count_of_params = 0;
+                
+                ret_code = get_token(token, stack);
+                if(ret_code != OK)
+                    return ret_code;
+                if(token->type != TOKEN_EOL && token->type != TOKEN_EOF && token->type != TOKEN_DEDEND)
+                    return ERR_SYNTAX; // ERROR MUST BE EOL or EOF or DEDENT
+                break;
+            
+            case TOKEN_PRINT:
+                flag_def = false;
+                ret_code = func_for_FNC(token, stack, hash_table, flag_def, &count_of_params, str_1);
+                if(ret_code != OK)
+                    return ret_code;
+                count_of_params = 0;
 
-                local_hash_table->prev_hash_table = hash_table;
+                ret_code = get_token(token, stack);
+                if(ret_code != OK)
+                    return ret_code;
+                if(token->type != TOKEN_EOL && token->type != TOKEN_EOF && token->type != TOKEN_DEDEND)
+                    return ERR_SYNTAX; // ERROR MUST BE EOL or EOF or DEDENT
+                break;
+            case TOKEN_INPUT_I:
+            case TOKEN_INPUT_S:
+            case TOKEN_INPUT_F:
 
-                func_for_FNC(file, token, stack, local_hash_table, flag_def);
-                get_token(file, token, stack);
-                if (token->type != TOKEN_DDOT)
-                    return -1; // must be :
-                get_token(file, token, stack);
-                if (token->type != TOKEN_EOL)
-                    return -1; // must be end of line
-                get_token(file, token, stack);
-                if (token->type != TOKEN_INDEND)
-                    return -1;                                                    // must be INDENT
-                func_prog(file, token, stack, state, ret_code, local_hash_table); // inside func
-                if (token->type != TOKEN_DEDEND)
-                    return -1; // must be DEDENT
-                htClearAll(local_hash_table);
-                free(local_hash_table);
+                break;
+            case TOKEN_LEN: // RDY
+                // GENERACE CILOVEHO KODU
+                ret_code = get_token(token, stack);
+                if(ret_code != OK)
+                    return ret_code;
+                if(token->type != TOKEN_L_BRACKET)
+                    return ERR_SYNTAX; // MUST BE L BRACKET
+                ret_code = get_token(token, stack);
+                if(ret_code != OK)
+                    return ret_code;
+                if(token->type != TOKEN_STRING){
+                    return ERR_SYNTAX; // MUST BE STRING
+                }
+                tmp_int = 0;
+                function_call(token, &tmp_int, "TF", str_1);
+                call_inserted_functions("len", str_1);
+                free(token->attribute.string);
+                ret_code = get_token(token, stack);
+                if(ret_code != OK)
+                    return ret_code;
+                if (token->type != TOKEN_R_BRACKET){
+                    return ERR_SYNTAX; // MUST BE R BRACKET
+                }
+                ret_code = get_token(token, stack);
+                if(ret_code != OK)
+                    return ret_code;
+                if(token->type != TOKEN_EOL && token->type != TOKEN_EOF && token->type != TOKEN_DEDEND)
+                    return ERR_SYNTAX; // ERROR MUST BE EOL or EOF or DEDENT
+                break;
+
+            case TOKEN_SUBSTR: // CILOVY KOD BUDE KONTROLOVAT VSECHNO, JA JEN MAM PREDAT TAM VSECHNY PARAMETRY
+                ret_code = get_token(token, stack);
+                if(ret_code != OK)
+                    return ret_code;
+                if(token->type != TOKEN_L_BRACKET)
+                    return ERR_SYNTAX; // MUST BE L BRACKET
+                ret_code = get_token(token, stack);
+                if(ret_code != OK)
+                    return ret_code;
+                if(token->type != TOKEN_STRING){
+                    return ERR_SYNTAX; // MUST BE STRING
+                }
+                tmp_int = 0;
+                function_call(token, &tmp_int, "TF", str_1);
+                free(token->attribute.string);
+                ret_code = get_token(token, stack);
+                if(ret_code != OK)
+                    return ret_code;
+                if(token->type != TOKEN_COMA){
+                    return ERR_SYNTAX; // MUST BE something , something
+                }
+                ret_code = get_token(token, stack);
+                if(ret_code != OK)
+                    return ret_code;
+                if(token->type != TOKEN_INT){
+                    return ERR_SYNTAX; // MUST BE INDEX - ZACATEK RETEZCE (INT)
+                }
+                tmp_int = 1;
+                function_call(token, &tmp_int, "TF", str_1);
+                ret_code = get_token(token, stack);
+                if(ret_code != OK)
+                    return ret_code;
+                if(token->type != TOKEN_COMA){
+                    return ERR_SYNTAX; // MUST BE something , something
+                }
+                ret_code = get_token(token, stack);
+                if(ret_code != OK)
+                    return ret_code;
+                if(token->type != TOKEN_INT){
+                    return ERR_SYNTAX; // MUST BE RANGE OF NEW STRING
+                }
+                tmp_int = 2;
+                function_call(token, &tmp_int, "TF", str_1);
+                ret_code = get_token(token, stack);
+                if(ret_code != OK)
+                    return ret_code;
+                if (token->type != TOKEN_R_BRACKET){
+                    return ERR_SYNTAX; // MUST BE R BRACKET
+                }
+                call_inserted_functions("substr", str_1);
+                ret_code = get_token(token, stack);
+                if(ret_code != OK)
+                    return ret_code;
+                if(token->type != TOKEN_EOL && token->type != TOKEN_EOF && token->type != TOKEN_DEDEND){
+                    return ERR_SYNTAX; // ERROR MUST BE EOL or EOF or DEDENT
+                }
+                break;
+
+            case TOKEN_ORD: // RDY
+                ret_code = get_token(token, stack);
+                if(ret_code != OK)
+                    return ret_code;
+                if(token->type != TOKEN_L_BRACKET)
+                    return ERR_SYNTAX; // MUST BE L BRACKET
+                ret_code = get_token(token, stack);
+                if(ret_code != OK)
+                    return ret_code;
+                if(token->type != TOKEN_STRING){
+                    return ERR_SYNTAX; // MUST BE STRING
+                }
+                tmp_int = 2;
+                function_call(token, &tmp_int, "TF", str_1);
+                free(token->attribute.string);
+                ret_code = get_token(token, stack);
+                if(ret_code != OK)
+                    return ret_code;
+                if(token->type != TOKEN_COMA){
+                    return ERR_SYNTAX; // MUST BE string , int
+                }
+                ret_code = get_token(token, stack);
+                if(ret_code != OK)
+                    return ret_code;
+                if(token->type != TOKEN_INT){
+                    return ERR_SYNTAX; // MUST BE RANGE OF NEW STRING
+                }
+                tmp_int = 1;
+                function_call(token, &tmp_int, "TF", str_1);
+                call_inserted_functions("ord", str_1);
+                ret_code = get_token(token, stack);
+                if(ret_code != OK)
+                    return ret_code;
+                if (token->type != TOKEN_R_BRACKET){
+                    return ERR_SYNTAX; // MUST BE R BRACKET
+                }
+                ret_code = get_token(token, stack);
+                if(ret_code != OK)
+                    return ret_code;
+                if(token->type != TOKEN_EOL && token->type != TOKEN_EOF && token->type != TOKEN_DEDEND){
+                    return ERR_SYNTAX; // ERROR MUST BE EOL or EOF or DEDENT
+                }
+                //GENERACE CILOVEHO KODU
+                break;
+
+            case TOKEN_CHR: // RDY
+                ret_code = get_token(token, stack);
+                if(ret_code != OK)
+                    return ret_code;
+                if(token->type != TOKEN_L_BRACKET)
+                    return ERR_SYNTAX; // MUST BE L BRACKET
+                ret_code = get_token(token, stack);
+                if(ret_code != OK)
+                    return ret_code;
+                if(token->type != TOKEN_INT)
+                    return ERR_SYNTAX;
+                tmp_int = 0;
+                function_call(token, &tmp_int, "TF", str_1);
+                call_inserted_functions("chr", str_1);
+                ret_code = get_token(token, stack);
+                if(ret_code != OK)
+                    return ret_code;
+                if(token->type != TOKEN_R_BRACKET)
+                    return ERR_SYNTAX;
+                ret_code = get_token(token, stack);
+                if(ret_code != OK)
+                    return ret_code;
+                if(token->type != TOKEN_EOL && token->type != TOKEN_EOF && token->type != TOKEN_DEDEND){
+                    return ERR_SYNTAX; // ERROR MUST BE EOL or EOF or DEDENT
+                }
+                break;
+
+            case TOKEN_KEY_WORD:
+                switch (token->attribute.key_word){
+                case _IF_: // RDY w/o condition
+                    // local_hash_table_if = (table_s *) malloc(sizeof(table_s));
+                    // if(!local_hash_table_if)
+                    //     return ERR_INTERNAL;
+                    // htInit(local_hash_table_if);
+
+                    // local_hash_table_if->prev_hash_table = hash_table;
+                    
+                    count_of_if++; // if1, if2, if3 for other ifs
+                    actual_if = count_of_if; // aktualni if/else, abychom mohli poznat ktery if/else to je
+                    generate_if_head(str_1);
+                    create_returnvalue(str_1, "LF", &actual_if);
+                    // (void)actual_if;
+                    count_of_brackets = 0;
+                    ret_code = func_cond_mb(token, stack, count_of_brackets, hash_table, &count_of_params, str_1);
+                    if(ret_code != OK)
+                        return ret_code;
+                    // GENERATION OF CONDITION
+                    count_of_params = 0;
+                    if_body(&actual_if, str_1);// GENERACE JMPIFNEQ
+                    //ret_code = get_token(token, stack);
+                    // if(token->type != TOKEN_DDOT){
+                    //     return -1; // must be :
+                    // }
+                    // //printf("im here\n");
+                    // ret_code = get_token(token, stack);
+                    // if(ret_code != OK)
+                    //     return ret_code;
+                    // //printf("%d\n", token->type);
+                    // if(token->type != TOKEN_EOL)
+                    //     return ERR_SYNTAX; // must be end of line
+                    ret_code = get_token(token, stack);
+                    if(ret_code != OK)
+                        return ret_code;
+                    if(token->type != TOKEN_INDEND)
+                        return ERR_SYNTAX; // must be INDENT
+                    ret_code = func_prog(token, stack, state, ret_code, hash_table, str_1); // inside if, generace body
+                    if(ret_code != OK)
+                        return ret_code;
+                    //printf("ja tutu\n");
+                    if(token->type != TOKEN_DEDEND)
+                        return ERR_SYNTAX; // must be DEDENT
+                    // htClearAll(local_hash_table_if, false);
+                    // free(local_hash_table_if);
+
+                    ret_code = get_token(token, stack);
+                    if(ret_code == OK){
+                        token_checked = 1;
+                        if(token->type == TOKEN_KEY_WORD){
+                            if(token->attribute.key_word == _ELSE_){
+                                token_checked = 0;
+                                // local_hash_table_else = (table_s *) malloc(sizeof(table_s));
+                                // if(!local_hash_table_else)
+                                //     return ERR_INTERNAL;
+                                // htInit(local_hash_table_else);
+
+                                // local_hash_table_else->prev_hash_table = hash_table;
+
+                                ret_code = get_token(token, stack);
+                                if(ret_code != OK){
+                                    // htClearAll(local_hash_table_else, false);
+                                    // free(local_hash_table_else);
+                                    return ret_code;
+                                }
+                                if(token->type != TOKEN_DDOT){
+                                    // htClearAll(local_hash_table_else, false);
+                                    // free(local_hash_table_else);
+                                    return ERR_SYNTAX; // must be :
+                                }
+                                ret_code = get_token(token, stack);
+                                if(ret_code != OK){
+                                    // htClearAll(local_hash_table_else, false);
+                                    // free(local_hash_table_else);
+                                    return ret_code;
+                                }
+                                if(token->type != TOKEN_EOL){
+                                    // htClearAll(local_hash_table_else, false);
+                                    // free(local_hash_table_else);
+                                    return ERR_SYNTAX; // must be end of line
+                                }
+                                ret_code = get_token(token, stack);
+                                if(ret_code != OK){
+                                    // htClearAll(local_hash_table_else, false);
+                                    // free(local_hash_table_else);
+                                    return ret_code;
+                                }
+                                if(token->type != TOKEN_INDEND){
+                                    // htClearAll(local_hash_table_else, false);
+                                    // free(local_hash_table_else);
+                                    return ERR_SYNTAX; // must be INDENT
+                                }
+                                found_else(&actual_if, str_1);
+                                ret_code = func_prog(token, stack, state, ret_code, hash_table, str_1); // inside if
+                                if(ret_code != OK){
+                                    // htClearAll(local_hash_table_else, false);
+                                    // free(local_hash_table_else);
+                                    return ret_code;
+                                }
+                                if(token->type != TOKEN_DEDEND){
+                                    // htClearAll(local_hash_table_else, false);
+                                    // free(local_hash_table_else);
+                                    return ERR_SYNTAX; // must be DEDENT
+                                }
+                                end_of_else(&actual_if, str_1);
+                                // if_end(); // NO NEED I THINK
+                                // htClearAll(local_hash_table_else, false);
+                                // free(local_hash_table_else);
+                            }else{
+                                end_of_if(&actual_if, str_1);
+                            }
+                        }else{
+                            end_of_if(&actual_if, str_1);
+                        }
+                    }else{
+                        return ret_code;
+                    }
+                    break;
+                
+                case _WHILE_:
+                    
+                    str_init(&str); // pomocny dynamicky radek pro spravny vypis
+                    count_of_if++;
+                    actual_while = count_of_if;
+                    flag_while++;
+                    generate_while_head_1(&actual_while, str_1);
+                    // local_hash_table_while = (table_s *) malloc(sizeof(table_s));
+                    // if(!local_hash_table_while)
+                    //     return ERR_INTERNAL;
+                    // htInit(local_hash_table_while);
+
+                    // local_hash_table_while->prev_hash_table = hash_table;
+                    
+                    count_of_brackets = 0;
+                    ret_code = func_cond_mb(token, stack, count_of_brackets, hash_table, &count_of_params, str_1);
+                    
+
+                    if(ret_code != OK){
+                        str_clean(str);
+                        // htClearAll(local_hash_table_while, false);
+                        // free(local_hash_table_while);
+                        return ret_code;
+                    }
+                    
+                    // printf("TOKEN_TYPE %d \n", token->type);
+
+                    count_of_params = 0;
+                    // ret_code = get_token(token, stack);
+                    // if(token->type != TOKEN_DDOT)
+                    //     return -1; // must be :
+                    // ret_code = get_token(token, stack);
+                    // if(ret_code != OK){
+                    //     str_clean(str);
+                    //     htClearAll(local_hash_table_while);
+                    //     free(local_hash_table_while);
+                    //     return ret_code;
+                    // }
+                    
+                    // if(token->type != TOKEN_EOL){
+                    //     str_clean(str);
+                    //     htClearAll(local_hash_table_while);
+                    //     free(local_hash_table_while);
+                    //     return ERR_SYNTAX; // must be end of line
+                    // }
+                    ret_code = get_token(token, stack);
+                    if(ret_code != OK){
+                        str_clean(str);
+                        // htClearAll(local_hash_table_while, false);
+                        // free(local_hash_table_while);
+                        return ret_code;
+                    }
+                    if(token->type != TOKEN_INDEND){
+                        str_clean(str);
+                        // htClearAll(local_hash_table_while, false);
+                        // free(local_hash_table_while);
+                        return ERR_SYNTAX; // must be INDENT
+                    }
+                    while_body(&actual_while, str_1);
+                    // printf("TOKEN_TYPE %d \n", token->type);
+                    
+                    // printf("IM BEFORE WHILE BODY AND FLAG_WHILE = %d\n", flag_while);
+                    ret_code = func_prog(token, stack, state, ret_code, hash_table, str); // inside while
+                    // printf("IM AFTER WHILE BODY AND FLAG_WHILE = %d\n", flag_while);
+                    // printf("ret_code %d\n", ret_code);
+                    
+                    // printf("-------------------------------------\n");
+                    // printf("%s",str->str);
+                    // printf("-------------------------------------\n");
+
+                    if(str->len){
+                        for(unsigned int i = 0; i < strlen(str->str); i++){
+                            add_char_to_str(str_1, (str->str)[i]);
+                        }
+                    }
+
+                    flag_while--;
+
+                    if(ret_code != OK){
+                        str_clean(str);
+                        // htClearAll(local_hash_table_while, false);
+                        // free(local_hash_table_while);
+                        return ret_code;
+                    }
+                    // printf("IM HERE BRO\n");
+                    if(token->type != TOKEN_DEDEND){
+                        str_clean(str);
+                        // htClearAll(local_hash_table_while, false);
+                        // free(local_hash_table_while);
+                        return ERR_SYNTAX; // must be DEDENT
+                    }
+                    // printf("IM HERE BRO\n");
+                    // printf("IM HERE AND FLAG_WHILE = %d\n", flag_while);
+
+                    if(!flag_while && str_1->len){
+                        printf("%s", str_1->str);
+
+                        free(str_1->str);
+                        str_1->str = (string)malloc(DEF_STR_SIZE);
+                        if(!str_1->str){
+                            str_clean(str);
+                            // htClearAll(local_hash_table_while, false);
+                            // free(local_hash_table_while);
+                            return ERR_INTERNAL;
+                        }
+                        str_1->size = DEF_STR_SIZE;
+                        str_1->len = 0;
+                    }
+
+                    generate_while_end(&actual_while, str_1);
+
+                    str_clean(str);
+                    // htClearAll(local_hash_table_while, false);
+                    // free(local_hash_table_while);
+                    break;
+
+                // case _ELSE_:
+                //     // token_checked = 1;
+                //     local_hash_table_else = (table_s *) malloc(sizeof(table_s));
+                //     if(!local_hash_table_else)
+                //         return ERR_INTERNAL;
+                //     htInit(local_hash_table_else);
+
+                //     local_hash_table_else->prev_hash_table = hash_table;
+
+                //     ret_code = get_token(token, stack);
+                //     if(token->type != TOKEN_DDOT)
+                //         return -1; // must be :
+                //     ret_code = get_token(token, stack);
+                //     if(token->type != TOKEN_EOL)
+                //         return -1; // must be end of line
+                //     ret_code = get_token(token, stack);
+                //     if(token->type != TOKEN_INDEND)
+                //         return -1; // must be INDENT
+                //     found_else(&actual_if);
+                //     func_prog(token, stack, state, ret_code, local_hash_table_else, str); // inside if
+                //     if(token->type != TOKEN_DEDEND)
+                //         return -1; // must be DEDENT
+                //     htClearAll(local_hash_table_else);
+                //     free(local_hash_table_else);
+                //     break;
+
+                // case _NONE_:
+                //         // NO NEED HERE ___ THINK
+                //     break;
+
+                case _PASS_:
+                    ret_code = get_token(token, stack);
+                    if(ret_code != OK)
+                        return ret_code;
+                    if(token->type != TOKEN_EOL)
+                        return ERR_SYNTAX; // ERROR MUST BE EOL
+                    break;
+
+                case _RETURN_:
+                    ret_code = get_token(token, stack);
+                    if(ret_code != OK)
+                        return ret_code;
+                    if(token->type == TOKEN_EOL){
+                        return OK; // WE R OK
+                    }else{
+                        ret_code = func_mb_ret(token, stack, hash_table, &count_of_params, str_1);
+                        if(ret_code != OK)
+                            return ret_code;
+                        count_of_params = 0;
+                    }
+                    break;
+
+                case _DEF_: // RDY
+                // printf("IM IN DEF\n");
+                    flag_def = true;
+                    ret_code = get_token(token, stack);
+                    if(ret_code != OK){
+                        free(token->attribute.string);
+                        return ret_code;
+                    }
+                    // printf("TType: %d\n", token->type);
+                    // printf("TNAME: %s\n", token->attribute.string);
+                    if(token->type != TOKEN_FNC){
+                        free(token->attribute.string);
+                        return ERR_SYNTAX; // must be name of FUNC
+                    }
+                    // printf("IM HERE\n");
+                    //CHECK HASH TABLE
+                    if(hash_table->prev_hash_table){
+                        free(token->attribute.string);
+                        return ERR_OTHER; // DEF CAN BE ONLY IN GLOBAL FRAME
+                    }
+                    local_hash_table_def = (table_s *) malloc(sizeof(table_s));
+                    if(!local_hash_table_def){
+                        free(token->attribute.string);
+                        return ERR_INTERNAL;
+                    }
+                    htInit(local_hash_table_def);
+
+                    local_hash_table_def->prev_hash_table = hash_table;
+                    // printf("IM HERE BEFORE RAUL\n");
+                    define_function_begin(token, str_1);
+                    retval_function(str_1);
+                    // printf("IM HERE AFTER RAUL\n");
+                    item = htSearch(hash_table, token->attribute.string);
+                    if(item){
+                        if(item->type == TOKEN_ID){
+                            free(token->attribute.string);
+                            htClearAll(local_hash_table_def, false);
+                            free(local_hash_table_def);
+                            return ERR_UNDEF;
+                        }else{
+                            if(item->id_declared == false){
+                                item->id_declared = true;
+                                ret_code = func_for_FNC(token, stack, local_hash_table_def, flag_def, &count_of_params, str_1);
+                                if(ret_code != OK){
+                                    free(token->attribute.string);
+                                    htClearAll(local_hash_table_def, false);
+                                    free(local_hash_table_def);
+                                    return ret_code;
+                                }
+                                if(item->param_count != count_of_params){
+                                    free(token->attribute.string);
+                                    htClearAll(local_hash_table_def, false);
+                                    free(local_hash_table_def);
+                                    return ERR_INCOMPATIBLE; // ERROR, no same count of params
+                                }
+                            }else{
+                                free(token->attribute.string);
+                                htClearAll(local_hash_table_def, false);
+                                free(local_hash_table_def);
+                                return ERR_UNDEF; // try to daclare fnc with the same name
+                            }
+                        }
+                    }else{
+                        htInsert(hash_table, token->attribute.string, token->type);
+                        item = htSearch(hash_table, token->attribute.string);
+                        item->id_declared = true;
+                        ret_code = func_for_FNC(token, stack, local_hash_table_def, flag_def, &count_of_params, str_1);
+                        if(ret_code != OK){
+                            free(token->attribute.string);
+                            htClearAll(local_hash_table_def, false);
+                            free(local_hash_table_def);
+                            return ret_code;
+                        }
+                        item->param_count = count_of_params;
+                    }
+
+                    count_of_params = 0;
+                    ret_code = get_token(token, stack);
+                    if(ret_code != OK){
+                        htClearAll(local_hash_table_def, false);
+                        free(local_hash_table_def);
+                        return ret_code;
+                    }
+                    if(token->type != TOKEN_DDOT){
+                        htClearAll(local_hash_table_def, false);
+                        free(local_hash_table_def);
+                        return ERR_SYNTAX; // must be :
+                    }
+                    ret_code = get_token(token, stack);
+                    if(ret_code != OK){
+                        htClearAll(local_hash_table_def, false);
+                        free(local_hash_table_def);
+                        return ret_code;
+                    }
+                    if(token->type != TOKEN_EOL){
+                        htClearAll(local_hash_table_def, false);
+                        free(local_hash_table_def);
+                        return ERR_SYNTAX; // must be end of line
+                    }
+                    ret_code = get_token(token, stack);
+                    if(ret_code != OK){
+                        htClearAll(local_hash_table_def, false);
+                        free(local_hash_table_def);
+                        return ret_code;
+                    }
+                    if(token->type != TOKEN_INDEND){
+                        htClearAll(local_hash_table_def, false);
+                        free(local_hash_table_def);
+                        return ERR_SYNTAX; // must be INDENT
+                    }
+                    ret_code = func_prog(token, stack, state, ret_code, local_hash_table_def, str); // inside func
+                    if(ret_code != OK){
+                        htClearAll(local_hash_table_def, false);
+                        free(local_hash_table_def);
+                        return ret_code;
+                    }
+                    if(token->type != TOKEN_DEDEND){
+                        htClearAll(local_hash_table_def, false);
+                        free(local_hash_table_def);
+                        return ERR_SYNTAX; // must be DEDENT
+                    }
+                    // printf("IM HERE \n");
+                    def_function_end(str_1);
+                    // printf("IM HERE NOW\n");
+                    htClearAll(local_hash_table_def, false);
+                    free(local_hash_table_def);
+                    break;
+                
+                default:
+                    return ERR_SYNTAX; // THISH KW DOES NOT EXIST
+                    break;
+                }
                 break;
 
             default:
-                return -1; // THISH KW DOES NOT EXIST
+                return ERR_SYNTAX; // THIS OPERATION DOES NOT EXIST
                 break;
             }
-
-            break;
-
-        default:
-            return -1; // THIS OPERATION DOES NOT EXIST
-            break;
-        }
-
-        // if(token->type == TOKEN_EOF){
-        // #ifdef DEBUG
-        //             printf("%s\n", types[token->type]);
-        // #endif
-        //      break;
-        //  }
-
-        // #ifdef DEBUG
-        //         if((token->type ==  TOKEN_KEY_WORD) || (token->type ==  TOKEN_FNC)){
-        //             printf("%s -- %s\n", types[token->type], (token->type == TOKEN_FNC) ? token->attribute.string : kw[token->attribute.key_word]);
-        //             if (token->type == TOKEN_FNC && token->attribute.string){
-        //                 free(token->attribute.string);
-        //             }
-        //         }
-        //         else{
-        //             printf("%s\n", types[token->type]);
-        //         }
-
-        //         if(token->type == TOKEN_ID || token->type == TOKEN_STRING){
-        //             printf("--------- attribute: %s\n", token->attribute.string);
-        //             free(token->attribute.string);
-        //         }
-        // #else
-        // if (((token->type == TOKEN_FNC) || (token->type == TOKEN_STRING) || (token->type == TOKEN_ID)) && (token->attribute.string != NULL)){
-        //     free(token->attribute.string);
-        // }
-        //#endif
     }
-    return 1;
+    return ret_code;
 }
