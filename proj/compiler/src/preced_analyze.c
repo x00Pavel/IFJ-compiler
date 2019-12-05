@@ -479,10 +479,23 @@ int preced_analyze(struct token_s *token, table_s *hash_table, int *count_of_par
             break;
         }
 
-        if (!end_scan)
-        {
-            if (token->type == TOKEN_ID || token->type == TOKEN_STRING)
-            {
+        if(token->type == TOKEN_ID){
+            if(!htSearch(hash_table, token->attribute.string)){
+                if (!search_everywhere(hash_table, token->attribute.string)){
+                    fprintf(stderr, "ID is not in hash table\n");
+                    end_scan = false;
+                    free(scanner_stack);
+                    // free(prev_token->attribute.string);
+                    free(prev_token);
+                    DLDisposeList(list);
+                    free(list);
+                    return ERR_UNDEF;
+                }
+            }
+        }
+
+        if (!end_scan){
+            if (token->type == TOKEN_ID || token->type == TOKEN_STRING){
                 free(token->attribute.string);
             }
             ret_code = get_token(token, scanner_stack);
@@ -527,8 +540,7 @@ int preced_analyze(struct token_s *token, table_s *hash_table, int *count_of_par
                 }
             }
         }
-        else if (token->type == TOKEN_FNC)
-        {
+        else if(token->type == TOKEN_FNC){
             // here would be code from parese for Function call
             tHTItem *item = htSearch(hash_table, token->attribute.string);
             if (item)

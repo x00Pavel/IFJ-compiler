@@ -52,7 +52,7 @@ void print_float(struct token_s *token_write,struct dynamic_string *str);
 void print_int(struct token_s *token_write,struct dynamic_string *str);
 void print_string(struct token_s *token_write,struct dynamic_string *str);
 void print_none(struct dynamic_string *str);
-void print_id(struct token_s *token_write,tHTItem *item, struct dynamic_string *str);
+void print_id(struct token_s *token_write,char *s, struct dynamic_string *str);
 void print_space(struct dynamic_string *str);
 void print_end(struct dynamic_string *str);
 void generate_if_head(struct dynamic_string *str);

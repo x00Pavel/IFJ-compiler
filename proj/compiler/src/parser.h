@@ -19,12 +19,13 @@
 #include "preced_analyze.h"
 // #include "ifj2019_old.h"
 
-static int flag_while = 0;
+int flag_while;
 // static void my_func(){
 //     (void)flag_while;
-//     if(flag_while){
-//         my_func();
-//     }
+//     // if(flag_while){
+//     //     my_func();
+//     // }
+
 // }
 /**
  * \brief

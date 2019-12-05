@@ -32,6 +32,38 @@ void create_functions(){
 	fprintf(stdout,"POPFRAME\n");
 	fprintf(stdout,"RETURN\n\n");
 
+    fprintf(stdout, "#INPUTS\n");
+	fprintf(stdout, "PUSHFRAME\n");
+	fprintf(stdout, "LABEL inputs\n");
+    fprintf(stdout, "DEFVAR LF@%%HELPER\n");
+	fprintf(stdout, "DEFVAR LF@%%retval\n"); 
+	fprintf(stdout, "DEFVAR LF@%%var\n");
+	fprintf(stdout, "READ LF@%%var LF@%%1\n");
+	fprintf(stdout, "DEFVAR LF@%%symb1\n");
+	fprintf(stdout, "STRLEN LF@%%symb1 LF@%%1\n");
+	fprintf(stdout, "DEFVAR LF@%%symb2\n");
+	fprintf(stdout, "MOVE LF@%%symb2 string@''\n");
+	fprintf(stdout, "SETCHAR LF@%%HELPER LF@%%symb1 LF@%%symb2\n");
+	fprintf(stdout, "MOVE LF@%%retval LF@%%HELPER\n");
+
+
+    fprintf(stdout, "#INPUTI\n");
+    fprintf(stdout, "PUSHFRAME\n");
+    fprintf(stdout, "LABEL inputi\n");
+    fprintf(stdout, "DEFVAR LF@$$var\n");
+    fprintf(stdout, "DEFVAR LF@%%retval\n");
+    fprintf(stdout, "MOVE LF@$$var LF@%%1\n");
+    fprintf(stdout, "FLOAT2INT LF@$$retval LF@$$var\n");
+
+
+    
+    fprintf(stdout, "#INPUTF\n");
+    fprintf(stdout, "PUSHFRAME\n");
+    fprintf(stdout, "LABEL inputf\n");
+    fprintf(stdout, "DEFVAR LF@$$var\n");
+    fprintf(stdout, "DEFVAR LF@%%retval\n");
+    fprintf(stdout, "MOVE LF@$$var LF@%%1\n");
+    fprintf(stdout, "INT2FLOAT LF@$$retval LF@$$var\n");
 
     
     fprintf(stdout,"#SUBSTRFUNCTION\n");
@@ -300,12 +332,10 @@ void end_main(){
     }
     
         
-    }
+}
 /*
 *End define variables in all scopes
 */
-
-
 
 //y = a + b + c эта функиция приржадит все что спарава к у
 void assign_to_variable(struct token_s *token,struct token_s *token_a, char *s, struct dynamic_string *str){
@@ -313,7 +343,7 @@ void assign_to_variable(struct token_s *token,struct token_s *token_a, char *s, 
     {  
         case TOKEN_INT:
         if(flag_while == 0){
-            fprintf(stdout, "MOVE %s@%%%s int@valueforcounting\n",s,token->attribute.string ); 
+            fprintf(stdout, "MOVE %s@%%%s int@retval\n",s,token->attribute.string ); 
             break;
         } else {
             for(unsigned int i = 0; i < strlen("MOVE "); i++){
@@ -328,8 +358,8 @@ void assign_to_variable(struct token_s *token,struct token_s *token_a, char *s, 
             for(unsigned int i = 0; i < strlen(token->attribute.string ); i++){
                 add_char_to_str(str, token->attribute.string [i]);
             }
-            for(unsigned int i = 0; i < strlen("int@valueforcounting"); i++){
-                add_char_to_str(str, "int@valueforcounting"[i]);
+            for(unsigned int i = 0; i < strlen("int@retval"); i++){
+                add_char_to_str(str, "int@retval"[i]);
             }
             add_char_to_str(str, 10);
             break;
@@ -338,7 +368,7 @@ void assign_to_variable(struct token_s *token,struct token_s *token_a, char *s, 
         case TOKEN_FLOAT:
         if(flag_while == 0)
         {
-            fprintf(stdout, "MOVE %s@%%%s float@valueforcounting\n",s,token->attribute.string); 
+            fprintf(stdout, "MOVE %s@%%%s float@retval\n",s,token->attribute.string); 
             break;
         }
         else
@@ -359,9 +389,9 @@ void assign_to_variable(struct token_s *token,struct token_s *token_a, char *s, 
             {
                 add_char_to_str(str, token->attribute.string [i]);
             }
-            for(unsigned int i = 0; i < strlen("float@valueforcounting"); i++)
+            for(unsigned int i = 0; i < strlen("float@retval"); i++)
             {
-                add_char_to_str(str, "float@valueforcounting"[i]);
+                add_char_to_str(str, "float@retval"[i]);
             }
             add_char_to_str(str, 10);
             break; 
@@ -369,7 +399,7 @@ void assign_to_variable(struct token_s *token,struct token_s *token_a, char *s, 
         case TOKEN_STRING:
         if(flag_while == 0)
         {
-            fprintf(stdout, "MOVE %s@%%%s string@valueforcounting\n",s,token->attribute.string);
+            fprintf(stdout, "MOVE %s@%%%s string@retval\n",s,token->attribute.string);
             break;
         }
         else
@@ -390,9 +420,9 @@ void assign_to_variable(struct token_s *token,struct token_s *token_a, char *s, 
             {
                 add_char_to_str(str, token->attribute.string [i]);
             }
-            for(unsigned int i = 0; i < strlen("string@valueforcounting"); i++)
+            for(unsigned int i = 0; i < strlen("string@retval"); i++)
             {
-                add_char_to_str(str, "string@valueforcounting"[i]);
+                add_char_to_str(str, "string@retval"[i]);
             }
             add_char_to_str(str, 10);
             break; 
@@ -400,7 +430,7 @@ void assign_to_variable(struct token_s *token,struct token_s *token_a, char *s, 
         case TOKEN_ID:
         if(flag_while == 0)
         {
-            fprintf(stdout, "MOVE %s@%%%s %s@valueforcounting\n",s,token->attribute.string, token_a->attribute.string);
+            fprintf(stdout, "MOVE %s@%%%s %s@retval\n",s,token->attribute.string, token_a->attribute.string);
             break;
         }
         else
@@ -425,9 +455,9 @@ void assign_to_variable(struct token_s *token,struct token_s *token_a, char *s, 
             {
                 add_char_to_str(str, token_a->attribute.string[i]);
             }
-            for(unsigned int i = 0; i < strlen("@valueforcounting"); i++)
+            for(unsigned int i = 0; i < strlen("@retval"); i++)
             {
-                add_char_to_str(str, "@valueforcounting"[i]);
+                add_char_to_str(str, "@retval"[i]);
             }
             add_char_to_str(str, 10);
             break;    
@@ -795,8 +825,8 @@ void assign_to_y(struct token_s *token, char *s,struct dynamic_string *str){
             for(unsigned int i = 0; i < strlen(token->attribute.string ); i++){
                 add_char_to_str(str, token->attribute.string [i]);
             }
-            for(unsigned int i = 0; i < strlen("TF@%%retval\n"); i++){
-                add_char_to_str(str, "TF@%%retval\n"[i]);
+            for(unsigned int i = 0; i < strlen("TF@%%retval"); i++){
+                add_char_to_str(str, "TF@%%retval"[i]);
             }
             add_char_to_str(str, 10);            
         }
@@ -816,7 +846,7 @@ void assign_to_y(struct token_s *token, char *s,struct dynamic_string *str){
 
 
 //принт флоута
-void print_float(struct token_s *token_write,struct dynamic_string *str){
+void print_float(struct token_s *token_write    ,struct dynamic_string *str){
     if(flag_while == 0){
         fprintf(stdout,"WRITE float@%a",token_write->attribute.float_val);
     }else{
@@ -877,11 +907,12 @@ void print_none(struct dynamic_string *str){
 
 
 //Функия для принта переменной с ее значением 
-void print_id(struct token_s *token_write,tHTItem *item, struct dynamic_string *str){
-    if(item->ret_val == TOKEN_INT)
-    {
-        if(flag_while == 0){
-           fprintf(stdout,"WRITE int@%d",token_write->attribute.int_val); 
+void print_id(struct token_s *token_write,char *s, struct dynamic_string *str){
+    //if(item->ret_val == TOKEN_INT)
+    //{
+        if(flag_while == 0)
+        { 
+           fprintf(stdout,"WRITE %s@%%%s\n",s,token_write->attribute.string); 
         }else{
             for(unsigned int i = 0; i < strlen("WRITE int@"); i++){
                 add_char_to_str(str, "WRITE int@"[i]);
@@ -893,7 +924,7 @@ void print_id(struct token_s *token_write,tHTItem *item, struct dynamic_string *
             }
         }        
         
-    }
+    /*}
     if(item->ret_val == TOKEN_FLOAT)
     {
        
@@ -922,7 +953,7 @@ void print_id(struct token_s *token_write,tHTItem *item, struct dynamic_string *
                 add_char_to_str(str, token_write->attribute.string[i]);
             }
         }   
-    }
+    }*/
 
 }
 //принт пробела
@@ -1091,25 +1122,25 @@ void print_end(struct dynamic_string *str){
 
 
     //эта и предыдушая фунуция выпишуь знак а потом выпишут куда нужно прыгать в случае успеха
-    //при сравнении значий valueforcounting и valueforounting1 
+    //при сравнении значий retval и valueforounting1 
     void if_body(int *t,struct dynamic_string *str){
       if(flag_while == 0)
       {
-        fprintf(stdout,"LF@res LF@valueforcounting%d LF@valueforcounting1%d\n",*t,*t);
+        fprintf(stdout,"LF@res LF@retval%d LF@retval1%d\n",*t,*t);
         fprintf(stdout,"JUMPIFNEQ $B0DY-EL%d LF@res bool@true\n", *t);
       }
       else
       {
-        for(unsigned int i = 0; i < strlen("LF@res LF@valueforcounting"); i++){
-            add_char_to_str(str, "LF@res LF@valueforcounting"[i]);
+        for(unsigned int i = 0; i < strlen("LF@res LF@retval"); i++){
+            add_char_to_str(str, "LF@res LF@retval"[i]);
         }
         char temp16[100];
         sprintf(temp16, "%d", *t);
         for(unsigned int i = 0; i < strlen(temp16 ); i++){
             add_char_to_str(str, temp16 [i]);
         }
-        for(unsigned int i = 0; i < strlen("\nLF@res LF@valueforcounting1"); i++){
-            add_char_to_str(str, "\nLF@res LF@valueforcounting1"[i]);
+        for(unsigned int i = 0; i < strlen("\nLF@res LF@retval1"); i++){
+            add_char_to_str(str, "\nLF@res LF@retval1"[i]);
         }
         char temp17[100];
         sprintf(temp17, "%d", *t);
@@ -1218,15 +1249,17 @@ void print_end(struct dynamic_string *str){
     void stack_operations(int *t,struct dynamic_string *str){
         if(flag_while == 0)
         {
-            fprintf(stdout, "DEFVAR GT@valueforcounting%d\n",*t);
-            fprintf(stdout, "DEFVAR GT@valueforcounting1%d\n",*t);
-            fprintf(stdout, "MOVE GT@valueforcounting%d int@0\n", *t);
-            fprintf(stdout, "MOVE GT@valueforcounting1%d int@0\n", *t);
+            fprintf(stdout, "DEFVAR GT@retval1\n");
+            fprintf(stdout, "DEFVAR GT@retval2\n");
+        
+            
+            fprintf(stdout, "MOVE GT@retval1 int@0\n");
+            fprintf(stdout, "MOVE GT@retval2 int@0\n");
         }
         else
         {
-            for(unsigned int i = 0; i < strlen("DEFVAR GT@valueforcounting"); i++){
-                add_char_to_str(str, "DEFVAR GT@valueforcounting"[i]);
+            for(unsigned int i = 0; i < strlen("DEFVAR GT@retval"); i++){
+                add_char_to_str(str, "DEFVAR GT@retval"[i]);
             } 
             char temp[100];
             sprintf(temp, "%d", *t);
@@ -1234,8 +1267,8 @@ void print_end(struct dynamic_string *str){
                 add_char_to_str(str, temp[i]);
             } 
             add_char_to_str(str, 10);
-            for(unsigned int i = 0; i < strlen("DEFVAR GT@valueforcounting1"); i++){
-                add_char_to_str(str, "DEFVAR GT@valueforcounting1"[i]);
+            for(unsigned int i = 0; i < strlen("DEFVAR GT@retval1"); i++){
+                add_char_to_str(str, "DEFVAR GT@retval1"[i]);
             } 
             char temp1[100];
             sprintf(temp1, "%d", *t);
@@ -1243,8 +1276,8 @@ void print_end(struct dynamic_string *str){
                 add_char_to_str(str, temp1[i]);
             }        
             add_char_to_str(str, 10);
-            for(unsigned int i = 0; i < strlen("MOVE GT@valueforcounting"); i++){
-                add_char_to_str(str, "MOVE GT@valueforcounting"[i]);
+            for(unsigned int i = 0; i < strlen("MOVE GT@retval"); i++){
+                add_char_to_str(str, "MOVE GT@retval"[i]);
             } 
             char temp2[100];
             sprintf(temp2, "%d", *t);
@@ -1254,8 +1287,8 @@ void print_end(struct dynamic_string *str){
             for(unsigned int i = 0; i < strlen(" int@\n"); i++){
                 add_char_to_str(str, " int@0\n"[i]);
             } 
-            for(unsigned int i = 0; i < strlen("MOVE GT@valueforcounting1"); i++){
-                add_char_to_str(str, "MOVE GT@valueforcounting1"[i]);
+            for(unsigned int i = 0; i < strlen("MOVE GT@retval1"); i++){
+                add_char_to_str(str, "MOVE GT@retval1"[i]);
             } 
             char temp3[100];
             sprintf(temp3, "%d", *t);
@@ -1312,26 +1345,26 @@ void generate_while_head_1(int *t, struct dynamic_string *str)
 //Создает тело функции 
 void while_body(int *t,struct dynamic_string *str){
     if(flag_while == 0){
-        fprintf(stdout,"LF@res LF@valueforcounting%d LF@valueforcounting1%d\n",*t,*t);
+        fprintf(stdout,"LF@res LF@retval1 LF@retval2\n");
         fprintf(stdout,"JUMPIFNEQ $EXIT%d LF@res bool@true\n", *t);  
     }else
     {
-        for(unsigned int i = 0; i < strlen("LF@res LF@valueforcounting"); i++){
-            add_char_to_str(str, "LF@res LF@valueforcounting"[i]);
+        for(unsigned int i = 0; i < strlen("LF@res LF@retval1"); i++){
+            add_char_to_str(str, "LF@res LF@retval1"[i]);
         }
-        char temp11[100];
-        sprintf(temp11, "%d", *t);
-        for(unsigned int i = 0; i < strlen(temp11); i++){
-            add_char_to_str(str, temp11[i]);
+       // char temp11[100];
+    //sprintf(temp11, "%d", *t);
+      //  for(unsigned int i = 0; i < strlen(temp11); i++){
+        //    add_char_to_str(str, temp11[i]);
+       // }
+        for(unsigned int i = 0; i < strlen(" LF@retval2"); i++){
+            add_char_to_str(str, " LF@retval2"[i]);
         }
-        for(unsigned int i = 0; i < strlen(" LF@valueforcounting1"); i++){
-            add_char_to_str(str, " LF@valueforcounting1"[i]);
-        }
-        char temp12[100];
-        sprintf(temp12, "%d", *t);
-        for(unsigned int i = 0; i < strlen(temp12); i++){
-            add_char_to_str(str, temp12[i]);
-        }
+        //char temp12[100];
+        //sprintf(temp12, "%d", *t);
+        //for(unsigned int i = 0; i < strlen(temp12); i++){
+         //   add_char_to_str(str, temp12[i]);
+        //}
         add_char_to_str(str, 10);
         for(unsigned int i = 0; i < strlen("JUMPIFNEQ $EXIT"); i++){
             add_char_to_str(str, "JUMPIFNEQ $EXIT"[i]);
@@ -1445,12 +1478,12 @@ void func_sum(struct token_s *token_one, char *s,struct dynamic_string *str){
     {   
         if(flag_while == 0)
         {
-            fprintf(stdout, "ADD GF@valueforcouning float@%a\n", token_one->attribute.float_val);
+            fprintf(stdout, "ADD GF@retvalfloat@%a\n", token_one->attribute.float_val);
         }
         else
         {
-            for(unsigned int i = 0; i < strlen("ADD GF@valueforcouning float@"); i++){
-                add_char_to_str(str, "ADD GF@valueforcouning float@"[i]);
+            for(unsigned int i = 0; i < strlen("ADD GF@retvalfloat@"); i++){
+                add_char_to_str(str, "ADD GF@retvalfloat@"[i]);
             } 
             char temp[100];
             sprintf(temp, "%f",  token_one->attribute.float_val);
@@ -1468,7 +1501,7 @@ void func_sum(struct token_s *token_one, char *s,struct dynamic_string *str){
             fprintf(stdout, "DEFVAR LF@TMPF2INT\n");
             fprintf(stdout, "MOVE LF@TMPF2INT int@%d\n", token_one->attribute.int_val);
             fprintf(stdout, "INT2FLOAT TF@%%TMPF2INT TF@%%TMPF2INT\n");
-            fprintf(stdout, "ADD GF@valueforcouning TF@%%TMPF2INT\n");
+            fprintf(stdout, "ADD GF@retvalTF@%%TMPF2INT\n");
         }
         else
         {
@@ -1481,8 +1514,8 @@ void func_sum(struct token_s *token_one, char *s,struct dynamic_string *str){
                 add_char_to_str(str, temp[i]);
             }
             add_char_to_str(str, 10);   
-            for(unsigned int i = 0; i < strlen("INT2FLOAT TF@%%TMPF2INT TF@%%TMPF2INT\nADD GF@valueforcouning TF@%%TMPF2INT\n"); i++){
-                add_char_to_str(str, "INT2FLOAT TF@%%TMPF2INT TF@%%TMPF2INT\nADD GF@valueforcouning TF@%%TMPF2INT\n"[i]);
+            for(unsigned int i = 0; i < strlen("INT2FLOAT TF@%%TMPF2INT TF@%%TMPF2INT\nADD GF@retvalTF@%%TMPF2INT\n"); i++){
+                add_char_to_str(str, "INT2FLOAT TF@%%TMPF2INT TF@%%TMPF2INT\nADD GF@retvalTF@%%TMPF2INT\n"[i]);
             } 
         }
         
@@ -1491,11 +1524,11 @@ void func_sum(struct token_s *token_one, char *s,struct dynamic_string *str){
     {
         if(flag_while == 0)
         {
-            fprintf(stdout, "ADD GF@valueforcouning %s@%s\n", s,token_one->attribute.string);
+            fprintf(stdout, "ADD GF@retval%s@%s\n", s,token_one->attribute.string);
         }else
         {
-            for(unsigned int i = 0; i < strlen("ADD GF@valueforcouning "); i++){
-                add_char_to_str(str, "ADD GF@valueforcouning "[i]);
+            for(unsigned int i = 0; i < strlen("ADD GF@retval"); i++){
+                add_char_to_str(str, "ADD GF@retval"[i]);
             } 
             for(unsigned int i = 0; i < strlen(s); i++){
                 add_char_to_str(str, s[i]);
@@ -1516,12 +1549,12 @@ void func_sum(struct token_s *token_one, char *s,struct dynamic_string *str){
     {
         if(flag_while == 0)
         {
-             fprintf(stdout, "ADDS GF@valueforcouning string@%s\n",token_one->attribute.string);
+             fprintf(stdout, "ADD    GF@retvalstring@%s\n",token_one->attribute.string);
         }
         else
         {
-            for(unsigned int i = 0; i < strlen("ADD GF@valueforcouning string@"); i++){
-                add_char_to_str(str, "ADD GF@valueforcouning string@"[i]);
+            for(unsigned int i = 0; i < strlen("ADD GF@retvalstring@"); i++){
+                add_char_to_str(str, "ADD GF@retvalstring@"[i]);
             } 
             for(unsigned int i = 0; i < strlen(token_one->attribute.string); i++){
                 add_char_to_str(str, token_one->attribute.string[i]);
@@ -1539,12 +1572,12 @@ void func_mul(struct token_s *token_one, char *s, struct dynamic_string *str){
     {   
         if(flag_while == 0)
         {
-            fprintf(stdout, "MUL GF@valueforcouning float@%a\n", token_one->attribute.float_val);
+            fprintf(stdout, "MUL GF@retvalfloat@%a\n", token_one->attribute.float_val);
         }
         else
         {
-            for(unsigned int i = 0; i < strlen("MUL GF@valueforcouning float@"); i++){
-                add_char_to_str(str, "MUL GF@valueforcouning float@"[i]);
+            for(unsigned int i = 0; i < strlen("MUL GF@retvalfloat@"); i++){
+                add_char_to_str(str, "MUL GF@retvalfloat@"[i]);
             } 
             char temp[100];
             sprintf(temp, "%f",  token_one->attribute.float_val);
@@ -1562,7 +1595,7 @@ void func_mul(struct token_s *token_one, char *s, struct dynamic_string *str){
             fprintf(stdout, "DEFVAR LF@TMPF2INT\n");
             fprintf(stdout, "MOVE LF@TMPF2INT int@%d\n", token_one->attribute.int_val);
             fprintf(stdout, "INT2FLOAT TF@%%TMPF2INT TF@%%TMPF2INT\n");
-            fprintf(stdout, "MUL GF@valueforcouning TF@%%TMPF2INT\n");
+            fprintf(stdout, "MUL GF@retvalTF@%%TMPF2INT\n");
         }
         else
         {
@@ -1575,8 +1608,8 @@ void func_mul(struct token_s *token_one, char *s, struct dynamic_string *str){
                 add_char_to_str(str, temp[i]);
             }
             add_char_to_str(str, 10);   
-            for(unsigned int i = 0; i < strlen("INT2FLOAT TF@%%TMPF2INT TF@%%TMPF2INT\nMUL GF@valueforcouning TF@%%TMPF2INT\n"); i++){
-                add_char_to_str(str, "INT2FLOAT TF@%%TMPF2INT TF@%%TMPF2INT\nMUL GF@valueforcouning TF@%%TMPF2INT\n"[i]);
+            for(unsigned int i = 0; i < strlen("INT2FLOAT TF@%%TMPF2INT TF@%%TMPF2INT\nMUL GF@retvalTF@%%TMPF2INT\n"); i++){
+                add_char_to_str(str, "INT2FLOAT TF@%%TMPF2INT TF@%%TMPF2INT\nMUL GF@retvalTF@%%TMPF2INT\n"[i]);
             } 
         }
         
@@ -1585,11 +1618,11 @@ void func_mul(struct token_s *token_one, char *s, struct dynamic_string *str){
     {
         if(flag_while == 0)
         {
-            fprintf(stdout, "ADD GF@valueforcouning %s@%s\n", s,token_one->attribute.string);
+            fprintf(stdout, "ADD GF@retval%s@%s\n", s,token_one->attribute.string);
         }else
         {
-            for(unsigned int i = 0; i < strlen("ADD GF@valueforcouning "); i++){
-                add_char_to_str(str, "ADD GF@valueforcouning "[i]);
+            for(unsigned int i = 0; i < strlen("ADD GF@retval"); i++){
+                add_char_to_str(str, "ADD GF@retval"[i]);
             } 
             for(unsigned int i = 0; i < strlen(s); i++){
                 add_char_to_str(str, s[i]);
@@ -1610,12 +1643,12 @@ void func_mul(struct token_s *token_one, char *s, struct dynamic_string *str){
     {
         if(flag_while == 0)
         {
-             fprintf(stdout, "MUL GF@valueforcouning string@%s\n",token_one->attribute.string);
+             fprintf(stdout, "MUL GF@retvalstring@%s\n",token_one->attribute.string);
         }
         else
         {
-            for(unsigned int i = 0; i < strlen("MUL GF@valueforcouning string@"); i++){
-                add_char_to_str(str, "MUL GF@valueforcouning string@"[i]);
+            for(unsigned int i = 0; i < strlen("MUL GF@retvalstring@"); i++){
+                add_char_to_str(str, "MUL GF@retvalstring@"[i]);
             } 
             for(unsigned int i = 0; i < strlen(token_one->attribute.string); i++){
                 add_char_to_str(str, token_one->attribute.string[i]);
@@ -1633,12 +1666,12 @@ void func_sub(struct token_s *token_one, char *s,struct dynamic_string *str){
     {   
         if(flag_while == 0)
         {
-            fprintf(stdout, "SUB GF@valueforcouning float@%a\n", token_one->attribute.float_val);
+            fprintf(stdout, "SUB GF@retvalfloat@%a\n", token_one->attribute.float_val);
         }
         else
         {
-            for(unsigned int i = 0; i < strlen("SUB GF@valueforcouning float@"); i++){
-                add_char_to_str(str, "SUB GF@valueforcouning float@"[i]);
+            for(unsigned int i = 0; i < strlen("SUB GF@retvalfloat@"); i++){
+                add_char_to_str(str, "SUB GF@retvalfloat@"[i]);
             } 
             char temp[100];
             sprintf(temp, "%f",  token_one->attribute.float_val);
@@ -1656,7 +1689,7 @@ void func_sub(struct token_s *token_one, char *s,struct dynamic_string *str){
             fprintf(stdout, "DEFVAR LF@TMPF2INT\n");
             fprintf(stdout, "MOVE LF@TMPF2INT int@%d\n", token_one->attribute.int_val);
             fprintf(stdout, "INT2FLOAT TF@%%TMPF2INT TF@%%TMPF2INT\n");
-            fprintf(stdout, "SUB GF@valueforcouning TF@%%TMPF2INT\n");
+            fprintf(stdout, "SUB GF@retvalTF@%%TMPF2INT\n");
         }
         else
         {
@@ -1669,8 +1702,8 @@ void func_sub(struct token_s *token_one, char *s,struct dynamic_string *str){
                 add_char_to_str(str, temp[i]);
             }
             add_char_to_str(str, 10);   
-            for(unsigned int i = 0; i < strlen("INT2FLOAT TF@%%TMPF2INT TF@%%TMPF2INT\nSUB GF@valueforcouning TF@%%TMPF2INT\n"); i++){
-                add_char_to_str(str, "INT2FLOAT TF@%%TMPF2INT TF@%%TMPF2INT\nSUB GF@valueforcouning TF@%%TMPF2INT\n"[i]);
+            for(unsigned int i = 0; i < strlen("INT2FLOAT TF@%%TMPF2INT TF@%%TMPF2INT\nSUB GF@retvalTF@%%TMPF2INT\n"); i++){
+                add_char_to_str(str, "INT2FLOAT TF@%%TMPF2INT TF@%%TMPF2INT\nSUB GF@retvalTF@%%TMPF2INT\n"[i]);
             } 
         }
         
@@ -1679,11 +1712,11 @@ void func_sub(struct token_s *token_one, char *s,struct dynamic_string *str){
     {
         if(flag_while == 0)
         {
-            fprintf(stdout, "SUB GF@valueforcouning %s@%s\n", s,token_one->attribute.string);
+            fprintf(stdout, "SUB GF@retval%s@%s\n", s,token_one->attribute.string);
         }else
         {
-            for(unsigned int i = 0; i < strlen("SUB GF@valueforcouning "); i++){
-                add_char_to_str(str, "SUB GF@valueforcouning "[i]);
+            for(unsigned int i = 0; i < strlen("SUB GF@retval"); i++){
+                add_char_to_str(str, "SUB GF@retval"[i]);
             } 
             for(unsigned int i = 0; i < strlen(s); i++){
                 add_char_to_str(str, s[i]);
@@ -1704,12 +1737,12 @@ void func_sub(struct token_s *token_one, char *s,struct dynamic_string *str){
     {
         if(flag_while == 0)
         {
-             fprintf(stdout, "SUB GF@valueforcouning string@%s\n",token_one->attribute.string);
+             fprintf(stdout, "SUB GF@retvalstring@%s\n",token_one->attribute.string);
         }
         else
         {
-            for(unsigned int i = 0; i < strlen("SUB GF@valueforcouning string@"); i++){
-                add_char_to_str(str, "SUB GF@valueforcouning string@"[i]);
+            for(unsigned int i = 0; i < strlen("SUB GF@retvalstring@"); i++){
+                add_char_to_str(str, "SUB GF@retvalstring@"[i]);
             } 
             for(unsigned int i = 0; i < strlen(token_one->attribute.string); i++){
                 add_char_to_str(str, token_one->attribute.string[i]);
@@ -1727,12 +1760,12 @@ void func_div(struct token_s *token_one, char *s,struct dynamic_string *str){
     {   
         if(flag_while == 0)
         {
-            fprintf(stdout, "DIV GF@valueforcouning float@%a\n", token_one->attribute.float_val);
+            fprintf(stdout, "DIV GF@retvalfloat@%a\n", token_one->attribute.float_val);
         }
         else
         {
-            for(unsigned int i = 0; i < strlen("DIV GF@valueforcouning float@"); i++){
-                add_char_to_str(str, "DIV GF@valueforcouning float@"[i]);
+            for(unsigned int i = 0; i < strlen("DIV GF@retvalfloat@"); i++){
+                add_char_to_str(str, "DIV GF@retvalfloat@"[i]);
             } 
             char temp[100];
             sprintf(temp, "%f",  token_one->attribute.float_val);
@@ -1750,7 +1783,7 @@ void func_div(struct token_s *token_one, char *s,struct dynamic_string *str){
             fprintf(stdout, "DEFVAR LF@TMPF2INT\n");
             fprintf(stdout, "MOVE LF@TMPF2INT int@%d\n", token_one->attribute.int_val);
             fprintf(stdout, "INT2FLOAT TF@%%TMPF2INT TF@%%TMPF2INT\n");
-            fprintf(stdout, "DIV GF@valueforcouning TF@%%TMPF2INT\n");
+            fprintf(stdout, "DIV GF@retvalTF@%%TMPF2INT\n");
         }
         else
         {
@@ -1763,8 +1796,8 @@ void func_div(struct token_s *token_one, char *s,struct dynamic_string *str){
                 add_char_to_str(str, temp[i]);
             }
             add_char_to_str(str, 10);   
-            for(unsigned int i = 0; i < strlen("INT2FLOAT TF@%%TMPF2INT TF@%%TMPF2INT\nDIV GF@valueforcouning TF@%%TMPF2INT\n"); i++){
-                add_char_to_str(str, "INT2FLOAT TF@%%TMPF2INT TF@%%TMPF2INT\nDIV GF@valueforcouning TF@%%TMPF2INT\n"[i]);
+            for(unsigned int i = 0; i < strlen("INT2FLOAT TF@%%TMPF2INT TF@%%TMPF2INT\nDIV GF@retvalTF@%%TMPF2INT\n"); i++){
+                add_char_to_str(str, "INT2FLOAT TF@%%TMPF2INT TF@%%TMPF2INT\nDIV GF@retvalTF@%%TMPF2INT\n"[i]);
             } 
         }
         
@@ -1773,11 +1806,11 @@ void func_div(struct token_s *token_one, char *s,struct dynamic_string *str){
     {
         if(flag_while == 0)
         {
-            fprintf(stdout, "DIV GF@valueforcouning %s@%s\n", s,token_one->attribute.string);
+            fprintf(stdout, "DIV GF@retval%s@%s\n", s,token_one->attribute.string);
         }else
         {
-            for(unsigned int i = 0; i < strlen("DIV GF@valueforcouning "); i++){
-                add_char_to_str(str, "DIV GF@valueforcouning "[i]);
+            for(unsigned int i = 0; i < strlen("DIV GF@retval"); i++){
+                add_char_to_str(str, "DIV GF@retval"[i]);
             } 
             for(unsigned int i = 0; i < strlen(s); i++){
                 add_char_to_str(str, s[i]);
@@ -1798,12 +1831,12 @@ void func_div(struct token_s *token_one, char *s,struct dynamic_string *str){
     {
         if(flag_while == 0)
         {
-             fprintf(stdout, "DIV GF@valueforcouning string@%s\n",token_one->attribute.string);
+             fprintf(stdout, "DIV GF@retvalstring@%s\n",token_one->attribute.string);
         }
         else
         {
-            for(unsigned int i = 0; i < strlen("DIV GF@valueforcouning string@"); i++){
-                add_char_to_str(str, "DIV GF@valueforcouning string@"[i]);
+            for(unsigned int i = 0; i < strlen("DIV GF@retvalstring@"); i++){
+                add_char_to_str(str, "DIV GF@retvalstring@"[i]);
             } 
             for(unsigned int i = 0; i < strlen(token_one->attribute.string); i++){
                 add_char_to_str(str, token_one->attribute.string[i]);
@@ -1817,12 +1850,12 @@ void func_int_div(struct token_s *token_one,struct dynamic_string *str){
 
     if(flag_while == 0)
     {
-        fprintf(stdout, "INT2FLOAT GF@valueforcouting GF@valueforcouting\n");
+        fprintf(stdout, "INT2FLOAT GF@retval GF@retval\n");
     }
     else
     {
-        for(unsigned int i = 0; i < strlen("INT2FLOAT GF@valueforcouting GF@valueforcouting\n"); i++){
-            add_char_to_str(str, "INT2FLOAT GF@valueforcouting GF@valueforcouting\n"[i]);
+        for(unsigned int i = 0; i < strlen("INT2FLOAT GF@retval GF@retval\n"); i++){
+            add_char_to_str(str, "INT2FLOAT GF@retval GF@retval\n"[i]);
         } 
     }
     
@@ -1835,7 +1868,7 @@ void func_int_div(struct token_s *token_one,struct dynamic_string *str){
             fprintf(stdout, "DEFVAR LF@TMPF2INT\n");
             fprintf(stdout, "MOVE LF@TMPF2INT int@%d\n", token_one->attribute.int_val);
             fprintf(stdout, "INT2FLOAT TF@%%TMPF2INT TF@%%TMPF2INT\n");
-            fprintf(stdout, "DIV GF@valueforcouning TF@%%TMPF2INT\n");
+            fprintf(stdout, "DIV GF@retvalTF@%%TMPF2INT\n");
         }
         else
         {
@@ -1849,8 +1882,8 @@ void func_int_div(struct token_s *token_one,struct dynamic_string *str){
         }
         add_char_to_str(str, 10);
         }
-       for(unsigned int i = 0; i < strlen("INT2FLOAT TF@%%TMPF2INT TF@%%TMPF2INT\nDIV GF@valueforcouning TF@%%TMPF2INT\n"); i++){
-            add_char_to_str(str, "INT2FLOAT TF@%%TMPF2INT TF@%%TMPF2INT\nDIV GF@valueforcouning TF@%%TMPF2INT\n"[i]);
+       for(unsigned int i = 0; i < strlen("INT2FLOAT TF@%%TMPF2INT TF@%%TMPF2INT\nDIV GF@retvalTF@%%TMPF2INT\n"); i++){
+            add_char_to_str(str, "INT2FLOAT TF@%%TMPF2INT TF@%%TMPF2INT\nDIV GF@retvalTF@%%TMPF2INT\n"[i]);
         } 
         
 
@@ -1860,12 +1893,12 @@ void func_int_div(struct token_s *token_one,struct dynamic_string *str){
     {
         if(flag_while == 0)
         {
-            fprintf(stdout, "DIV GF@valueforcouning float@%f\n",token_one->attribute.float_val);
+            fprintf(stdout, "DIV GF@retvalfloat@%f\n",token_one->attribute.float_val);
         }
         else
         {
-            for(unsigned int i = 0; i < strlen("DIV GF@valueforcouning float@"); i++){
-                add_char_to_str(str, "DIV GF@valueforcouning float@"[i]);
+            for(unsigned int i = 0; i < strlen("DIV GF@retvalfloat@"); i++){
+                add_char_to_str(str, "DIV GF@retvalfloat@"[i]);
             } 
             char temp[100];
             sprintf(temp, "%f", token_one->attribute.float_val);
@@ -1891,5 +1924,6 @@ void func_int_div(struct token_s *token_one,struct dynamic_string *str){
 
       
 }
+
 
 
