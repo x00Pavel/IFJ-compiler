@@ -156,7 +156,20 @@ void create_functions(){
 	fprintf(stdout,"POPFRAME\n");														
 	fprintf(stdout,"RETURN\n\n");
 
+    // printf("#ERRORS\n");
+    // printf("LABEL $INCOMPATIBLE\n");
+    // printf("EXIT 4\n");
+
+    // printf("#CHECK_TYPE_AND_SUM\n");
+    // printf("LABEL $CHECK_TYPE_AND_SUM\n");
+    // printf("");
+    // printf("JUMPIFEQ $CONCATE GF@type_var_1 string@string\n");
+    // printf("JUMP $ADD");
+
+
+    // printf("#FUNC_FOR_CONCATE\n");
 }
+
 
 
 void jump_to_main(){
@@ -1920,4 +1933,69 @@ void func_int_div(struct token_s *token_one,struct dynamic_string *str){
 }
 
 
+// PASHA`S FUNCTIONS //
+prec_an_def_var(){
+    printf("DEFVAR GF@type_var_1\n");
+    printf("DEFVAR GF@type_var_2\n");
+    printf("DEFVAR GF@prec_var_eq\n");
+    printf("DEFVAR GF@prec_var_temp_1\n");
+    printf("DEFVAR GF@prec_var_temp_2\n");
+}
 
+prec_an_operand(char *s, struct token_s *token, struct dynamic_string *str){
+    switch (token->type){
+    case TOKEN_ID:
+        printf("PUSHS %s@%s\n", s, token->attribute.string);
+        break;
+    case TOKEN_INT:
+        printf("PUSHS int@%s\n", token->attribute.int_val);
+        break;
+    case TOKEN_FLOAT:
+        printf("PUSHS float@%s\n", token->attribute.float_val);
+        break;
+    case TOKEN_STRING:
+        printf("PUSHS string@%s\n", token->attribute.string);
+        break;
+    default:
+        break;
+    }
+}
+
+prec_an_operator(){
+    switch(token->type){
+    case TOKEN_SUM:
+        printf("POPS GF@prec_var_temp_1\n");
+        printf("TYPE GF@type_var_1 GF@prec_var_temp_1\n");
+        printf("POPS GF@prec_var_temp_2\n");
+        printf("TYPE GF@type_var_2 GF@prec_var_temp_2\n");
+        
+        printf("JUMPIFEQ $SUM_SKIP%d GF@type_var_1 GF@type_var_2\n", skip_counter);
+        
+        printf("LABEL $SUM_SKIP%d\n", skip_counter);
+        printf("JUMPIFEQ $CONCATE GF@type_var_1 string@string\n");
+        printf("JUMP $ADD");
+        break;
+    case TOKEN_DIVISION:
+        break;
+    case TOKEN_MINUS:
+        break;
+    case TOKEN_DIV_INT:
+        break;
+    case TOKEN_MULTIPLY:
+        break;
+    case TOKEN_EQUAL:
+        break;
+    case TOKEN_NOT_EQUAL:
+        break;
+    case TOKEN_LESS:
+        break;
+    case TOKEN_GREATER:
+        break;
+    case TOKEN_LESS_EQ:
+        break;
+    case TOKEN_GREATER_EQ:
+        break;
+    default:
+        break;
+    }
+}
