@@ -464,9 +464,9 @@ int preced_analyze(struct token_s *token, table_s *hash_table, int* count_of_par
                 DLSucc(list);
             }
             else{
-                #ifdef DEBUG     
-                    printf("insert to the top: %s\n", symbols[symbol]);
-                #endif            
+                // #ifdef DEBUG     
+                //     printf("insert to the top: %s\n", symbols[symbol]);
+                // #endif            
                 DLPostInsert(list, S);
                 DLSucc(list);
                 DLPostInsert(list, symbol);
@@ -494,6 +494,8 @@ int preced_analyze(struct token_s *token, table_s *hash_table, int* count_of_par
             break;
         }
         // Save previous important token
+        if(prev_token->type == TOKEN_STRING || prev_token->type ==  TOKEN_STRING )
+            free(prev_token->attribute.string);
         switch (token->type){
         case TOKEN_ID:
             prev_token->type = TOKEN_ID;
@@ -513,11 +515,9 @@ int preced_analyze(struct token_s *token, table_s *hash_table, int* count_of_par
             prev_token->type =  TOKEN_FLOAT; 
             prev_token->attribute.float_val = token->attribute.float_val;
             break;
-        case TOKEN_EOL:
+        // case TOKEN_EOL:
         case TOKEN_EOF:
-        #ifdef DEBUG_PRECED
-            fprintf(stderr, "Error in precedence analyzes\n");
-        #endif
+            // printf( "Error in precedence analyzes\n");
             end = true;
             free(scanner_stack);
             if (prev_token->type == TOKEN_ID || prev_token->type == TOKEN_STRING)

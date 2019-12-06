@@ -435,6 +435,7 @@ int func_for_id(struct token_s *token, tStack *stack, table_s *hash_table, int *
         case TOKEN_INT:
             ret_code = preced_analyze(token, hash_table, 0, str_1, stack);
             if(ret_code != OK){
+                free(token_for_time.attribute.string);
                 return ret_code;
             }
             // printf("GENERACE OPERACI\n"); // ------------------------------------------------ 
