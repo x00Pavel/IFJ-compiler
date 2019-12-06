@@ -75,5 +75,5 @@ void func_div(struct token_s *token_one, char *s,struct dynamic_string *str);
 void func_int_div(struct token_s *token_one,struct dynamic_string *str);
 void prec_an_def_var();
 void prec_an_operand(char *s, struct token_s *token, struct dynamic_string *str);
-void prec_an_operator(struct token_s *token, struct dynamic_string *str);
+void prec_an_operator(token_t token, struct dynamic_string *str);
 #endif 
