@@ -2066,8 +2066,67 @@ void prec_an_operator(token_t type, struct dynamic_string *str){
         skip_counter++;
         break;
     case TOKEN_DIV_INT:
+        printf("POPS GF@prec_var_temp_1\n");
+        printf("TYPE GF@type_var_1 GF@prec_var_temp_1\n");
+        printf("POPS GF@prec_var_temp_2\n");
+        printf("TYPE GF@type_var_2 GF@prec_var_temp_2\n");
+
+        printf("JUMPIFNEQ $skip_string_%d GF@type_var_1 string@string\n", skip_counter);
+        printf("EXIT 4\n");
+        printf("LABEL $skip_string_%d\n", skip_counter);
+
+        printf("JUMPIFNEQ $skip_string_2_%d GF@type_var_2 string@string\n", skip_counter);
+        printf("EXIT 4\n");
+        printf("LABEL $skip_string_2_%d\n", skip_counter);
+
+        printf("JUMPIFNEQ $skip_float_%d GF@type_var_1 string@float\n", skip_counter);
+        printf("EXIT 4\n");
+        printf("LABEL $skip_float_%d\n", skip_counter);
+
+        printf("JUMPIFNEQ $skip_float_2_%d GF@type_var_2 string@float\n", skip_counter);
+        printf("EXIT 4\n");
+        printf("LABEL $skip_float_2_%d\n", skip_counter);
+
+        printf("JUMPIFNEQ $SKIP_EXIT_0_%d GF@prec_var_temp_1 int@0\n", skip_counter);
+        printf("EXIT 57\n");
+        printf("LABEL $SKIP_EXIT_0_%d\n", skip_counter);
+        printf("IDIV GF@prec_var_temp_1 GF@prec_var_temp_2 GF@prec_var_temp_1\n");
+
+        printf("PUSHS GF@prec_var_temp_1\n");
+
+        skip_counter++;
         break;
     case TOKEN_MULTIPLY:
+        printf("POPS GF@prec_var_temp_1\n");
+        printf("TYPE GF@type_var_1 GF@prec_var_temp_1\n");
+        printf("POPS GF@prec_var_temp_2\n");
+        printf("TYPE GF@type_var_2 GF@prec_var_temp_2\n");
+
+        printf("JUMPIFNEQ $skip_string_%d GF@type_var_1 string@string\n", skip_counter);
+        printf("EXIT 4\n");
+        printf("LABEL $skip_string_%d\n", skip_counter);
+
+        printf("JUMPIFNEQ $skip_string_2_%d GF@type_var_2 string@string\n", skip_counter);
+        printf("EXIT 4\n");
+        printf("LABEL $skip_string_2_%d\n", skip_counter);
+
+        printf("JUMPIFEQ $MUL_SKIP_%d GF@type_var_1 GF@type_var_2\n", skip_counter);
+
+        printf("JUMPIFNEQ $skip_float_%d GF@type_var_1 string@int\n", skip_counter);
+        printf("INT2FLOAT GF@prec_var_temp_1 GF@prec_var_temp_1\n");
+        printf("JUMP $MUL_SKIP_%d", skip_counter);
+        printf("LABEL $skip_float_%d\n", skip_counter);
+
+        printf("INT2FLOAT GF@prec_var_temp_2 GF@prec_var_temp_2\n");
+
+        printf("LABEL $MUL_SKIP_%d\n", skip_counter);
+
+        printf("MUL GF@prec_var_temp_1 GF@prec_var_temp_2 GF@prec_var_temp_1\n");
+
+        printf("PUSHS GF@prec_var_temp_1\n");
+
+        skip_counter++;
+
         break;
     case TOKEN_EQUAL:
         printf("POPS GF@prec_var_temp_1\n");
@@ -2093,7 +2152,7 @@ void prec_an_operator(token_t type, struct dynamic_string *str){
 
         printf("LABEL $EQ_SKIP_%d\n", skip_counter);
 
-        printf("SUB GF@prec_var_temp_1 GF@prec_var_temp_2 GF@prec_var_temp_1\n");
+        printf("EQ GF@prec_var_temp_1 GF@prec_var_temp_2 GF@prec_var_temp_1\n");
 
         printf("PUSHS GF@prec_var_temp_1\n");
         skip_counter++;
@@ -2122,9 +2181,14 @@ void prec_an_operator(token_t type, struct dynamic_string *str){
 
         printf("LABEL $NE_SKIP_%d\n", skip_counter);
 
-        printf("SUB GF@prec_var_temp_1 GF@prec_var_temp_2 GF@prec_var_temp_1\n");
+        printf("JUMPIFNEQ $NOT_EQUAL_%d GF@prec_var_temp_2 GF@prec_var_temp_1\n", skip_counter);
+        printf("PUSH bool@false\n");
+        printf("JUMP $END_AFTER_NE_%d\n", skip_counter);
+        printf("LABEL $NOT_EQUAL_%d\n", skip_counter);
+        printf("PUSH bool@true\n");
 
-        printf("PUSHS GF@prec_var_temp_1\n");
+        printf("LABEL $END_AFTER_NE_%d\n");
+
         skip_counter++;
         break;
     case TOKEN_LESS:
@@ -2151,7 +2215,7 @@ void prec_an_operator(token_t type, struct dynamic_string *str){
 
         printf("LABEL $LS_SKIP_%d\n", skip_counter);
 
-        printf("SUB GF@prec_var_temp_1 GF@prec_var_temp_2 GF@prec_var_temp_1\n");
+        printf("LS GF@prec_var_temp_1 GF@prec_var_temp_2 GF@prec_var_temp_1\n");
 
         printf("PUSHS GF@prec_var_temp_1\n");
         skip_counter++;
@@ -2180,7 +2244,7 @@ void prec_an_operator(token_t type, struct dynamic_string *str){
 
         printf("LABEL $GT_SKIP_%d\n", skip_counter);
 
-        printf("SUB GF@prec_var_temp_1 GF@prec_var_temp_2 GF@prec_var_temp_1\n");
+        printf("GT GF@prec_var_temp_1 GF@prec_var_temp_2 GF@prec_var_temp_1\n");
 
         printf("PUSHS GF@prec_var_temp_1\n");
         skip_counter++;
@@ -2209,7 +2273,9 @@ void prec_an_operator(token_t type, struct dynamic_string *str){
 
         printf("LABEL $LS_EQ_SKIP_%d\n", skip_counter);
 
-        printf("SUB GF@prec_var_temp_1 GF@prec_var_temp_2 GF@prec_var_temp_1\n");
+        printf("JUMPIFEG $SKIP_IN_LSEQ%d GF@type_var_1 GF@type_var_2\n");
+        printf("LS GF@prec_var_temp_1 GF@prec_var_temp_2 GF@prec_var_temp_1\n");
+        printf("LABEL $SKIP_IN_LSEQ%d\n", skip_counter);
 
         printf("PUSHS GF@prec_var_temp_1\n");
         skip_counter++;
@@ -2237,8 +2303,9 @@ void prec_an_operator(token_t type, struct dynamic_string *str){
         printf("INT2FLOAT GF@prec_var_temp_2 GF@prec_var_temp_2\n");
 
         printf("LABEL $GT_EQ_SKIP_%d\n", skip_counter);
-
-        printf("SUB GF@prec_var_temp_1 GF@prec_var_temp_2 GF@prec_var_temp_1\n");
+        printf("JUMPIFEG $SKIP_IN_GTEQ%d GF@type_var_1 GF@type_var_2\n");
+        printf("GT GF@prec_var_temp_1 GF@prec_var_temp_2 GF@prec_var_temp_1\n");
+        printf("LABEL $SKIP_IN_GTEQ%d\n", skip_counter);
 
         printf("PUSHS GF@prec_var_temp_1\n");
         skip_counter++;
