@@ -69,6 +69,6 @@ typedef enum
  * \return false in case of any error
  * 
 */
-int preced_analyze(struct token_s *token, table_s *hash_table, int bracket_cnt, struct dynamic_string *str);
+int preced_analyze(struct token_s *, table_s *, int* , struct dynamic_string *, tStack *);
 
 #endif

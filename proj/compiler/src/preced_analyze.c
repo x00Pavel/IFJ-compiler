@@ -92,7 +92,8 @@ typedef enum
 
 struct token_s *prev_token;
 int i;
-int array_rules[100];
+// int array_rules[100];
+char array_rules[50];
 
 tab_symbol token_to_element(struct token_s *token)
 {
@@ -168,7 +169,14 @@ bool check_operand(tDLList *list){
     }
     return true;
 }
-
+void del_last_3(tDLList *list){
+    DLPred(list);
+    DLPred(list);
+    DLPred(list);
+    DLPostDelete(list);
+    DLPostDelete(list);
+    DLPostDelete(list);
+}
 int reduce_rule(tDLList *list, int symbol, int top, struct token_s *prev_token)
 {
     if (symbol == DLR){
@@ -186,88 +194,56 @@ int reduce_rule(tDLList *list, int symbol, int top, struct token_s *prev_token)
         if(!check_operand(list)){
             return -1;
         }
-        // printf("rule: E -> E + E\n");
-        DLPred(list);
-        DLPred(list);
-        DLPred(list);
-        DLPostDelete(list);
-        DLPostDelete(list);
-        DLPostDelete(list);
+        del_last_3(list);
         DLActualize(list, ID_NT);
-        // if(token->type == TOKEN_STRING && prev_token->type == TOKEN_STRING){
-
-        // }
-        // func_sum(зкум)
-            // (token, prev_token);
-            // free(prev_token->attribute.string);
-        array_rules[i] = PLUS_OP;
-        i++;
+        #ifdef DEBUG_PRECED
+            array_rules[i] = '+';
+            i++;
+        #endif
         break;
     case MINUS:
         if(!check_operand(list)){
             return -1;
         }
-        // printf("rule: E -> E - E\n");
-        DLPred(list);
-        DLPred(list);
-        DLPred(list);
-        DLPostDelete(list);
-        DLPostDelete(list);
-        DLPostDelete(list);
+        del_last_3(list);
         DLActualize(list, ID_NT);
-        // if(token->type != TOKEN_STRING && prev_token->type != TOKEN_STRING)
-        // gen_sub(token, prev_token)
-        // else{
-        //     printf()
-        // }
-        array_rules[i] = MINUS_OP;
-        i++;
+        #ifdef DEBUG_PRECED
+        array_rules[i] = '-';
+                i++;
+        #endif
         break;
     case MUL:
         if (!check_operand(list)){
             return -1;
         }
-        DLPred(list);
-        DLPred(list);
-        DLPred(list);
-
-        // printf("rule: E -> E * E\n");
-        DLPostDelete(list);
-        DLPostDelete(list);
-        DLPostDelete(list);
+        del_last_3(list);
         DLActualize(list, ID_NT);
-        array_rules[i] = MUL_OP;
-        i++;
+        #ifdef DEBUG_PRECED
+            array_rules[i] = '*';
+            i++;
+        #endif
         break;
     case DIV:
         if(!check_operand(list)){
             return -1;
         }
-        DLPred(list);
-        DLPred(list);
-        DLPred(list);
-
-        // printf("rule: E -> E / E\n");
-        DLPostDelete(list);
-        DLPostDelete(list);
-        DLPostDelete(list);
+        del_last_3(list);
         DLActualize(list, ID_NT);
-        array_rules[i] = DIV_OP;
-        i++;
+        #ifdef DEBUG_PRECED
+            array_rules[i] = '/';
+            i++;
+        #endif
         break;
     case DIV_INT:
         if (!check_operand(list)){
             return -1;
         }
-        DLPred(list);
-        DLPred(list);
-        DLPred(list);
-
-        // printf("rule: E -> E // E\n");
-        DLPostDelete(list);
-        DLPostDelete(list);
-        DLPostDelete(list);
+        del_last_3(list);
         DLActualize(list, ID_NT);
+        #ifdef DEBUG_PRECED
+            array_rules[i] = '~';
+            i++;
+        #endif
         break;
     case INT_NT: // E -> ( int|id|flt|str )
     case FLT_NT:
@@ -308,123 +284,87 @@ int reduce_rule(tDLList *list, int symbol, int top, struct token_s *prev_token)
         DLCopy(list, &tmp);
         if (tmp == S){
             DLPostDelete(list);
-            // printf("rule E->i\n");
             DLActualize(list, ID_NT);
         }
         else{
             fprintf(stderr,"error. before ID can be only <\n");
             return -1;
         }
-        array_rules[i] = GEN_VAR;
-        i++;
+        #ifdef DEBUG_PRECED
+            array_rules[i] = 'E';
+            i++;
+        #endif
         break;
     case RB:
-        // #ifdef DEBUG
-        // printf("rule: E -> (E)\n");
-        // #endif
-        DLPred(list);
-        DLPred(list);
-        DLPred(list);
-        DLPostDelete(list);
-        DLPostDelete(list);
-        DLPostDelete(list);
+        del_last_3(list);
         DLActualize(list, ID_NT);
+        #ifdef DEBUG_PRECED
+                array_rules[i] = ')';
+                i++;
+        #endif
         break;
     case GT:
         if (!check_operand(list)){
             return -1;
         }
-        // #ifdef DEBUG
-        // printf("rule: E -> E > E\n");
-        // #endif
-        DLPred(list);
-        DLPred(list);
-        DLPred(list);
-        DLPostDelete(list);
-        DLPostDelete(list);
-        DLPostDelete(list);
+        del_last_3(list);
         DLActualize(list, ID_NT);
-        array_rules[i] = GT_OP;
-        i++;
+        #ifdef DEBUG_PRECED
+            array_rules[i] = '>';
+            i++;
+        #endif 
         break;
     case GE:
         if (!check_operand(list)){
             return -1;
         }
-        // #ifdef DEBUG
-        // printf("rule: E -> E >= E\n");
-        // #endif
-        DLPred(list);
-        DLPred(list);
-        DLPred(list);
-        DLPostDelete(list);
-        DLPostDelete(list);
-        DLPostDelete(list);
+        del_last_3(list);
         DLActualize(list, ID_NT);
         break;
     case LS:
         if (!check_operand(list)){
             return -1;
         }
-        // #ifdef DEBUG 
-        // printf("rule: E -> E < E\n");
-        // #endif
-        DLPred(list);
-        DLPred(list);
-        DLPred(list);
-        DLPostDelete(list);
-        DLPostDelete(list);
-        DLPostDelete(list);
+        del_last_3(list);
         DLActualize(list, ID_NT);
+        #ifdef DEBUG_PRECED
+            array_rules[i] = '<';
+            i++;
+        #endif
         break;
     case LE:
         if (!check_operand(list)){
             return -1;
         }
-        // #ifdef DEBUG
-        // printf("rule: E -> E <= E\n");
-        // #endif
-        DLPred(list);
-        DLPred(list);
-        DLPred(list);
-        DLPostDelete(list);
-        DLPostDelete(list);
-        DLPostDelete(list);
+        del_last_3(list);
         DLActualize(list, ID_NT);
         break;
     case NE:
         if (!check_operand(list)){
             return -1;
         }
-        // #ifdef DEBUG
-        //     printf("rule: E -> E != E\n");
-        // #endif
-        DLPred(list);
-        DLPred(list);
-        DLPred(list);
-        DLPostDelete(list);
-        DLPostDelete(list);
-        DLPostDelete(list);
+        del_last_3(list);
         DLActualize(list, ID_NT);
+        #ifdef DEBUG_PRECED
+            array_rules[i] = '!';
+            i++;
+        #endif
         break;
     case EQ:
         if (!check_operand(list)){
             return -1;
         }
-        // #ifdef DEBUG
-        //     printf("rule: E -> E == E\n");
-        // #endif
-        DLPred(list);
-        DLPred(list);
-        DLPred(list);
-        DLPostDelete(list);
-        DLPostDelete(list);
-        DLPostDelete(list);
+        del_last_3(list);
         DLActualize(list, ID_NT);
+        #ifdef DEBUG_PRECED
+            array_rules[i] = '=';
+            i++;
+        #endif
         break;
-
     default:
-        printf("error\n");
+        #ifdef 	DEBUG_PRECED
+            printf("ERROR IN REDUCE RULE -- NO CASE");
+        #endif 
         break;
     }
     if (symbol == DLR){
@@ -450,14 +390,14 @@ int reduce_rule(tDLList *list, int symbol, int top, struct token_s *prev_token)
     return 0;
 }
 
-int preced_analyze(struct token_s *token, table_s *hash_table, int bracket_cnt, struct dynamic_string *str)
+int preced_analyze(struct token_s *token, table_s *hash_table, int* count_of_params, struct dynamic_string *str, tStack *stack)
 {
     // (void)flag_while;
     (void)str;
     (void)hash_table;
-    
+    (void)count_of_params;
+    (void)stack;
     i = 0;
-    int rule;
     int ret_code = 0;
     tDLList *list = (tDLList *)malloc(sizeof(tDLList));
     DLInitList(list);
@@ -476,7 +416,9 @@ int preced_analyze(struct token_s *token, table_s *hash_table, int bracket_cnt, 
     {
         symbol = token_to_element(token);
         if(symbol == NT){
-            fprintf(stdout, "Invalid operator\n");
+            #ifdef DEBUG_PRECED
+                fprintf(stdout, "Invalid operator\n");
+            #endif
             return ERR_SYNTAX;
         }
         top = top_term(list); //in stack
@@ -485,10 +427,7 @@ int preced_analyze(struct token_s *token, table_s *hash_table, int bracket_cnt, 
             end = false;
             break;
         }
-        // #ifdef DEBUG
-        //     printf("top %s -- symbol: %s\t", symbols[top], symbols[symbol]);
-        //     printf("operation %c\t", prec_table[top][symbol]);
-        // #endif
+        
         int top_nt;
         switch (prec_table[top][symbol]){
         case '=':
@@ -502,7 +441,7 @@ int preced_analyze(struct token_s *token, table_s *hash_table, int bracket_cnt, 
                 DLSucc(list);
             }
             else{
-                // #ifdef DEBUG     
+                // #ifdef DEBUG_PRECED     
                 //     printf("insert to the top: %s\n", symbols[symbol]);
                 // #endif            
                 DLPostInsert(list, S);
@@ -512,8 +451,7 @@ int preced_analyze(struct token_s *token, table_s *hash_table, int bracket_cnt, 
             }
             break;
         case '>':
-            
-            rule = reduce_rule(list, symbol, top, prev_token);
+            reduce_rule(list, symbol, top, prev_token);
             break;
         default:
             end_scan = false;
@@ -545,12 +483,12 @@ int preced_analyze(struct token_s *token, table_s *hash_table, int bracket_cnt, 
         //     prev_token->type =  TOKEN_FLOAT; 
         //     prev_token->attribute.float_val = token->attribute.float_val;
         //     break;
-        case TOKEN_L_BRACKET:
-            bracket_cnt++;
-            break;
-        case TOKEN_R_BRACKET:
-            bracket_cnt--;
-            break;
+        // case TOKEN_L_BRACKET:
+        //     bracket_cnt++;
+        //     break;
+        // case TOKEN_R_BRACKET:
+        //     bracket_cnt--;
+        //     break;
         // case TOKEN_EOL:
         case TOKEN_EOF:
             fprintf(stderr, "Error in precedence analyzes\n");
@@ -601,14 +539,62 @@ int preced_analyze(struct token_s *token, table_s *hash_table, int bracket_cnt, 
             }
         }
         else if(token->type == TOKEN_FNC){
-            // here would be code from parese for Function call 
-        }
-    } while (!end);
+            tHTItem *item = htSearch(hash_table, token->attribute.string);
+                if(item){
+                    if(item->type == TOKEN_ID){
+                        free(token->attribute.string);
+                        return ERR_UNDEF; // ERROR, FNC WITH THE SAME NAME AS ID
+                    }else if(item->type == TOKEN_FNC){
+                        ret_code = func_for_FNC(token, stack, hash_table, false, count_of_params, str);
+                        if(ret_code != OK){
+                            return ret_code;
+                        }
+                        if(item->param_count != *count_of_params){
+                            return ERR_INCOMPATIBLE; // ERROR, no same count of params
+                        }
+                    }
+                }else{
+                    item = search_everywhere(hash_table, token->attribute.string);
+                    if(item){
+                        if(item->type == TOKEN_ID){
+                            free(token->attribute.string);
+                            return ERR_UNDEF; // ERROR, FNC WITH THE SAME NAME AS ID
+                        }else if(item->type == TOKEN_FNC){
+                            ret_code = func_for_FNC(token, stack, hash_table, false, count_of_params, str);
+                            if(ret_code != OK){
+                                return ret_code;
+                            }
+                            if(item->param_count != *count_of_params){
+                                return ERR_INCOMPATIBLE; // no same counf of params
+                            }
+                        }
+                    }else{
+                        table_s *glob_hash_table = hash_table;
 
-    for(int a = 0; a < i; a++){
-        printf("%d --> ", array_rules[a]);
-    }
-    printf("the end\n");
+                        while(glob_hash_table->prev_hash_table != NULL){
+                            glob_hash_table = glob_hash_table->prev_hash_table;
+                        }
+
+                        htInsert(glob_hash_table, token->attribute.string, token->type);
+                        item = htSearch(glob_hash_table, token->attribute.string);
+                        item->id_declared = false;
+
+                        ret_code = func_for_FNC(token, stack, hash_table, false, count_of_params, str);
+                        if(ret_code){
+                            return ret_code;
+                        }
+                        item->param_count = *count_of_params;
+                    }
+                }
+        *count_of_params = 0; // free string inside function
+            }
+    } while (!end);
+    #ifdef DEBUG_PRECED
+        for(int a = 0; a < i; a++){
+            printf("%c --> ", array_rules[a]);
+        }
+        printf("the end\n");
+    #endif
     end_scan = false;
     free(scanner_stack);
     // free(prev_token->attribute.string);
