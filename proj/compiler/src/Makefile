@@ -1,29 +1,38 @@
+# author: Yadlouski Pavel
+
 PROJ=ifj2019
 SCANNER=scaner.c
 STRING=dynamic_string.c
-SCTACK=./stack/c202.c
-TABLE=./hash_table/c016.c
-CFLAGS= -Wconversion -Wunreachable-code -Wextra -Wall -O -g   
+SCTACK=stack.c
+TABLE=symtable.c
+PARSER=parser.c
+CODEGENERATOR=codegenerator.c
+PREC_ANALYZE=preced_analyze.c
+LINSTACK=linear_stack.c
+CFLAGS= -Wconversion -Wunreachable-code -Wextra -Wall -O -g
 
 
 main: ${PROJ}.c 
-	gcc ${CFLAGS} -D DEBUG -o ${PROJ} ${PROJ}.c ${SCANNER} ${STRING} ${SCTACK} ${TABLE}
-
+	gcc ${CFLAGS} -D DEBUG -o ${PROJ} ${PROJ}.c ${SCANNER} ${STRING} ${SCTACK} ${TABLE} ${LINSTACK} ${PREC_ANALYZE} 
 rel: ${PROJ}.c
 	gcc ${CFLAGS} -o ${PROJ} ${PROJ}.c ${SCANNER} ${STRING} ${SCTACK}
 
 v1: 
-	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes ./${PROJ} test1.txt  
+	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes ./${PROJ} < test1.txt  
 v2:  
-	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes ./${PROJ} test2.txt  
+	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes ./${PROJ} < test2.txt  
 v3:  
-	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes ./${PROJ} test3.txt
+	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes ./${PROJ} < test3.txt
+v4:
+	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes ./${PROJ} < test.txt
+	
 
 t1: 
-	./${PROJ} test1.txt
+	./${PROJ} < test1.txt 
 t2: 
-	./${PROJ} test2.txt
+	./${PROJ} < test2.txt
 t3: 
-	./${PROJ} test3.txt
-
+	./${PROJ} < test3.txt
+t4:
+	./${PROJ} < test.txt
 

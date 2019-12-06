@@ -5,9 +5,12 @@
 #include <ctype.h>
 
 #include "errors.h"
-#include "scaner.h"
-#include "./stack/c202.h"
-#include "./hash_table/c016.h"
+#include "stack.h"
+#include "symtable.h"
+#include "preced_analyze.h"
+#ifndef _SCANNER_H
+    #include "scanner.h"
+#endif
 
 char *types[] = {
 
@@ -47,10 +50,18 @@ char *types[] = {
     "TOKEN_HEX",
     "TOKEN_INDEND", // indend
     "TOKEN_DEDEND", // dedend
-    "TOKEN_NONE",
     "TOKEN_FNC",
-    "TOKEN_DIV_INT"
-};
+    "TOKEN_NONE",
+    "TOKEN_DIV_INT",
+    "TOKEN_PRINT",
+    "TOKEN_INPUT_S",
+    "TOKEN_INPUT_I",
+    "TOKEN_INPUT_F",
+    "TOKEN_ORD",
+    "TOKEN_SUBSTR",
+    "TOKEN_LEN",
+    "TOKEN_CHR"
+    };
 
 char *kw[] = {
     "_DEF_",
@@ -59,23 +70,22 @@ char *kw[] = {
     "_NONE_",
     "_PASS_",
     "_RETURN_",
-    "_WHILE_"
-};
-
+    "_WHILE_"};
 
 int
 main(int arc, char **argv)
 {
 
     (void)arc;
+    (void)argv;
     /* Input file */
-    FILE *file;
-    file = fopen(argv[1], "r");
+    // FILE *file;
+    // file = fopen(argv[1], "r");
     
-    if (!file){
-        fprintf(stderr, "Error in opening file %s\n", argv[0]);
-        return ERR_OTHER;
-    }
+    // if (!file){
+    //     fprintf(stderr, "Error in opening file %s\n", argv[0]);
+    //     return ERR_OTHER;
+    // }
 
     struct token_s *token = (struct token_s *)malloc(sizeof(struct token_s));
     
@@ -88,63 +98,63 @@ main(int arc, char **argv)
     stackPush(stack, 0);
     
     // Initialization of hash table for global frame
-    tHTable *hash_table =  (tHTable *) malloc(sizeof(tHTable));
-    if(!hash_table){
+    table_s *ht = (table_s *)malloc(sizeof(table_s));
+    if(!ht){
         return ERR_INTERNAL;
     }
-    htInit(hash_table);
-    int ret_code = 0;
+    htInit(ht);
+    int cnt = 0;
+    int ret_code = get_token(token, stack);
+    htInsert(ht, "a", TOKEN_ID);
+    (void)ret_code;
+    preced_analyze(token, ht, cnt, NULL);
 
-    ret_code = get_token(file, token, stack);
-    htInsert(hash_table, types[token->type], *token);
-
-
+    /*int ret_code = 0;
     while (ret_code != -1){
-        ret_code = get_token(file, token, stack);
+        ret_code = get_token(token, stack);
         
+        if(token->type == TOKEN_FNC || token->type == TOKEN_ID){
+            htInsert(ht, token->attribute.string, token->type);
+        }
+
         if (ret_code != OK){
             if (token->type == TOKEN_ID || token->type == TOKEN_STRING || (token->type ==  TOKEN_FNC)){
                 free(token->attribute.string);
             }
-            return ret_code;
+            break;
+            // return ret_code;
         }
-
         if(token->type == TOKEN_EOF){
-#ifdef DEBUG
             printf("%s\n", types[token->type]);
-#endif
             break;
         }
 
-#ifdef DEBUG
-        if((token->type ==  TOKEN_KEY_WORD) || (token->type ==  TOKEN_FNC)){
-            printf("%s -- %s\n", types[token->type], (token->type == TOKEN_FNC) ? token->attribute.string : kw[token->attribute.key_word]);
-            if (token->type == TOKEN_FNC && token->attribute.string){
-                free(token->attribute.string);
-            }
-        }
-        else{
-            printf("%s\n", types[token->type]);
-        }
-
-        
-        if(token->type == TOKEN_ID || token->type == TOKEN_STRING){
+        switch (token->type)
+        {
+        case TOKEN_ID:
+        case TOKEN_STRING:
             printf("--------- attribute: %s\n", token->attribute.string);
             free(token->attribute.string);
-        }
-#else
-        if ((token->type == TOKEN_FNC) || (token->type == TOKEN_STRING) || (token->type == TOKEN_ID) 
-            && (token->attribute.string != NULL)){
+            break;
+        case TOKEN_FNC:
+            printf("%s -- %s\n", types[token->type], token->attribute.string);
             free(token->attribute.string);
+            break;
+        case TOKEN_KEY_WORD:
+            printf("%s -- %s\n", types[token->type],kw[token->attribute.key_word]);
+            break;
+        default:
+            printf("%s\n", types[token->type]);
+            break;
         }
-#endif
         
     }
-    free(hash_table);
+    htPrintTable(ht);*/
+    htClearAll(ht);
+    free(ht);
     free(stack);
     free(token);
-    fclose(file);
-
+    
     return 0;
 }
 
