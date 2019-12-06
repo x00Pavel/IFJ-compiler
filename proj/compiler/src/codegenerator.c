@@ -2024,7 +2024,7 @@ void prec_an_operator(token_t type, struct dynamic_string *str){
         // printf("LABEL $DIV_SKIP_%d\n", skip_counter);
 
         printf("JUMPIFNEQ $SKIP_EXIT_0_%d GF@prec_var_temp_1 float@0x0\n", skip_counter);
-        printf("EXIT 57\n");
+        printf("EXIT 9\n");
         printf("LABEL $SKIP_EXIT_0_%d\n", skip_counter);
         printf("DIV GF@prec_var_temp_1 GF@prec_var_temp_2 GF@prec_var_temp_1\n");
 
@@ -2057,7 +2057,7 @@ void prec_an_operator(token_t type, struct dynamic_string *str){
         printf("LABEL $MINUS_SKIP_%d\n", skip_counter);
 
         // printf("JUMPIFNEQ $SKIP_EXIT_0_%d GF@prec_var_temp_1 float@0x0\n", skip_counter);
-        // printf("EXIT 57\n");
+        // printf("EXIT 9\n");
         // printf("LABEL $SKIP_EXIT_0_%d\n", skip_counter);
         printf("SUB GF@prec_var_temp_1 GF@prec_var_temp_2 GF@prec_var_temp_1\n");
 
@@ -2088,7 +2088,7 @@ void prec_an_operator(token_t type, struct dynamic_string *str){
         printf("LABEL $skip_float_2_%d\n", skip_counter);
 
         printf("JUMPIFNEQ $SKIP_EXIT_0_%d GF@prec_var_temp_1 int@0\n", skip_counter);
-        printf("EXIT 57\n");
+        printf("EXIT 9\n");
         printf("LABEL $SKIP_EXIT_0_%d\n", skip_counter);
         printf("IDIV GF@prec_var_temp_1 GF@prec_var_temp_2 GF@prec_var_temp_1\n");
 
