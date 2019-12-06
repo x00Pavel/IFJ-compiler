@@ -565,8 +565,10 @@ int preced_analyze(struct token_s *token, table_s *hash_table, int* count_of_par
                     fprintf(stderr, "ID is not in hash table\n");
                     end_scan = false;
                     free(scanner_stack);
-                    // free(prev_token->attribute.string);
+                    if (prev_token->type == TOKEN_ID || prev_token->type == TOKEN_STRING)
+                        free(prev_token->attribute.string);
                     free(prev_token);
+                    free(token->attribute.string);
                     DLDisposeList(list);
                     free(list);
                     return ERR_UNDEF;
