@@ -29,7 +29,7 @@ typedef char* tKey;
 typedef struct tHTItem{
 	tKey key;				 /*< Key - name of id                 */
 	token_t type;			 /*< Token type                       */
-	token_t ret_val;
+	token_t ret_val;		 /*< Type of return value */
 	int param_count;         /*< Count of paramters for functions */
 	bool id_declared;        /*< Flag for declared identeficators */
 	struct tHTItem* ptrnext; /*< Pointer to next node             */
@@ -50,11 +50,11 @@ tHTItem *htSearch(table_s *ptrht, tKey key);
 
 int htInsert(table_s *ptrht, tKey key, token_t type);
 
-tHTItem* search_everywhere(table_s *ptrht, tKey key);
+tHTItem *search_everywhere(table_s *ptrht, tKey key);
 
 void htDelete(table_s *ptrht, tKey key);
 
-void htClearAll(table_s *hash_table);
+int htClearAll(table_s *hash_table, bool ok);
 
 void htPrintItem(tHTItem *ptritem);
 

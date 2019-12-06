@@ -12,6 +12,7 @@
 
 #include <ctype.h>
 #include "symtable.h"
+#include "errors.h"
 
 int HTSIZE = MAX_HTSIZE;
 
@@ -83,6 +84,7 @@ void htInit (table_s *ptrht) {
         ptrht->hash_table[i] = NULL;
     }
     ptrht->prev_hash_table = NULL;
+
 }
 
 tHTItem* htSearch (table_s *ptrht, tKey key ) {
@@ -181,7 +183,7 @@ void htDelete ( table_s* ptrht, tKey key ) {
     }
 }
 
-void htClearAll(table_s *hash_table)
+int htClearAll(table_s *hash_table, bool ok)
 {
 
     tHTItem *item, *delete_item;
@@ -192,12 +194,21 @@ void htClearAll(table_s *hash_table)
         // go through every item in linked list
         while(item){
             delete_item = item;
+            if(ok){
+                if(delete_item->type == TOKEN_FNC){
+                    if(!delete_item->id_declared){
+                        fprintf(stderr,"Function is not decleared\n");
+                        return ERR_UNDEF;
+                    }
+                }
+            }
             item = item->ptrnext;
             free(delete_item->key);
             free(delete_item);
         }
         hash_table->hash_table[i] = NULL;
     }
+    return OK;
 }
 
 #ifdef DEBUG

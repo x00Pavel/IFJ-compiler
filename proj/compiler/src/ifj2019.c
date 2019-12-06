@@ -107,7 +107,7 @@ main(int arc, char **argv)
     int ret_code = get_token(token, stack);
     htInsert(ht, "a", TOKEN_ID);
     (void)ret_code;
-    preced_analyze(token, ht, cnt, NULL);
+    preced_analyze(token, ht, &cnt, NULL, NULL);
 
     /*int ret_code = 0;
     while (ret_code != -1){
@@ -150,7 +150,7 @@ main(int arc, char **argv)
         
     }
     htPrintTable(ht);*/
-    htClearAll(ht);
+    htClearAll(ht, true);
     free(ht);
     free(stack);
     free(token);
