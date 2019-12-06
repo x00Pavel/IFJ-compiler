@@ -531,6 +531,7 @@ int preced_analyze(struct token_s *token, table_s *hash_table, int* count_of_par
                     end_scan = false;
                     free(scanner_stack);
                     // free(prev_token->attribute.string);
+                    free(token->attribute.string);
                     free(prev_token);
                     DLDisposeList(list);
                     free(list);
@@ -538,56 +539,56 @@ int preced_analyze(struct token_s *token, table_s *hash_table, int* count_of_par
                 }
             }
         }
-        else if(token->type == TOKEN_FNC){
-            tHTItem *item = htSearch(hash_table, token->attribute.string);
-                if(item){
-                    if(item->type == TOKEN_ID){
-                        free(token->attribute.string);
-                        return ERR_UNDEF; // ERROR, FNC WITH THE SAME NAME AS ID
-                    }else if(item->type == TOKEN_FNC){
-                        ret_code = func_for_FNC(token, stack, hash_table, false, count_of_params, str);
-                        if(ret_code != OK){
-                            return ret_code;
-                        }
-                        if(item->param_count != *count_of_params){
-                            return ERR_INCOMPATIBLE; // ERROR, no same count of params
-                        }
-                    }
-                }else{
-                    item = search_everywhere(hash_table, token->attribute.string);
-                    if(item){
-                        if(item->type == TOKEN_ID){
-                            free(token->attribute.string);
-                            return ERR_UNDEF; // ERROR, FNC WITH THE SAME NAME AS ID
-                        }else if(item->type == TOKEN_FNC){
-                            ret_code = func_for_FNC(token, stack, hash_table, false, count_of_params, str);
-                            if(ret_code != OK){
-                                return ret_code;
-                            }
-                            if(item->param_count != *count_of_params){
-                                return ERR_INCOMPATIBLE; // no same counf of params
-                            }
-                        }
-                    }else{
-                        table_s *glob_hash_table = hash_table;
+        // else if(token->type == TOKEN_FNC){
+        //     tHTItem *item = htSearch(hash_table, token->attribute.string);
+        //         if(item){
+        //             if(item->type == TOKEN_ID){
+        //                 free(token->attribute.string);
+        //                 return ERR_UNDEF; // ERROR, FNC WITH THE SAME NAME AS ID
+        //             }else if(item->type == TOKEN_FNC){
+        //                 ret_code = func_for_FNC(token, stack, hash_table, false, count_of_params, str);
+        //                 if(ret_code != OK){
+        //                     return ret_code;
+        //                 }
+        //                 if(item->param_count != *count_of_params){
+        //                     return ERR_INCOMPATIBLE; // ERROR, no same count of params
+        //                 }
+        //             }
+        //         }else{
+        //             item = search_everywhere(hash_table, token->attribute.string);
+        //             if(item){
+        //                 if(item->type == TOKEN_ID){
+        //                     free(token->attribute.string);
+        //                     return ERR_UNDEF; // ERROR, FNC WITH THE SAME NAME AS ID
+        //                 }else if(item->type == TOKEN_FNC){
+        //                     ret_code = func_for_FNC(token, stack, hash_table, false, count_of_params, str);
+        //                     if(ret_code != OK){
+        //                         return ret_code;
+        //                     }
+        //                     if(item->param_count != *count_of_params){
+        //                         return ERR_INCOMPATIBLE; // no same counf of params
+        //                     }
+        //                 }
+        //             }else{
+        //                 table_s *glob_hash_table = hash_table;
 
-                        while(glob_hash_table->prev_hash_table != NULL){
-                            glob_hash_table = glob_hash_table->prev_hash_table;
-                        }
+        //                 while(glob_hash_table->prev_hash_table != NULL){
+        //                     glob_hash_table = glob_hash_table->prev_hash_table;
+        //                 }
 
-                        htInsert(glob_hash_table, token->attribute.string, token->type);
-                        item = htSearch(glob_hash_table, token->attribute.string);
-                        item->id_declared = false;
+        //                 htInsert(glob_hash_table, token->attribute.string, token->type);
+        //                 item = htSearch(glob_hash_table, token->attribute.string);
+        //                 item->id_declared = false;
 
-                        ret_code = func_for_FNC(token, stack, hash_table, false, count_of_params, str);
-                        if(ret_code){
-                            return ret_code;
-                        }
-                        item->param_count = *count_of_params;
-                    }
-                }
-        *count_of_params = 0; // free string inside function
-            }
+        //                 ret_code = func_for_FNC(token, stack, hash_table, false, count_of_params, str);
+        //                 if(ret_code){
+        //                     return ret_code;
+        //                 }
+        //                 item->param_count = *count_of_params;
+        //             }
+        //         }
+        // *count_of_params = 0; // free string inside function
+        //     }
     } while (!end);
     #ifdef DEBUG_PRECED
         for(int a = 0; a < i; a++){
