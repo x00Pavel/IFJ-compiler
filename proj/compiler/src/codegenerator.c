@@ -1482,457 +1482,449 @@ void generate_while_for_true_end(int *t,struct dynamic_string *str){
 
 
 //Функия посчитает и запишет в помоцную переменную valueforcouing все что вы туда пошлете(sum)
-void func_sum(struct token_s *token_one, char *s,struct dynamic_string *str){
-    if(token_one->type == TOKEN_FLOAT)
-    {   
-        if(flag_while == 0)
-        {
-            fprintf(stdout, "ADD GF@retval GF@retval float@%a\n", token_one->attribute.float_val);
-        }
-        else
-        {
-            for(unsigned int i = 0; i < strlen("ADD GF@retval GF@retval float@"); i++){
-                add_char_to_str(str, "ADD GF@retval GF@retval float@"[i]);
-            } 
-            char temp[100];
-            sprintf(temp, "%f",  token_one->attribute.float_val);
-            for(unsigned int i = 0; i < strlen(temp); i++){
-                add_char_to_str(str, temp[i]);
-            }
-            add_char_to_str(str, 10);   
-        }   
-    }
-    if(token_one->type == TOKEN_INT)
-    {  
+// void func_sum(struct token_s *token_one, char *s,struct dynamic_string *str){
+//     if(token_one->type == TOKEN_FLOAT)
+//     {   
+//         if(flag_while == 0)
+//         {
+//             fprintf(stdout, "ADD GF@retval GF@retval float@%a\n", token_one->attribute.float_val);
+//         }
+//         else
+//         {
+//             for(unsigned int i = 0; i < strlen("ADD GF@retval GF@retval float@"); i++){
+//                 add_char_to_str(str, "ADD GF@retval GF@retval float@"[i]);
+//             } 
+//             char temp[100];
+//             sprintf(temp, "%f",  token_one->attribute.float_val);
+//             for(unsigned int i = 0; i < strlen(temp); i++){
+//                 add_char_to_str(str, temp[i]);
+//             }
+//             add_char_to_str(str, 10);   
+//         }   
+//     }
+//     if(token_one->type == TOKEN_INT)
+//     {  
 
-        if(flag_while == 0)
-        {
-            fprintf(stdout, "DEFVAR LF@TMPF2INT\n");
-            fprintf(stdout, "MOVE LF@TMPF2INT int@%d\n", token_one->attribute.int_val);
-            fprintf(stdout, "INT2FLOAT TF@%%TMPF2INT TF@%%TMPF2INT\n");
-            fprintf(stdout, "ADD GF@retval GF@retval TF@%%TMPF2INT\n");
-        }
-        else
-        {
-            for(unsigned int i = 0; i < strlen("DEFVAR LF@TMPF2INT\nMOVE LF@TMPF2INT int@"); i++){
-                add_char_to_str(str, "DEFVAR LF@TMPF2INT\nMOVE LF@TMPF2INT int@"[i]);
-            } 
-            char temp[100];
-            sprintf(temp, "%d",  token_one->attribute.int_val);
-            for(unsigned int i = 0; i < strlen(temp); i++){
-                add_char_to_str(str, temp[i]);
-            }
-            add_char_to_str(str, 10);   
-            for(unsigned int i = 0; i < strlen("INT2FLOAT TF@%%TMPF2INT TF@%%TMPF2INT\nADD GF@retval GF@retval TF@%%TMPF2INT\n"); i++){
-                add_char_to_str(str, "INT2FLOAT TF@%%TMPF2INT TF@%%TMPF2INT\nADD GF@retval GF@retval TF@%%TMPF2INT\n"[i]);
-            } 
-        }
+//         if(flag_while == 0)
+//         {
+//             fprintf(stdout, "DEFVAR LF@TMPF2INT\n");
+//             fprintf(stdout, "MOVE LF@TMPF2INT int@%d\n", token_one->attribute.int_val);
+//             fprintf(stdout, "INT2FLOAT TF@%%TMPF2INT TF@%%TMPF2INT\n");
+//             fprintf(stdout, "ADD GF@retval GF@retval TF@%%TMPF2INT\n");
+//         }
+//         else
+//         {
+//             for(unsigned int i = 0; i < strlen("DEFVAR LF@TMPF2INT\nMOVE LF@TMPF2INT int@"); i++){
+//                 add_char_to_str(str, "DEFVAR LF@TMPF2INT\nMOVE LF@TMPF2INT int@"[i]);
+//             } 
+//             char temp[100];
+//             sprintf(temp, "%d",  token_one->attribute.int_val);
+//             for(unsigned int i = 0; i < strlen(temp); i++){
+//                 add_char_to_str(str, temp[i]);
+//             }
+//             add_char_to_str(str, 10);   
+//             for(unsigned int i = 0; i < strlen("INT2FLOAT TF@%%TMPF2INT TF@%%TMPF2INT\nADD GF@retval GF@retval TF@%%TMPF2INT\n"); i++){
+//                 add_char_to_str(str, "INT2FLOAT TF@%%TMPF2INT TF@%%TMPF2INT\nADD GF@retval GF@retval TF@%%TMPF2INT\n"[i]);
+//             } 
+//         }
         
-    }
-    if(token_one->type == TOKEN_ID)
-    {
-        if(flag_while == 0)
-        {
-            fprintf(stdout, "ADD GF@retval GF@retval %s@%s\n", s,token_one->attribute.string);
-        }else
-        {
-            for(unsigned int i = 0; i < strlen("ADD GF@retval GF@retval"); i++){
-                add_char_to_str(str, "ADD GF@retval GF@retval"[i]);
-            } 
-            for(unsigned int i = 0; i < strlen(s); i++){
-                add_char_to_str(str, s[i]);
-            }
-            for(unsigned int i = 0; i < strlen("@"); i++){
-                add_char_to_str(str, "@"[i]);
-            } 
-            for(unsigned int i = 0; i < strlen(token_one->attribute.string); i++){
-                add_char_to_str(str, token_one->attribute.string[i]);
-            }
-            add_char_to_str(str, 10);  
-        }
+//     }
+//     if(token_one->type == TOKEN_ID)
+//     {
+//         if(flag_while == 0)
+//         {
+//             fprintf(stdout, "ADD GF@retval GF@retval %s@%s\n", s,token_one->attribute.string);
+//         }else
+//         {
+//             for(unsigned int i = 0; i < strlen("ADD GF@retval GF@retval"); i++){
+//                 add_char_to_str(str, "ADD GF@retval GF@retval"[i]);
+//             } 
+//             for(unsigned int i = 0; i < strlen(s); i++){
+//                 add_char_to_str(str, s[i]);
+//             }
+//             for(unsigned int i = 0; i < strlen("@"); i++){
+//                 add_char_to_str(str, "@"[i]);
+//             } 
+//             for(unsigned int i = 0; i < strlen(token_one->attribute.string); i++){
+//                 add_char_to_str(str, token_one->attribute.string[i]);
+//             }
+//             add_char_to_str(str, 10);  
+//         }
         
 
         
-    }
-    if(token_one->type == TOKEN_STRING)
-    {
-        if(flag_while == 0)
-        {
-             fprintf(stdout, "CONCAT GF@retval GF@retval@ %s\n",token_one->attribute.string);
-        }
-        else
-        {
-            for(unsigned int i = 0; i < strlen("CONCAT GF@retval GF@retval "); i++){
-                add_char_to_str(str, "ADD GF@retval GF@retval "[i]);
-            } 
-            for(unsigned int i = 0; i < strlen(token_one->attribute.string); i++){
-                add_char_to_str(str, token_one->attribute.string[i]);
-            }
-            add_char_to_str(str, 10);   
-        }   
+//     }
+//     if(token_one->type == TOKEN_STRING)
+//     {
+//         if(flag_while == 0)
+//         {
+//              fprintf(stdout, "CONCAT GF@retval GF@retval@ %s\n",token_one->attribute.string);
+//         }
+//         else
+//         {
+//             for(unsigned int i = 0; i < strlen("CONCAT GF@retval GF@retval "); i++){
+//                 add_char_to_str(str, "ADD GF@retval GF@retval "[i]);
+//             } 
+//             for(unsigned int i = 0; i < strlen(token_one->attribute.string); i++){
+//                 add_char_to_str(str, token_one->attribute.string[i]);
+//             }
+//             add_char_to_str(str, 10);   
+//         }   
        
-    }    
-}
+//     }    
+// }
 
 //Функия посчитает и запишет в помоцную переменную valueforcouing все что вы туда пошлете(mul)
-void func_mul(struct token_s *token_one, char *s, struct dynamic_string *str){
+// void func_mul(struct token_s *token_one, char *s, struct dynamic_string *str){
 
-    if(token_one->type == TOKEN_FLOAT)
-    {   
-        if(flag_while == 0)
-        {
-            fprintf(stdout, "MUL GF@retval GF@retval float@%a\n", token_one->attribute.float_val);
-        }
-        else
-        {
-            for(unsigned int i = 0; i < strlen("MUL GF@retval GF@retval float@"); i++){
-                add_char_to_str(str, "MUL GF@retval GF@retval float@"[i]);
-            } 
-            char temp[100];
-            sprintf(temp, "%f",  token_one->attribute.float_val);
-            for(unsigned int i = 0; i < strlen(temp); i++){
-                add_char_to_str(str, temp[i]);
-            }
-            add_char_to_str(str, 10);   
-        }   
-    }
-    if(token_one->type == TOKEN_INT)
-    {  
+//     if(token_one->type == TOKEN_FLOAT)
+//     {   
+//         if(flag_while == 0)
+//         {
+//             fprintf(stdout, "MUL GF@retval GF@retval float@%a\n", token_one->attribute.float_val);
+//         }
+//         else
+//         {
+//             for(unsigned int i = 0; i < strlen("MUL GF@retval GF@retval float@"); i++){
+//                 add_char_to_str(str, "MUL GF@retval GF@retval float@"[i]);
+//             } 
+//             char temp[100];
+//             sprintf(temp, "%f",  token_one->attribute.float_val);
+//             for(unsigned int i = 0; i < strlen(temp); i++){
+//                 add_char_to_str(str, temp[i]);
+//             }
+//             add_char_to_str(str, 10);   
+//         }   
+//     }
+//     if(token_one->type == TOKEN_INT)
+//     {  
 
-        if(flag_while == 0)
-        {
-            fprintf(stdout, "DEFVAR LF@TMPF2INT\n");
-            fprintf(stdout, "MOVE LF@TMPF2INT int@%d\n", token_one->attribute.int_val);
-            fprintf(stdout, "INT2FLOAT TF@%%TMPF2INT TF@%%TMPF2INT\n");
-            fprintf(stdout, "MUL GF@retval GF@retval TF@%%TMPF2INT\n");
-        }
-        else
-        {
-            for(unsigned int i = 0; i < strlen("DEFVAR LF@TMPF2INT\nMOVE LF@TMPF2INT int@"); i++){
-                add_char_to_str(str, "DEFVAR LF@TMPF2INT\nMOVE LF@TMPF2INT int@"[i]);
-            } 
-            char temp[100];
-            sprintf(temp, "%d",  token_one->attribute.int_val);
-            for(unsigned int i = 0; i < strlen(temp); i++){
-                add_char_to_str(str, temp[i]);
-            }
-            add_char_to_str(str, 10);   
-            for(unsigned int i = 0; i < strlen("INT2FLOAT TF@%%TMPF2INT TF@%%TMPF2INT\nMUL GF@retval GF@retval TF@%%TMPF2INT\n"); i++){
-                add_char_to_str(str, "INT2FLOAT TF@%%TMPF2INT TF@%%TMPF2INT\nMUL GF@retval GF@retval TF@%%TMPF2INT\n"[i]);
-            } 
-        }
+//         if(flag_while == 0)
+//         {
+//             fprintf(stdout, "DEFVAR LF@TMPF2INT\n");
+//             fprintf(stdout, "MOVE LF@TMPF2INT int@%d\n", token_one->attribute.int_val);
+//             fprintf(stdout, "INT2FLOAT TF@%%TMPF2INT TF@%%TMPF2INT\n");
+//             fprintf(stdout, "MUL GF@retval GF@retval TF@%%TMPF2INT\n");
+//         }
+//         else
+//         {
+//             for(unsigned int i = 0; i < strlen("DEFVAR LF@TMPF2INT\nMOVE LF@TMPF2INT int@"); i++){
+//                 add_char_to_str(str, "DEFVAR LF@TMPF2INT\nMOVE LF@TMPF2INT int@"[i]);
+//             } 
+//             char temp[100];
+//             sprintf(temp, "%d",  token_one->attribute.int_val);
+//             for(unsigned int i = 0; i < strlen(temp); i++){
+//                 add_char_to_str(str, temp[i]);
+//             }
+//             add_char_to_str(str, 10);   
+//             for(unsigned int i = 0; i < strlen("INT2FLOAT TF@%%TMPF2INT TF@%%TMPF2INT\nMUL GF@retval GF@retval TF@%%TMPF2INT\n"); i++){
+//                 add_char_to_str(str, "INT2FLOAT TF@%%TMPF2INT TF@%%TMPF2INT\nMUL GF@retval GF@retval TF@%%TMPF2INT\n"[i]);
+//             } 
+//         }
         
-    }
-    if(token_one->type == TOKEN_ID)
-    {
-        if(flag_while == 0)
-        {
-            fprintf(stdout, "MUL GF@retval GF@retval %s@%s\n", s,token_one->attribute.string);
-        }else
-        {
-            for(unsigned int i = 0; i < strlen("MUL GF@retval GF@retval"); i++){
-                add_char_to_str(str, "MUL GF@retval GF@retval"[i]);
-            } 
-            for(unsigned int i = 0; i < strlen(s); i++){
-                add_char_to_str(str, s[i]);
-            }
-            for(unsigned int i = 0; i < strlen("@"); i++){
-                add_char_to_str(str, "@"[i]);
-            } 
-            for(unsigned int i = 0; i < strlen(token_one->attribute.string); i++){
-                add_char_to_str(str, token_one->attribute.string[i]);
-            }
-            add_char_to_str(str, 10);  
-        }
+//     }
+//     if(token_one->type == TOKEN_ID)
+//     {
+//         if(flag_while == 0)
+//         {
+//             fprintf(stdout, "MUL GF@retval GF@retval %s@%s\n", s,token_one->attribute.string);
+//         }else
+//         {
+//             for(unsigned int i = 0; i < strlen("MUL GF@retval GF@retval"); i++){
+//                 add_char_to_str(str, "MUL GF@retval GF@retval"[i]);
+//             } 
+//             for(unsigned int i = 0; i < strlen(s); i++){
+//                 add_char_to_str(str, s[i]);
+//             }
+//             for(unsigned int i = 0; i < strlen("@"); i++){
+//                 add_char_to_str(str, "@"[i]);
+//             } 
+//             for(unsigned int i = 0; i < strlen(token_one->attribute.string); i++){
+//                 add_char_to_str(str, token_one->attribute.string[i]);
+//             }
+//             add_char_to_str(str, 10);  
+//         }
         
 
         
-    }
-    //Умножение двух стрингов
-    //if(token_one->type == TOKEN_STRING){
-        if(flag_while == 0)
-        {
-             fprintf(stdout, "CONCAT GF@retval GF@retval@ %s\n",token_one->attribute.string);
-        }
-        else
-        {
-            for(unsigned int i = 0; i < strlen("CONCAT GF@retval GF@retval "); i++){
-                add_char_to_str(str, "ADD GF@retval GF@retval "[i]);
-            } 
-            for(unsigned int i = 0; i < strlen(token_one->attribute.string); i++){
-                add_char_to_str(str, token_one->attribute.string[i]);
-            }
-            add_char_to_str(str, 10);   
-        }   
+//     }
+//     //Умножение двух стрингов
+//     //if(token_one->type == TOKEN_STRING){
+//         if(flag_while == 0)
+//         {
+//              fprintf(stdout, "CONCAT GF@retval GF@retval@ %s\n",token_one->attribute.string);
+//         }
+//         else
+//         {
+//             for(unsigned int i = 0; i < strlen("CONCAT GF@retval GF@retval "); i++){
+//                 add_char_to_str(str, "ADD GF@retval GF@retval "[i]);
+//             } 
+//             for(unsigned int i = 0; i < strlen(token_one->attribute.string); i++){
+//                 add_char_to_str(str, token_one->attribute.string[i]);
+//             }
+//             add_char_to_str(str, 10);   
+//         }   
        
-    //}        
-}
+//     //}        
+// }
 
 //Функия посчитает и запишет в помоцную переменную valueforcouing все что вы туда пошлете(sub)
-void func_sub(struct token_s *token_one, char *s,struct dynamic_string *str){
+// void func_sub(struct token_s *token_one, char *s,struct dynamic_string *str){
 
-    if(token_one->type == TOKEN_FLOAT)
-    {   
-        if(flag_while == 0)
-        {
-            fprintf(stdout, "SUB GF@retval GF@retval float@%a\n", token_one->attribute.float_val);
-        }
-        else
-        {
-            for(unsigned int i = 0; i < strlen("SUB GF@retval GF@retval float@"); i++){
-                add_char_to_str(str, "SUB GF@retval GF@retval float@"[i]);
-            } 
-            char temp[100];
-            sprintf(temp, "%f",  token_one->attribute.float_val);
-            for(unsigned int i = 0; i < strlen(temp); i++){
-                add_char_to_str(str, temp[i]);
-            }
-            add_char_to_str(str, 10);   
-        }   
-    }
-    if(token_one->type == TOKEN_INT)
-    {  
+//     if(token_one->type == TOKEN_FLOAT)
+//     {   
+//         if(flag_while == 0)
+//         {
+//             fprintf(stdout, "SUB GF@retval GF@retval float@%a\n", token_one->attribute.float_val);
+//         }
+//         else
+//         {
+//             for(unsigned int i = 0; i < strlen("SUB GF@retval GF@retval float@"); i++){
+//                 add_char_to_str(str, "SUB GF@retval GF@retval float@"[i]);
+//             } 
+//             char temp[100];
+//             sprintf(temp, "%f",  token_one->attribute.float_val);
+//             for(unsigned int i = 0; i < strlen(temp); i++){
+//                 add_char_to_str(str, temp[i]);
+//             }
+//             add_char_to_str(str, 10);   
+//         }   
+//     }
+//     if(token_one->type == TOKEN_INT)
+//     {  
 
-        if(flag_while == 0)
-        {
-            fprintf(stdout, "DEFVAR LF@TMPF2INT\n");
-            fprintf(stdout, "MOVE LF@TMPF2INT int@%d\n", token_one->attribute.int_val);
-            fprintf(stdout, "INT2FLOAT TF@%%TMPF2INT TF@%%TMPF2INT\n");
-            fprintf(stdout, "SUB GF@retval GF@retval TF@%%TMPF2INT\n");
-        }
-        else
-        {
-            for(unsigned int i = 0; i < strlen("DEFVAR LF@TMPF2INT\nMOVE LF@TMPF2INT int@"); i++){
-                add_char_to_str(str, "DEFVAR LF@TMPF2INT\nMOVE LF@TMPF2INT int@"[i]);
-            } 
-            char temp[100];
-            sprintf(temp, "%d",  token_one->attribute.int_val);
-            for(unsigned int i = 0; i < strlen(temp); i++){
-                add_char_to_str(str, temp[i]);
-            }
-            add_char_to_str(str, 10);   
-            for(unsigned int i = 0; i < strlen("INT2FLOAT TF@%%TMPF2INT TF@%%TMPF2INT\nSUB GF@retval GF@retval TF@%%TMPF2INT\n"); i++){
-                add_char_to_str(str, "INT2FLOAT TF@%%TMPF2INT TF@%%TMPF2INT\nSUB GF@retval GF@retval TF@%%TMPF2INT\n"[i]);
-            } 
-        }
+//         if(flag_while == 0)
+//         {
+//             fprintf(stdout, "DEFVAR LF@TMPF2INT\n");
+//             fprintf(stdout, "MOVE LF@TMPF2INT int@%d\n", token_one->attribute.int_val);
+//             fprintf(stdout, "INT2FLOAT TF@%%TMPF2INT TF@%%TMPF2INT\n");
+//             fprintf(stdout, "SUB GF@retval GF@retval TF@%%TMPF2INT\n");
+//         }
+//         else
+//         {
+//             for(unsigned int i = 0; i < strlen("DEFVAR LF@TMPF2INT\nMOVE LF@TMPF2INT int@"); i++){
+//                 add_char_to_str(str, "DEFVAR LF@TMPF2INT\nMOVE LF@TMPF2INT int@"[i]);
+//             } 
+//             char temp[100];
+//             sprintf(temp, "%d",  token_one->attribute.int_val);
+//             for(unsigned int i = 0; i < strlen(temp); i++){
+//                 add_char_to_str(str, temp[i]);
+//             }
+//             add_char_to_str(str, 10);   
+//             for(unsigned int i = 0; i < strlen("INT2FLOAT TF@%%TMPF2INT TF@%%TMPF2INT\nSUB GF@retval GF@retval TF@%%TMPF2INT\n"); i++){
+//                 add_char_to_str(str, "INT2FLOAT TF@%%TMPF2INT TF@%%TMPF2INT\nSUB GF@retval GF@retval TF@%%TMPF2INT\n"[i]);
+//             } 
+//         }
         
-    }
-    if(token_one->type == TOKEN_ID)
-    {
-        if(flag_while == 0)
-        {
-            fprintf(stdout, "SUB GF@retval GF@retval %s@%s\n", s,token_one->attribute.string);
-        }else
-        {
-            for(unsigned int i = 0; i < strlen("SUB GF@retval GF@retval"); i++){
-                add_char_to_str(str, "SUB GF@retval GF@retval"[i]);
-            } 
-            for(unsigned int i = 0; i < strlen(s); i++){
-                add_char_to_str(str, s[i]);
-            }
-            for(unsigned int i = 0; i < strlen("@"); i++){
-                add_char_to_str(str, "@"[i]);
-            } 
-            for(unsigned int i = 0; i < strlen(token_one->attribute.string); i++){
-                add_char_to_str(str, token_one->attribute.string[i]);
-            }
-            add_char_to_str(str, 10);  
-        }
+//     }
+//     if(token_one->type == TOKEN_ID)
+//     {
+//         if(flag_while == 0)
+//         {
+//             fprintf(stdout, "SUB GF@retval GF@retval %s@%s\n", s,token_one->attribute.string);
+//         }else
+//         {
+//             for(unsigned int i = 0; i < strlen("SUB GF@retval GF@retval"); i++){
+//                 add_char_to_str(str, "SUB GF@retval GF@retval"[i]);
+//             } 
+//             for(unsigned int i = 0; i < strlen(s); i++){
+//                 add_char_to_str(str, s[i]);
+//             }
+//             for(unsigned int i = 0; i < strlen("@"); i++){
+//                 add_char_to_str(str, "@"[i]);
+//             } 
+//             for(unsigned int i = 0; i < strlen(token_one->attribute.string); i++){
+//                 add_char_to_str(str, token_one->attribute.string[i]);
+//             }
+//             add_char_to_str(str, 10);  
+//         }
         
 
         
-    }
-    //There is no string sub
-    //if(token_one->type == TOKEN_STRING){
-        if(flag_while == 0)
-        {
-             fprintf(stdout, "CONCAT GF@retval GF@retval@ %s\n",token_one->attribute.string);
-        }
-        else
-        {
-            for(unsigned int i = 0; i < strlen("CONCAT GF@retval GF@retval "); i++){
-                add_char_to_str(str, "ADD GF@retval GF@retval "[i]);
-            } 
-            for(unsigned int i = 0; i < strlen(token_one->attribute.string); i++){
-                add_char_to_str(str, token_one->attribute.string[i]);
-            }
-            add_char_to_str(str, 10);   
-        }   
+//     }
+//     //There is no string sub
+//     //if(token_one->type == TOKEN_STRING){
+//         if(flag_while == 0)
+//         {
+//              fprintf(stdout, "CONCAT GF@retval GF@retval@ %s\n",token_one->attribute.string);
+//         }
+//         else
+//         {
+//             for(unsigned int i = 0; i < strlen("CONCAT GF@retval GF@retval "); i++){
+//                 add_char_to_str(str, "ADD GF@retval GF@retval "[i]);
+//             } 
+//             for(unsigned int i = 0; i < strlen(token_one->attribute.string); i++){
+//                 add_char_to_str(str, token_one->attribute.string[i]);
+//             }
+//             add_char_to_str(str, 10);   
+//         }   
        
-    //}       
-}
+//     //}       
+// }
 
 
 //Функия посчитает и запишет в помоцную переменную valueforcouing все что вы туда пошлете(div)
-void func_div(struct token_s *token_one, char *s,struct dynamic_string *str){
-    if(token_one->type == TOKEN_FLOAT)
-    {   
-        if(flag_while == 0)
-        {
-            fprintf(stdout, "DIV GF@retval GF@retval float@%a\n", token_one->attribute.float_val);
-        }
-        else
-        {
-            for(unsigned int i = 0; i < strlen("DIV GF@retval GF@retval float@"); i++){
-                add_char_to_str(str, "DIV GF@retval GF@retval float@"[i]);
-            } 
-            char temp[100];
-            sprintf(temp, "%f",  token_one->attribute.float_val);
-            for(unsigned int i = 0; i < strlen(temp); i++){
-                add_char_to_str(str, temp[i]);
-            }
-            add_char_to_str(str, 10);   
-        }   
-    }
-    if(token_one->type == TOKEN_INT)
-    {  
+// void func_div(struct token_s *token_one, char *s,struct dynamic_string *str){
+//     if(token_one->type == TOKEN_FLOAT)
+//     {   
+//         if(flag_while == 0)
+//         {
+//             fprintf(stdout, "DIV GF@retval GF@retval float@%a\n", token_one->attribute.float_val);
+//         }
+//         else
+//         {
+//             for(unsigned int i = 0; i < strlen("DIV GF@retval GF@retval float@"); i++){
+//                 add_char_to_str(str, "DIV GF@retval GF@retval float@"[i]);
+//             } 
+//             char temp[100];
+//             sprintf(temp, "%f",  token_one->attribute.float_val);
+//             for(unsigned int i = 0; i < strlen(temp); i++){
+//                 add_char_to_str(str, temp[i]);
+//             }
+//             add_char_to_str(str, 10);   
+//         }   
+//     }
+//     if(token_one->type == TOKEN_INT)
+//     {  
 
-        if(flag_while == 0)
-        { 
-            fprintf(stdout, "DEFVAR LF@TMPF2INT\n");
-            fprintf(stdout, "MOVE LF@TMPF2INT int@%d\n", token_one->attribute.int_val);
-            fprintf(stdout, "INT2FLOAT TF@%%TMPF2INT TF@%%TMPF2INT\n");
-            fprintf(stdout, "DIV GF@retval GF@retval TF@%%TMPF2INT\n");
-        }
-        else
-        {
-            for(unsigned int i = 0; i < strlen("DEFVAR LF@TMPF2INT\nMOVE LF@TMPF2INT int@"); i++){
-                add_char_to_str(str, "DEFVAR LF@TMPF2INT\nMOVE LF@TMPF2INT int@"[i]);
-            } 
-            char temp[100];
-            sprintf(temp, "%d",  token_one->attribute.int_val);
-            for(unsigned int i = 0; i < strlen(temp); i++){
-                add_char_to_str(str, temp[i]);
-            }
-            add_char_to_str(str, 10);   
-            for(unsigned int i = 0; i < strlen("INT2FLOAT TF@%%TMPF2INT TF@%%TMPF2INT\nDIV GF@retval GF@retval TF@%%TMPF2INT\n"); i++){
-                add_char_to_str(str, "INT2FLOAT TF@%%TMPF2INT TF@%%TMPF2INT\nDIV GF@retval GF@retval TF@%%TMPF2INT\n"[i]);
-            } 
-        }
+//         if(flag_while == 0)
+//         { 
+//             fprintf(stdout, "DEFVAR LF@TMPF2INT\n");
+//             fprintf(stdout, "MOVE LF@TMPF2INT int@%d\n", token_one->attribute.int_val);
+//             fprintf(stdout, "INT2FLOAT TF@%%TMPF2INT TF@%%TMPF2INT\n");
+//             fprintf(stdout, "DIV GF@retval GF@retval TF@%%TMPF2INT\n");
+//         }
+//         else
+//         {
+//             for(unsigned int i = 0; i < strlen("DEFVAR LF@TMPF2INT\nMOVE LF@TMPF2INT int@"); i++){
+//                 add_char_to_str(str, "DEFVAR LF@TMPF2INT\nMOVE LF@TMPF2INT int@"[i]);
+//             } 
+//             char temp[100];
+//             sprintf(temp, "%d",  token_one->attribute.int_val);
+//             for(unsigned int i = 0; i < strlen(temp); i++){
+//                 add_char_to_str(str, temp[i]);
+//             }
+//             add_char_to_str(str, 10);   
+//             for(unsigned int i = 0; i < strlen("INT2FLOAT TF@%%TMPF2INT TF@%%TMPF2INT\nDIV GF@retval GF@retval TF@%%TMPF2INT\n"); i++){
+//                 add_char_to_str(str, "INT2FLOAT TF@%%TMPF2INT TF@%%TMPF2INT\nDIV GF@retval GF@retval TF@%%TMPF2INT\n"[i]);
+//             } 
+//         }
         
-    }
-    if(token_one->type == TOKEN_ID)
-    {
-        if(flag_while == 0)
-        {
-            fprintf(stdout, "DIV GF@retval GF@retval %s@%s\n", s,token_one->attribute.string);
-        }else
-        {
-            for(unsigned int i = 0; i < strlen("DIV GF@retval GF@retval"); i++){
-                add_char_to_str(str, "DIV GF@retval GF@retval"[i]);
-            } 
-            for(unsigned int i = 0; i < strlen(s); i++){
-                add_char_to_str(str, s[i]);
-            }
-            for(unsigned int i = 0; i < strlen("@"); i++){
-                add_char_to_str(str, "@"[i]);
-            } 
-            for(unsigned int i = 0; i < strlen(token_one->attribute.string); i++){
-                add_char_to_str(str, token_one->attribute.string[i]);
-            }
-            add_char_to_str(str, 10);  
-        }
+//     }
+//     if(token_one->type == TOKEN_ID)
+//     {
+//         if(flag_while == 0)
+//         {
+//             fprintf(stdout, "DIV GF@retval GF@retval %s@%s\n", s,token_one->attribute.string);
+//         }else
+//         {
+//             for(unsigned int i = 0; i < strlen("DIV GF@retval GF@retval"); i++){
+//                 add_char_to_str(str, "DIV GF@retval GF@retval"[i]);
+//             } 
+//             for(unsigned int i = 0; i < strlen(s); i++){
+//                 add_char_to_str(str, s[i]);
+//             }
+//             for(unsigned int i = 0; i < strlen("@"); i++){
+//                 add_char_to_str(str, "@"[i]);
+//             } 
+//             for(unsigned int i = 0; i < strlen(token_one->attribute.string); i++){
+//                 add_char_to_str(str, token_one->attribute.string[i]);
+//             }
+//             add_char_to_str(str, 10);  
+//         }
         
 
         
-    }
-    //There is no string sub
-    //if(token_one->type == TOKEN_STRING){
-        if(flag_while == 0)
-        {
-             fprintf(stdout, "CONCAT GF@retval GF@retval@ %s\n",token_one->attribute.string);
-        }
-        else
-        {
-            for(unsigned int i = 0; i < strlen("CONCAT GF@retval GF@retval "); i++){
-                add_char_to_str(str, "ADD GF@retval GF@retval "[i]);
-            } 
-            for(unsigned int i = 0; i < strlen(token_one->attribute.string); i++){
-                add_char_to_str(str, token_one->attribute.string[i]);
-            }
-            add_char_to_str(str, 10);   
-        }   
+//     }
+//     //There is no string sub
+//     //if(token_one->type == TOKEN_STRING){
+//         if(flag_while == 0)
+//         {
+//              fprintf(stdout, "CONCAT GF@retval GF@retval@ %s\n",token_one->attribute.string);
+//         }
+//         else
+//         {
+//             for(unsigned int i = 0; i < strlen("CONCAT GF@retval GF@retval "); i++){
+//                 add_char_to_str(str, "ADD GF@retval GF@retval "[i]);
+//             } 
+//             for(unsigned int i = 0; i < strlen(token_one->attribute.string); i++){
+//                 add_char_to_str(str, token_one->attribute.string[i]);
+//             }
+//             add_char_to_str(str, 10);   
+//         }   
        
-    //}  
-}
-void func_int_div(struct token_s *token_one,struct dynamic_string *str){
+//     //}  
+// }
+// void func_int_div(struct token_s *token_one,struct dynamic_string *str){
 
-    if(flag_while == 0)
-    {
-        fprintf(stdout, "INT2FLOAT GF@retval GF@retval\n");
-    }
-    else
-    {
-        for(unsigned int i = 0; i < strlen("INT2FLOAT GF@retval GF@retval\n"); i++){
-            add_char_to_str(str, "INT2FLOAT GF@retval GF@retval\n"[i]);
-        } 
-    }
+//     if(flag_while == 0)
+//     {
+//         fprintf(stdout, "INT2FLOAT GF@retval GF@retval\n");
+//     }
+//     else
+//     {
+//         for(unsigned int i = 0; i < strlen("INT2FLOAT GF@retval GF@retval\n"); i++){
+//             add_char_to_str(str, "INT2FLOAT GF@retval GF@retval\n"[i]);
+//         } 
+//     }
     
 
    
-    if(token_one->type == TOKEN_INT)
-    {
-        if(flag_while == 0)
-        {        
-            fprintf(stdout, "DEFVAR LF@TMPF2INT\n");
-            fprintf(stdout, "MOVE LF@TMPF2INT int@%d\n", token_one->attribute.int_val);
-            fprintf(stdout, "INT2FLOAT TF@%%TMPF2INT TF@%%TMPF2INT\n");
-            fprintf(stdout, "DIV GF@retval GF@retval TF@%%TMPF2INT\n");
-        }
-        else
-        {
-        for(unsigned int i = 0; i < strlen("DEFVAR LF@TMPF2INT\nMOVE LF@TMPF2INT int@"); i++){
-            add_char_to_str(str, "DEFVAR LF@TMPF2INT\nMOVE LF@TMPF2INT int@"[i]);
-        } 
-        char temp[100];
-        sprintf(temp, "%d", token_one->attribute.int_val);
-        for(unsigned int i = 0; i < strlen(temp); i++){
-            add_char_to_str(str, temp[i]);
-        }
-        add_char_to_str(str, 10);
-        }
-       for(unsigned int i = 0; i < strlen("INT2FLOAT TF@%%TMPF2INT TF@%%TMPF2INT\nDIV GF@retval GF@retval TF@%%TMPF2INT\n"); i++){
-            add_char_to_str(str, "INT2FLOAT TF@%%TMPF2INT TF@%%TMPF2INT\nDIV GF@retval GF@retval TF@%%TMPF2INT\n"[i]);
-        } 
-        
-
-
-    }
-    if(token_one->type == TOKEN_FLOAT)
-    {
-        if(flag_while == 0)
-        {
-            fprintf(stdout, "DIV GF@retval GF@retval float@%a\n",token_one->attribute.float_val);
-        }
-        else
-        {
-            for(unsigned int i = 0; i < strlen("DIV GF@retval GF@retval float"); i++){
-                add_char_to_str(str, "DIV GF@retval GF@retval float"[i]);
-            } 
-            char temp[100];
-            sprintf(temp, "%f", token_one->attribute.float_val);
-            for(unsigned int i = 0; i < strlen(temp); i++){
-                add_char_to_str(str, temp[i]);
-            }
-            add_char_to_str(str, 10);
-        }
-        
-        
-    }
-    if(flag_while == 0)
-    {
-        fprintf(stdout, "FLOAT2INTS GF@retval GF@retval\n");
-    }
-    else
-    {
-        for(unsigned int i = 0; i < strlen("FLOAT2INTS GF@retval GF@retval\n"); i++){
-            add_char_to_str(str, "FLOAT2INTS GF@retval GF@retval\n"[i]);
-        } 
-    }
-    
-
-      
-}
+//     if(token_one->type == TOKEN_INT)
+//     {
+//         if(flag_while == 0)
+//         {        
+//             fprintf(stdout, "DEFVAR LF@TMPF2INT\n");
+//             fprintf(stdout, "MOVE LF@TMPF2INT int@%d\n", token_one->attribute.int_val);
+//             fprintf(stdout, "INT2FLOAT TF@%%TMPF2INT TF@%%TMPF2INT\n");
+//             fprintf(stdout, "DIV GF@retval GF@retval TF@%%TMPF2INT\n");
+//         }
+//         else
+//         {
+//         for(unsigned int i = 0; i < strlen("DEFVAR LF@TMPF2INT\nMOVE LF@TMPF2INT int@"); i++){
+//             add_char_to_str(str, "DEFVAR LF@TMPF2INT\nMOVE LF@TMPF2INT int@"[i]);
+//         } 
+//         char temp[100];
+//         sprintf(temp, "%d", token_one->attribute.int_val);
+//         for(unsigned int i = 0; i < strlen(temp); i++){
+//             add_char_to_str(str, temp[i]);
+//         }
+//         add_char_to_str(str, 10);
+//         }
+//        for(unsigned int i = 0; i < strlen("INT2FLOAT TF@%%TMPF2INT TF@%%TMPF2INT\nDIV GF@retval GF@retval TF@%%TMPF2INT\n"); i++){
+//             add_char_to_str(str, "INT2FLOAT TF@%%TMPF2INT TF@%%TMPF2INT\nDIV GF@retval GF@retval TF@%%TMPF2INT\n"[i]);
+//         } 
+//     }
+//     if(token_one->type == TOKEN_FLOAT)
+//     {
+//         if(flag_while == 0)
+//         {
+//             fprintf(stdout, "DIV GF@retval GF@retval float@%a\n",token_one->attribute.float_val);
+//         }
+//         else
+//         {
+//             for(unsigned int i = 0; i < strlen("DIV GF@retval GF@retval float"); i++){
+//                 add_char_to_str(str, "DIV GF@retval GF@retval float"[i]);
+//             } 
+//             char temp[100];
+//             sprintf(temp, "%f", token_one->attribute.float_val);
+//             for(unsigned int i = 0; i < strlen(temp); i++){
+//                 add_char_to_str(str, temp[i]);
+//             }
+//             add_char_to_str(str, 10);
+//         }
+//     }
+//     if(flag_while == 0)
+//     {
+//         fprintf(stdout, "FLOAT2INTS GF@retval GF@retval\n");
+//     }
+//     else
+//     {
+//         for(unsigned int i = 0; i < strlen("FLOAT2INTS GF@retval GF@retval\n"); i++){
+//             add_char_to_str(str, "FLOAT2INTS GF@retval GF@retval\n"[i]);
+//         } 
+//     }
+// }
 
 
 // PASHA`S FUNCTIONS //
@@ -2074,16 +2066,178 @@ void prec_an_operator(struct token_s *token, struct dynamic_string *str){
     case TOKEN_MULTIPLY:
         break;
     case TOKEN_EQUAL:
+        printf("POPS GF@prec_var_temp_1\n");
+        printf("TYPE GF@type_var_1 GF@prec_var_temp_1\n");
+        printf("POPS GF@prec_var_temp_2\n");
+        printf("TYPE GF@type_var_2 GF@prec_var_temp_2\n");
+
+        printf("JUMPIFEQ $EQ_SKIP_%d GF@type_var_1 GF@type_var_2\n", skip_counter);
+
+        printf("JUMPIFNEQ $skip_eq_%d GF@type_var_1 string@string\n", skip_counter);
+        printf("EXIT 4\n");
+        printf("LABEL $skip_eq_%d\n", skip_counter);
+
+        printf("JUMPIFNEQ $skip_eq_2_%d GF@type_var_2 string@string\n", skip_counter);
+        printf("EXIT 4\n");
+        printf("LABEL $skip_eq_2_%d\n", skip_counter);
+
+        printf("JUMPIFEQ $EQ_SKIP_%d GF@type_var_1 GF@type_var_2\n", skip_counter);
+        printf("INT2FLOAT GF@prec_var_temp_1 GF@prec_var_temp_1\n");
+        printf("JUMP $EQ_SKIP_%d\n", skip_counter);
+        printf("LABEL $skip_eq_%d\n", skip_counter);
+        printf("INT2FLOAT GF@prec_var_temp_2 GF@prec_var_temp_2\n");
+
+        printf("LABEL $EQ_SKIP_%d\n", skip_counter);
+
+        printf("SUB GF@prec_var_temp_1 GF@prec_var_temp_2 GF@prec_var_temp_1\n");
+
+        printf("PUSHS GF@prec_var_temp_1\n");
+        skip_counter++;
         break;
     case TOKEN_NOT_EQUAL:
+        printf("POPS GF@prec_var_temp_1\n");
+        printf("TYPE GF@type_var_1 GF@prec_var_temp_1\n");
+        printf("POPS GF@prec_var_temp_2\n");
+        printf("TYPE GF@type_var_2 GF@prec_var_temp_2\n");
+
+        printf("JUMPIFEQ $NE_SKIP_%d GF@type_var_1 GF@type_var_2\n", skip_counter);
+
+        printf("JUMPIFNEQ $skip_ne_%d GF@type_var_1 string@string\n", skip_counter);
+        printf("EXIT 4\n");
+        printf("LABEL $skip_ne_%d\n", skip_counter);
+
+        printf("JUMPIFNEQ $skip_ne_2_%d GF@type_var_2 string@string\n", skip_counter);
+        printf("EXIT 4\n");
+        printf("LABEL $skip_ne_2_%d\n", skip_counter);
+
+        printf("JUMPIFEQ $NE_SKIP_%d GF@type_var_1 GF@type_var_2\n", skip_counter);
+        printf("INT2FLOAT GF@prec_var_temp_1 GF@prec_var_temp_1\n");
+        printf("JUMP $NE_SKIP_%d\n", skip_counter);
+        printf("LABEL $skip_ne_%d\n", skip_counter);
+        printf("INT2FLOAT GF@prec_var_temp_2 GF@prec_var_temp_2\n");
+
+        printf("LABEL $NE_SKIP_%d\n", skip_counter);
+
+        printf("SUB GF@prec_var_temp_1 GF@prec_var_temp_2 GF@prec_var_temp_1\n");
+
+        printf("PUSHS GF@prec_var_temp_1\n");
+        skip_counter++;
         break;
     case TOKEN_LESS:
+        printf("POPS GF@prec_var_temp_1\n");
+        printf("TYPE GF@type_var_1 GF@prec_var_temp_1\n");
+        printf("POPS GF@prec_var_temp_2\n");
+        printf("TYPE GF@type_var_2 GF@prec_var_temp_2\n");
+
+        printf("JUMPIFEQ $LS_SKIP_%d GF@type_var_1 GF@type_var_2\n", skip_counter);
+
+        printf("JUMPIFNEQ $skip_ls_%d GF@type_var_1 string@string\n", skip_counter);
+        printf("EXIT 4\n");
+        printf("LABEL $skip_ls_%d\n", skip_counter);
+
+        printf("JUMPIFNEQ $skip_ls_2_%d GF@type_var_2 string@string\n", skip_counter);
+        printf("EXIT 4\n");
+        printf("LABEL $skip_ls_2_%d\n", skip_counter);
+
+        printf("JUMPIFEQ $LS_SKIP_%d GF@type_var_1 GF@type_var_2\n", skip_counter);
+        printf("INT2FLOAT GF@prec_var_temp_1 GF@prec_var_temp_1\n");
+        printf("JUMP $LS_SKIP_%d\n", skip_counter);
+        printf("LABEL $skip_ls_%d\n", skip_counter);
+        printf("INT2FLOAT GF@prec_var_temp_2 GF@prec_var_temp_2\n");
+
+        printf("LABEL $LS_SKIP_%d\n", skip_counter);
+
+        printf("SUB GF@prec_var_temp_1 GF@prec_var_temp_2 GF@prec_var_temp_1\n");
+
+        printf("PUSHS GF@prec_var_temp_1\n");
+        skip_counter++;
         break;
     case TOKEN_GREATER:
+        printf("POPS GF@prec_var_temp_1\n");
+        printf("TYPE GF@type_var_1 GF@prec_var_temp_1\n");
+        printf("POPS GF@prec_var_temp_2\n");
+        printf("TYPE GF@type_var_2 GF@prec_var_temp_2\n");
+
+        printf("JUMPIFEQ $GT_SKIP_%d GF@type_var_1 GF@type_var_2\n", skip_counter);
+
+        printf("JUMPIFNEQ $skip_gt_%d GF@type_var_1 string@string\n", skip_counter);
+        printf("EXIT 4\n");
+        printf("LABEL $skip_gt_%d\n", skip_counter);
+
+        printf("JUMPIFNEQ $skip_gt_2_%d GF@type_var_2 string@string\n", skip_counter);
+        printf("EXIT 4\n");
+        printf("LABEL $skip_gt_2_%d\n", skip_counter);
+
+        printf("JUMPIFEQ $GT_SKIP_%d GF@type_var_1 GF@type_var_2\n", skip_counter);
+        printf("INT2FLOAT GF@prec_var_temp_1 GF@prec_var_temp_1\n");
+        printf("JUMP $GT_SKIP_%d\n", skip_counter);
+        printf("LABEL $skip_gt_%d\n", skip_counter);
+        printf("INT2FLOAT GF@prec_var_temp_2 GF@prec_var_temp_2\n");
+
+        printf("LABEL $GT_SKIP_%d\n", skip_counter);
+
+        printf("SUB GF@prec_var_temp_1 GF@prec_var_temp_2 GF@prec_var_temp_1\n");
+
+        printf("PUSHS GF@prec_var_temp_1\n");
+        skip_counter++;
         break;
     case TOKEN_LESS_EQ:
+        printf("POPS GF@prec_var_temp_1\n");
+        printf("TYPE GF@type_var_1 GF@prec_var_temp_1\n");
+        printf("POPS GF@prec_var_temp_2\n");
+        printf("TYPE GF@type_var_2 GF@prec_var_temp_2\n");
+
+        printf("JUMPIFEQ $LS_EQ_SKIP_%d GF@type_var_1 GF@type_var_2\n", skip_counter);
+
+        printf("JUMPIFNEQ $skip_ls_eq_%d GF@type_var_1 string@string\n", skip_counter);
+        printf("EXIT 4\n");
+        printf("LABEL $skip_ls_eq_%d\n", skip_counter);
+
+        printf("JUMPIFNEQ $skip_ls_eq_2_%d GF@type_var_2 string@string\n", skip_counter);
+        printf("EXIT 4\n");
+        printf("LABEL $skip_ls_eq_2_%d\n", skip_counter);
+
+        printf("JUMPIFEQ $LS_EQ_SKIP_%d GF@type_var_1 GF@type_var_2\n", skip_counter);
+        printf("INT2FLOAT GF@prec_var_temp_1 GF@prec_var_temp_1\n");
+        printf("JUMP $LS_EQ_SKIP_%d\n", skip_counter);
+        printf("LABEL $skip_ls_eq_%d\n", skip_counter);
+        printf("INT2FLOAT GF@prec_var_temp_2 GF@prec_var_temp_2\n");
+
+        printf("LABEL $LS_EQ_SKIP_%d\n", skip_counter);
+
+        printf("SUB GF@prec_var_temp_1 GF@prec_var_temp_2 GF@prec_var_temp_1\n");
+
+        printf("PUSHS GF@prec_var_temp_1\n");
+        skip_counter++;
         break;
     case TOKEN_GREATER_EQ:
+        printf("POPS GF@prec_var_temp_1\n");
+        printf("TYPE GF@type_var_1 GF@prec_var_temp_1\n");
+        printf("POPS GF@prec_var_temp_2\n");
+        printf("TYPE GF@type_var_2 GF@prec_var_temp_2\n");
+
+        printf("JUMPIFEQ $GT_EQ_SKIP_%d GF@type_var_1 GF@type_var_2\n", skip_counter);
+
+        printf("JUMPIFNEQ $skip_gt_eq_%d GF@type_var_1 string@string\n", skip_counter);
+        printf("EXIT 4\n");
+        printf("LABEL $skip_gt_eq_%d\n", skip_counter);
+
+        printf("JUMPIFNEQ $skip_gt_eq_2_%d GF@type_var_2 string@string\n", skip_counter);
+        printf("EXIT 4\n");
+        printf("LABEL $skip_gt_eq_2_%d\n", skip_counter);
+
+        printf("JUMPIFEQ $GT_EQ_SKIP_%d GF@type_var_1 GF@type_var_2\n", skip_counter);
+        printf("INT2FLOAT GF@prec_var_temp_1 GF@prec_var_temp_1\n");
+        printf("JUMP $GT_EQ_SKIP_%d\n", skip_counter);
+        printf("LABEL $skip_gt_eq_%d\n", skip_counter);
+        printf("INT2FLOAT GF@prec_var_temp_2 GF@prec_var_temp_2\n");
+
+        printf("LABEL $GT_EQ_SKIP_%d\n", skip_counter);
+
+        printf("SUB GF@prec_var_temp_1 GF@prec_var_temp_2 GF@prec_var_temp_1\n");
+
+        printf("PUSHS GF@prec_var_temp_1\n");
+        skip_counter++;
         break;
     default:
         break;
