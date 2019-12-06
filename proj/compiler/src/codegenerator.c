@@ -2014,18 +2014,13 @@ void prec_an_operator(struct token_s *token, struct dynamic_string *str){
         printf("EXIT 4\n");
         printf("LABEL $skip_string_2_%d\n", skip_counter);
         
-        // printf("JUMPIFEQ $DIV_SKIP_%d GF@type_var_1 GF@type_var_2\n", skip_counter);
-
         printf("JUMPIFNEQ $skip_int_%d GF@type_var_1 string@int\n", skip_counter);
         printf("INT2FLOAT GF@prec_var_temp_1 GF@prec_var_temp_1\n");
-        // printf("JUMP $DIV_SKIP_%d\n", skip_counter);
         printf("LABEL $skip_int_%d\n", skip_counter);
         
         printf("JUMPIFNEQ $skip_int_2_%d GF@type_var_2 string@int\n", skip_counter);
         printf("INT2FLOAT GF@prec_var_temp_2 GF@prec_var_temp_2\n");
         printf("LABEL $skip_int_2_%d\n", skip_counter);
-
-        // printf("LABEL $DIV_SKIP_%d\n", skip_counter);
 
         printf("JUMPIFNEQ $SKIP_EXIT_0_%d GF@prec_var_temp_1 float@0x0\n", skip_counter);
         printf("EXIT 57\n");
@@ -2060,9 +2055,6 @@ void prec_an_operator(struct token_s *token, struct dynamic_string *str){
 
         printf("LABEL $MINUS_SKIP_%d\n", skip_counter);
 
-        // printf("JUMPIFNEQ $SKIP_EXIT_0_%d GF@prec_var_temp_1 float@0x0\n", skip_counter);
-        // printf("EXIT 57\n");
-        // printf("LABEL $SKIP_EXIT_0_%d\n", skip_counter);
         printf("SUB GF@prec_var_temp_1 GF@prec_var_temp_2 GF@prec_var_temp_1\n");
 
         printf("PUSHS GF@prec_var_temp_1\n");
@@ -2070,8 +2062,67 @@ void prec_an_operator(struct token_s *token, struct dynamic_string *str){
         skip_counter++;
         break;
     case TOKEN_DIV_INT:
+        printf("POPS GF@prec_var_temp_1\n");
+        printf("TYPE GF@type_var_1 GF@prec_var_temp_1\n");
+        printf("POPS GF@prec_var_temp_2\n");
+        printf("TYPE GF@type_var_2 GF@prec_var_temp_2\n");
+
+        printf("JUMPIFNEQ $skip_string_%d GF@type_var_1 string@string\n", skip_counter);
+        printf("EXIT 4\n");
+        printf("LABEL $skip_string_%d\n", skip_counter);
+        
+        printf("JUMPIFNEQ $skip_string_2_%d GF@type_var_2 string@string\n", skip_counter);
+        printf("EXIT 4\n");
+        printf("LABEL $skip_string_2_%d\n", skip_counter);
+        
+        printf("JUMPIFNEQ $skip_float_%d GF@type_var_1 string@float\n", skip_counter);
+        printf("EXIT 4\n");
+        printf("LABEL $skip_float_%d\n", skip_counter);
+        
+        printf("JUMPIFNEQ $skip_float_2_%d GF@type_var_2 string@float\n", skip_counter);
+        printf("EXIT 4\n");
+        printf("LABEL $skip_float_2_%d\n", skip_counter);
+
+        printf("JUMPIFNEQ $SKIP_EXIT_0_%d GF@prec_var_temp_1 int@0\n", skip_counter);
+        printf("EXIT 57\n");
+        printf("LABEL $SKIP_EXIT_0_%d\n", skip_counter);
+        printf("IDIV GF@prec_var_temp_1 GF@prec_var_temp_2 GF@prec_var_temp_1\n");
+
+        printf("PUSHS GF@prec_var_temp_1\n");
+        
+        skip_counter++;
         break;
     case TOKEN_MULTIPLY:
+        printf("POPS GF@prec_var_temp_1\n");
+        printf("TYPE GF@type_var_1 GF@prec_var_temp_1\n");
+        printf("POPS GF@prec_var_temp_2\n");
+        printf("TYPE GF@type_var_2 GF@prec_var_temp_2\n");
+
+        printf("JUMPIFNEQ $skip_string_%d GF@type_var_1 string@string\n", skip_counter);
+        printf("EXIT 4\n");
+        printf("LABEL $skip_string_%d\n", skip_counter);
+        
+        printf("JUMPIFNEQ $skip_string_2_%d GF@type_var_2 string@string\n", skip_counter);
+        printf("EXIT 4\n");
+        printf("LABEL $skip_string_2_%d\n", skip_counter);
+
+        printf("JUMPIFEQ $MUL_SKIP_%d GF@type_var_1 GF@type_var_2\n", skip_counter);
+        
+        printf("JUMPIFNEQ $skip_float_%d GF@type_var_1 string@int\n", skip_counter);
+        printf("INT2FLOAT GF@prec_var_temp_1 GF@prec_var_temp_1\n");
+        printf("JUMP $MUL_SKIP_%d", skip_counter);
+        printf("LABEL $skip_float_%d\n", skip_counter);
+        
+        printf("INT2FLOAT GF@prec_var_temp_2 GF@prec_var_temp_2\n");
+
+        printf("LABEL $MUL_SKIP_%d\n", skip_counter);
+
+        printf("MUL GF@prec_var_temp_1 GF@prec_var_temp_2 GF@prec_var_temp_1\n");
+
+        printf("PUSHS GF@prec_var_temp_1\n");
+        
+        skip_counter++;
+        
         break;
     case TOKEN_EQUAL:
         break;
