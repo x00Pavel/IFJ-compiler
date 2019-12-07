@@ -434,6 +434,7 @@ int func_for_id(struct token_s *token, tStack *stack, table_s *hash_table, int *
         switch (token->type){
         case TOKEN_INT:
             ret_code = preced_analyze(token, hash_table, 0, str_1, stack);
+            // printf("ret_code: %d\n", ret_code);
             if(ret_code != OK){
                 free(token_for_time.attribute.string);
                 return ret_code;
@@ -1222,7 +1223,7 @@ int func_prog(struct token_s *token, tStack *stack, int state, int ret_code, tab
                     count_of_if++; // if1, if2, if3 for other ifs
                     actual_if = count_of_if; // aktualni if/else, abychom mohli poznat ktery if/else to je
                     generate_if_head(str_1);
-                    create_returnvalue(str_1, "LF", &actual_if);
+                    // create_returnvalue(str_1, "LF", &actual_if);
                     // (void)actual_if;
                     count_of_brackets = 0;
                     ret_code = func_cond_mb(token, stack, count_of_brackets, hash_table, &count_of_params, str_1);

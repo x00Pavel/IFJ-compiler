@@ -1,9 +1,4 @@
 # Program 1: Vypocet faktorialu (iterativne)
 a = 0
-if a :
+if a > 0 :
     b = 5
-else:
-    vysl = 1
-    while a > 0:
-        vysl = vysl * a
-        a = a - 1

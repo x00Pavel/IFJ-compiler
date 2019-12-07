@@ -294,6 +294,8 @@ int reduce_rule(tDLList *list, int symbol, int top, struct token_s *token, struc
             i++;
         #endif
         prec_an_operand(frame, token, str_for_while);
+        if(token->type == TOKEN_STRING || token->type ==  TOKEN_STRING )
+            free(token->attribute.string);
         break;
     case RB:
         del_last_3(list);
@@ -494,8 +496,7 @@ int preced_analyze(struct token_s *token, table_s *hash_table, int* count_of_par
             break;
         }
         // Save previous important token
-        if(prev_token->type == TOKEN_STRING || prev_token->type ==  TOKEN_STRING )
-            free(prev_token->attribute.string);
+        
         switch (token->type){
         case TOKEN_ID:
             prev_token->type = TOKEN_ID;
@@ -531,7 +532,7 @@ int preced_analyze(struct token_s *token, table_s *hash_table, int* count_of_par
         default:
             break;
         }
-
+        
         if (!end_scan){
             if (token->type == TOKEN_ID || token->type == TOKEN_STRING){
                 free(token->attribute.string);
@@ -625,6 +626,7 @@ int preced_analyze(struct token_s *token, table_s *hash_table, int* count_of_par
                 }
         *count_of_params = 0; // free string inside function
             }
+        
     } while (!end);
     
     #ifdef DEBUG_PRECED

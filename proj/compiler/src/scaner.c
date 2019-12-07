@@ -46,7 +46,7 @@ int get_token(struct token_s *token, tStack *stack)
 {
 
     // if (!file){
-    //     
+    //     SLOG("There is no input file.Rerun with file");
     // }
 
     // string to writing down attribute
@@ -319,10 +319,11 @@ int get_token(struct token_s *token, tStack *stack)
                 }
                 else if (isdigit(c)){
                     str_clean(str);
-                    return ERR_LEXER;
+                    // SLOG("ERROR. In the begining of number cant be more then one");
                 }
                 else{
                     if(isalpha(c)){
+                        //SLOG("Wrong ID");
                         return ERR_LEXER;
                     }
                     ungetc(c,stdin);
@@ -349,6 +350,7 @@ int get_token(struct token_s *token, tStack *stack)
             }
             else{
                 if(isalpha(c)){
+                    // SLOG("Wrong indetificator");
                     return ERR_LEXER; 
                 }
                 ungetc(c,stdin);
@@ -368,7 +370,8 @@ int get_token(struct token_s *token, tStack *stack)
                 state = SCANNER_EXP;
             }
             else{
-                if(isalpha(c)){                    
+                if(isalpha(c)){
+                    // SLOG("Wrong indetificator");
                     return ERR_LEXER; 
                 }
 
@@ -388,6 +391,7 @@ int get_token(struct token_s *token, tStack *stack)
             }
             else{
                 if(isalpha(c)){
+                    // SLOG("Wrong indetificator");
                     return ERR_LEXER; 
                 }
 
@@ -503,6 +507,7 @@ int get_token(struct token_s *token, tStack *stack)
                             tmp[i] = (char)c;
                         }
                         else{
+                           // SLOG("Hexadecimal value in string must be in format '\\xAB, where A and B are integer numbers");
                             return ERR_LEXER;
                         }
                     }
@@ -535,6 +540,7 @@ int get_token(struct token_s *token, tStack *stack)
             else if (c == '\n'){
                 str_clean(str);
                 str_clean(str);
+                // SLOG("ERROR. String must be in one line!");
                 return ERR_LEXER;
             }
             else{
@@ -577,6 +583,7 @@ int get_token(struct token_s *token, tStack *stack)
                                     tmp[i] = (char)c;
                                 }
                                 else{
+                                    // SLOG("Hexadecimal value in string must be in format '\\xAB, where A and B are integer numbers");
                                 }
                             }
                             char hex;
@@ -624,6 +631,7 @@ int get_token(struct token_s *token, tStack *stack)
             }
             else{
                 str_clean(str);
+                // SLOG("ERROR. Block string must start from '\"\"\"' !");
             }
             break;
         case SCANNER_COMMENT:
@@ -678,6 +686,7 @@ int get_token(struct token_s *token, tStack *stack)
             }
             else{
                 str_clean(str);
+                // SLOG("ERROR. After '!' can be only '=' !");
             }
             break;
         case SCANNER_BRACKET:

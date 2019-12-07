@@ -2097,7 +2097,7 @@ void prec_an_def_var(){
     // }
 }
 void prec_an_operand(char *s, struct token_s *token, struct dynamic_string *str){
-    (void)str;
+    // (void)str;
     switch (token->type){
     case TOKEN_ID:
         if( flag_while == 0)
@@ -2183,7 +2183,7 @@ void prec_an_operand(char *s, struct token_s *token, struct dynamic_string *str)
     }
 }
 void prec_an_operator(token_t type, struct dynamic_string *str){
-    (void)str;
+    // (void)str;
     switch(type){
 
     case TOKEN_SUM:
