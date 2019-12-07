@@ -2106,7 +2106,7 @@ void prec_an_operand(char *s, struct token_s *token, struct dynamic_string *str)
     case TOKEN_FLOAT:
         if( flag_while == 0)
         {
-            printf("PUSHS float@%f\n", token->attribute.float_val);
+            printf("PUSHS float@%a\n", token->attribute.float_val);
             break;
         }
         else
