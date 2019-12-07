@@ -56,7 +56,7 @@ void print_id(struct token_s *token_write,char *s, struct dynamic_string *str);
 void print_space(struct dynamic_string *str);
 void print_end(struct dynamic_string *str);
 void generate_if_head(struct dynamic_string *str);
-void create_returnvalue(struct dynamic_string *str,char *s, int *t);
+//void create_returnvalue(struct dynamic_string *str);
 void select_operator(struct token_s *token,struct dynamic_string *str);
 void if_body(int *t,struct dynamic_string *str);
 void found_else(int *t,struct dynamic_string *str);
@@ -73,7 +73,4 @@ void func_mul(struct token_s *token_one, char *s, struct dynamic_string *str);
 void func_sub(struct token_s *token_one, char *s,struct dynamic_string *str);
 void func_div(struct token_s *token_one, char *s,struct dynamic_string *str);
 void func_int_div(struct token_s *token_one,struct dynamic_string *str);
-void prec_an_def_var();
-void prec_an_operand(char *s, struct token_s *token, struct dynamic_string *str);
-void prec_an_operator(token_t token, struct dynamic_string *str);
 #endif 
