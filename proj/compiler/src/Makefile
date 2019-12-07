@@ -36,3 +36,6 @@ t3:
 t4:
 	./${PROJ} < test.txt
 
+test:
+	./${PROJ} < test.txt >  test.out
+	./ic19int test.out
