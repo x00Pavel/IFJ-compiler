@@ -154,7 +154,7 @@ bool check_operand(tDLList *list){
     int i;
     DLCopyLast(list, &i);
     if(i != ID_NT){
-        printf("ERROR. NO OPERANDS\n");
+        // printf("ERROR. NO OPERANDS\n");
         end_scan = true;
         end = true;
         return false;
@@ -546,7 +546,7 @@ int preced_analyze(struct token_s *token, table_s *hash_table, int* count_of_par
                     return ret_code;
                 }    
                 if(token->type != TOKEN_EOL){
-                    fprintf(stderr, "ERROR AFTER DDOT - NOT EOL\n");
+                    // fprintf(stderr, "ERROR AFTER DDOT - NOT EOL\n");
                     end_scan = false;
                     free(scanner_stack);
                     if (prev_token->type == TOKEN_ID || prev_token->type == TOKEN_STRING){
@@ -562,7 +562,7 @@ int preced_analyze(struct token_s *token, table_s *hash_table, int* count_of_par
         if(token->type == TOKEN_ID){
             if(!htSearch(hash_table, token->attribute.string)){
                 if (!search_everywhere(hash_table, token->attribute.string)){
-                    fprintf(stderr, "ID is not in hash table\n");
+                    // fprintf(stderr, "ID is not in hash table\n");
                     end_scan = false;
                     free(scanner_stack);
                     if (prev_token->type == TOKEN_ID || prev_token->type == TOKEN_STRING)
