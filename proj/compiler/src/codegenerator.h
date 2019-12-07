@@ -56,6 +56,7 @@ void print_id(struct token_s *token_write,char *s, struct dynamic_string *str);
 void print_space(struct dynamic_string *str);
 void print_end(struct dynamic_string *str);
 void generate_if_head(struct dynamic_string *str);
+void pop_retval();
 //void create_returnvalue(struct dynamic_string *str);
 void select_operator(struct token_s *token,struct dynamic_string *str);
 void if_body(int *t,struct dynamic_string *str);

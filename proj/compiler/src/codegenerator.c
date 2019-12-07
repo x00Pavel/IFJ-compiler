@@ -28,13 +28,13 @@ static int skip_counter = 0;
 void create_functions(){
     fprintf(stdout,".IFJcode19\n");
     fprintf(stdout,"JUMP $$main\n\n");
-    fprintf(stdout,"FUNCLEN\n");
+    fprintf(stdout,"#FUNCLEN\n");
     fprintf(stdout,"PUSHFRAME\n");
     fprintf(stdout,"LABEL $len\n");
     fprintf(stdout,"DEFVAR LF@%%retval\n");
     fprintf(stdout,"STRLEN LF@%%retval LF@%%1\n");
     fprintf(stdout,"POPFRAME\n");
-    fprintf(stdout,"RETURN\n\n");
+    fprintf(stdout,"RETURN\n");
 
   fprintf(stdout, "#INPUTS\n");
     fprintf(stdout, "PUSHFRAME\n");
@@ -147,7 +147,7 @@ void create_functions(){
     fprintf(stdout,"JUMPIFEQ $substr$process_loop LF@process_loop_cond bool@true\n");   
     fprintf(stdout,"LABEL $substr$return\n");                                       
     fprintf(stdout,"POPFRAME\n");                                                       
-    fprintf(stdout,"RETURN\n\n");
+    fprintf(stdout,"RETURN\n");
 
     fprintf(stdout,"#ASCFUNCTION\n");                                                   
     fprintf(stdout,"LABEL $ord\n");                                                         
@@ -169,7 +169,7 @@ void create_functions(){
     fprintf(stdout,"STRI2INT LF@%%retval LF@%%1 LF@%%2\n");
     fprintf(stdout,"LABEL $asc$return\n");
     fprintf(stdout,"POPFRAME\n");                                                       
-    fprintf(stdout,"RETURN\n\n");
+    fprintf(stdout,"RETURN\n");
 
     fprintf(stdout,"#CHRFUNCTION\n");                                                       
     fprintf(stdout,"LABEL $chr\n");                                                         
@@ -184,12 +184,12 @@ void create_functions(){
     fprintf(stdout,"INT2CHAR LF@%%retval LF@%%1\n");                                            
     fprintf(stdout,"LABEL $chr$return\n");                                                  
     fprintf(stdout,"POPFRAME\n");                                                       
-    fprintf(stdout,"RETURN\n\n");
+    fprintf(stdout,"RETURN\n");
 
 
     fprintf(stdout,"DEFVAR GF@res\n");
     printf("DEFVAR GF@TYPEOFVAR\n");
-    fprintf(stdout, "LABEL $%%main\n");
+    fprintf(stdout, "LABEL $$main\n");
     
     // printf("#ERRORS\n");
     // printf("LABEL $INCOMPATIBLE\n");
@@ -2079,25 +2079,17 @@ void generate_while_for_true_end(int *t,struct dynamic_string *str){
 //}
 // PASHA`S FUNCTIONS //
 void prec_an_def_var(){
-   // if(flag_while == 0)
-    //{
         printf("DEFVAR GF@type_var_1\n");
         printf("DEFVAR GF@type_var_2\n");
         printf("DEFVAR GF@prec_var_eq\n");
         printf("DEFVAR GF@prec_var_temp_1\n");
         printf("DEFVAR GF@prec_var_temp_2\n");
-        fprintf(stdout, "DEFVAR GT@retval1\n");
-        fprintf(stdout, "DEFVAR GT@retval2\n"); 
-    //}
-    // else
-    // {
-    //     for(unsigned int i = 0; i < strlen("DEFVAR GF@type_var_1\nDEFVAR GF@type_var_2\nDEFVAR GF@prec_var_eq\nDEFVAR GF@prec_var_temp_2\nDEFVAR GT@retval1\nDEFVAR GT@retval2\n"); i++){
-    //         add_char_to_str(str, "DEFVAR GF@type_var_1\nDEFVAR GF@type_var_2\nDEFVAR GF@prec_var_eq\nDEFVAR GF@prec_var_temp_2\nDEFVAR GT@retval1\nDEFVAR GT@retval2\n"[i]);
-    //     } 
-    // }
+        fprintf(stdout, "DEFVAR GF@retval\n");
+        fprintf(stdout, "DEFVAR GF@retval1\n"); 
+        fprintf(stdout, "DEFVAR GF@retval2\n"); 
 }
 void prec_an_operand(char *s, struct token_s *token, struct dynamic_string *str){
-    (void)str;
+    
     switch (token->type){
     case TOKEN_ID:
         if( flag_while == 0)
@@ -3719,4 +3711,8 @@ void prec_an_operator(token_t type, struct dynamic_string *str){
     default:
         break;
     }
+}
+void pop_retval()
+{
+    fprintf(stdout, "POPS LF@retval\n");
 }
