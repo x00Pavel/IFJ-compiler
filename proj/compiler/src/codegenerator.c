@@ -186,9 +186,11 @@ void create_functions(){
     fprintf(stdout,"POPFRAME\n");                                                       
     fprintf(stdout,"RETURN\n\n");
 
+
+    fprintf(stdout,"DEFVAR GF@res\n");
     printf("DEFVAR GF@TYPEOFVAR\n");
     fprintf(stdout, "LABEL $%%main\n");
-
+    
     // printf("#ERRORS\n");
     // printf("LABEL $INCOMPATIBLE\n");
     // printf("EXIT 4\n");
@@ -958,31 +960,10 @@ void print_end(struct dynamic_string *str){
         }
     }
 
-    //здесь будет тру или фалсе в зависимоти он выследка сравнение
-    //и если булет фалсе то деламе скок 
-    void create_returnvalue(struct dynamic_string *str){
 
-
-        
-        if(flag_while == 0)
-        {////in the beggiing
-            fprintf(stdout,"DEFVAR GF@res\n");
-        }
-        // else
-        // {
-        //     for(unsigned int i = 0; i < strlen("DEFVAR GF"); i++){
-        //         add_char_to_str(str, "DEFVAR GF"[i]);
-        //     }
-        //     for(unsigned int i = 0; i < strlen("@res\n"); i++){
-        //         add_char_to_str(str, "@res\n"[i]);
-        //     }
-
-        // }  
-        
-    }
 
     //функция выбора операторов(Привет Паша)
-    //void select_operator(struct token_s *token,struct dynamic_string *str){
+    /*void select_operator(struct token_s *token,struct dynamic_string *str){
         switch (token->type)
         {
             case TOKEN_EQUAL:
@@ -1073,7 +1054,7 @@ void print_end(struct dynamic_string *str){
             default:
                 break;
         }
-    //}
+    }*/
 
 
     //эта и предыдушая фунуция выпишуь знак а потом выпишут куда нужно прыгать в случае успеха
@@ -1308,10 +1289,10 @@ void print_end(struct dynamic_string *str){
             for(unsigned int i = 0; i < strlen("LABEL end_float_"); i++){
                 add_char_to_str(str, "LABEL end_float_"[i]);
             }
-            char temp116[100];
-            sprintf(temp116, "%d", skip_counter);
-            for(unsigned int i = 0; i < strlen(temp116); i++){
-                add_char_to_str(str, temp116[i]);
+            char temp1116[100];
+            sprintf(temp1116, "%d", skip_counter);
+            for(unsigned int i = 0; i < strlen(temp1116); i++){
+                add_char_to_str(str, temp1116[i]);
             }
             for(unsigned int i = 0; i < strlen("\nMOVE GF@res bool@false\n"); i++){
                 add_char_to_str(str, "\nMOVE GF@res bool@false\n"[i]);
@@ -1319,10 +1300,10 @@ void print_end(struct dynamic_string *str){
             for(unsigned int i = 0; i < strlen("JUMP $skip_for_bool_"); i++){
                 add_char_to_str(str, "JUMP $skip_for_bool_"[i]);
             }
-            char temp117[100];
-            sprintf(temp117, "%d", skip_counter);
-            for(unsigned int i = 0; i < strlen(temp117); i++){
-                add_char_to_str(str, temp117[i]);
+            char temp1117[100];
+            sprintf(temp1117, "%d", skip_counter);
+            for(unsigned int i = 0; i < strlen(temp1117); i++){
+                add_char_to_str(str, temp1117[i]);
             }
             add_char_to_str(str, 10);
 
@@ -1446,7 +1427,7 @@ void print_end(struct dynamic_string *str){
 
     //Эта функция создает дополнительные переменные в которые будем записывать
     //то что слева от знака и справа от знака %d для того если у нас if в if
-    //void stack_operations(int *t,struct dynamic_string *str){
+    /*void stack_operations(int *t,struct dynamic_string *str){
         if(flag_while == 0)
         {
             fprintf(stdout, "DEFVAR GT@retval1\n");
@@ -1498,8 +1479,8 @@ void print_end(struct dynamic_string *str){
             for(unsigned int i = 0; i < strlen(" int@0\n"); i++){
                 add_char_to_str(str, " int@0\n"[i]);
             } 
-    //}
-}
+    //}}
+    */
 /*
  *   end of if function
  *
@@ -2107,7 +2088,7 @@ void prec_an_def_var(){
         printf("DEFVAR GF@prec_var_temp_2\n");
         fprintf(stdout, "DEFVAR GT@retval1\n");
         fprintf(stdout, "DEFVAR GT@retval2\n"); 
-    }
+    //}
     // else
     // {
     //     for(unsigned int i = 0; i < strlen("DEFVAR GF@type_var_1\nDEFVAR GF@type_var_2\nDEFVAR GF@prec_var_eq\nDEFVAR GF@prec_var_temp_2\nDEFVAR GT@retval1\nDEFVAR GT@retval2\n"); i++){
@@ -2153,9 +2134,11 @@ void prec_an_operand(char *s, struct token_s *token, struct dynamic_string *str)
             for(unsigned int i = 0; i < strlen("PUSHS int@"); i++){
                 add_char_to_str(str, "PUSHS int@"[i]);
             } 
-            for(unsigned int i = 0; i < strlen(token->attribute.int_val); i++){
-                add_char_to_str(str, token->attribute.int_val[i]);
-            }  
+            char i1[100];
+            sprintf(i1, "%d",token->attribute.int_val);
+            for(unsigned int i = 0; i < strlen(i1); i++){
+                add_char_to_str(str, i1[i]);
+            } 
             add_char_to_str(str, 10);
             break;
         }
@@ -2170,9 +2153,11 @@ void prec_an_operand(char *s, struct token_s *token, struct dynamic_string *str)
             for(unsigned int i = 0; i < strlen("PUSHS float@"); i++){
                 add_char_to_str(str, "PUSHS float@"[i]);
         } 
-            for(unsigned int i = 0; i < strlen(token->attribute.float_val); i++){
-                add_char_to_str(str, token->attribute.float_val[i]);
-        }  
+            char f1[100];
+            sprintf(f1, "%a",token->attribute.float_val);
+            for(unsigned int i = 0; i < strlen(f1); i++){
+                add_char_to_str(str, f1[i]);
+            } 
             add_char_to_str(str, 10);
             break;
         }
@@ -2246,16 +2231,16 @@ void prec_an_operator(token_t type, struct dynamic_string *str){
             }    
             char tmp14[100];
             sprintf(tmp14, "%d", skip_counter);
-            for(unsigned int i = 0; i < strlen(tmp14tmp14); i++){
+            for(unsigned int i = 0; i < strlen(tmp14); i++){
                 add_char_to_str(str, tmp14[i]);
             }
             for(unsigned int i = 0; i < strlen(" GF@type_var_1 GF@type_var_2\nJUMPIFNEQ $skip_string_"); i++){
                 add_char_to_str(str,  "GF@type_var_1 GF@type_var_2\nJUMPIFNEQ $skip_string_"[i]);
             } 
-            char tnp15[100];
-            sprintf(tnp15, "%d", skip_counter);
-            for(unsigned int i = 0; i < strlen(tnp15); i++){
-                add_char_to_str(str, tnp15[i]);
+            char tmp15[100];
+            sprintf(tmp15, "%d", skip_counter);
+            for(unsigned int i = 0; i < strlen(tmp15); i++){
+                add_char_to_str(str, tmp15[i]);
             }
             for(unsigned int i = 0; i < strlen(" GF@type_var_1 string@string\nEXIT 4\nLABEL $skip_string_"); i++){
                 add_char_to_str(str,   " GF@type_var_1 string@string\nEXIT 4\nLABEL $skip_string_"[i]);
@@ -2351,9 +2336,10 @@ void prec_an_operator(token_t type, struct dynamic_string *str){
             }
             for(unsigned int i = 0; i < strlen("\nPUSHS GF@prec_var_temp_1"); i++){
                 add_char_to_str(str,  "\nPUSHS GF@prec_var_temp_1"[i]);
-            } 
+            }
+            skip_counter++; 
             break;
-            skip_counter++;
+            
         }
 
 
@@ -2862,9 +2848,8 @@ void prec_an_operator(token_t type, struct dynamic_string *str){
                 add_char_to_str(str, tmp59[i]);
             }
             for(unsigned int i = 0; i < strlen("MUL GF@prec_var_temp_1 GF@rpec_var_temp_2 GF@prec_var_temp_1\nPUSHS GF@prec_var_temp_1\n"); i++){
-                add_char_to_str(str,   "MUL GF@prec_var_temp_1 GF@rpec_var_temp_2 GF@prec_var_temp_1\nPUSHS GF@prec_var_temp_1\n");
+                add_char_to_str(str, "MUL GF@prec_var_temp_1 GF@rpec_var_temp_2 GF@prec_var_temp_1\nPUSHS GF@prec_var_temp_1\n"[i]);
             } 
-       
             skip_counter++;
             break;
         }
@@ -2906,7 +2891,7 @@ void prec_an_operator(token_t type, struct dynamic_string *str){
         else
         {
           for(unsigned int i = 0; i < strlen("POPS GF@prec_var_temp_1\nTYPE GF@type_var_1 GF@prec_var_temp_1\nPOPS GF@prec_var_temp_2\nTYPE GF@type_var_2 GF@prec_var_temp_2\nJUMPIFNEQ $EQ_SKIP_"); i++){
-                add_char_to_str(str, "POPS GF@prec_var_temp_1\nTYPE GF@type_var_1 GF@prec_var_temp_1\nPOPS GF@prec_var_temp_2\nTYPE GF@type_var_2 GF@prec_var_temp_2\nJUMPIFNEQ $EQ_SKIP"_[i]);
+                add_char_to_str(str, "POPS GF@prec_var_temp_1\nTYPE GF@type_var_1 GF@prec_var_temp_1\nPOPS GF@prec_var_temp_2\nTYPE GF@type_var_2 GF@prec_var_temp_2\nJUMPIFNEQ $EQ_SKIP_"[i]);
             }    
             char tmp59[100];
             sprintf(tmp59, "%d", skip_counter);
@@ -3205,7 +3190,7 @@ void prec_an_operator(token_t type, struct dynamic_string *str){
         else
         {
           for(unsigned int i = 0; i < strlen("POPS GF@prec_var_temp_1\nTYPE GF@type_var_1 GF@prec_var_temp_1\nPOPS GF@prec_var_temp_2\nTYPE GF@type_var_2 GF@prec_var_temp_2\nJUMPIFNEQ $LS_SKIP_"); i++){
-                add_char_to_str(str, "POPS GF@prec_var_temp_1\nTYPE GF@type_var_1 GF@prec_var_temp_1\nPOPS GF@prec_var_temp_2\nTYPE GF@type_var_2 GF@prec_var_temp_2\nJUMPIFNEQ $LS_SKIP"_[i]);
+                add_char_to_str(str, "POPS GF@prec_var_temp_1\nTYPE GF@type_var_1 GF@prec_var_temp_1\nPOPS GF@prec_var_temp_2\nTYPE GF@type_var_2 GF@prec_var_temp_2\nJUMPIFNEQ $LS_SKIP"[i]);
             }    
             char tmp85[100];
             sprintf(tmp85, "%d", skip_counter);
