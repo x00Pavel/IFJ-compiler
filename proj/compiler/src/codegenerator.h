@@ -73,7 +73,11 @@ void func_mul(struct token_s *token_one, char *s, struct dynamic_string *str);
 void func_sub(struct token_s *token_one, char *s,struct dynamic_string *str);
 void func_div(struct token_s *token_one, char *s,struct dynamic_string *str);
 void func_int_div(struct token_s *token_one,struct dynamic_string *str);
-void prec_an_def_var();
 void prec_an_operator(token_t type, struct dynamic_string *str);
 void prec_an_operand(char *s, struct token_s *token, struct dynamic_string *str);
+void prec_an_def_var();
+void pop_retval(struct dynamic_string *str);
+void inputs_call(struct dynamic_string *str);
+void inputi_call(struct dynamic_string *str);
+void inputf_call(struct dynamic_string *str);
 #endif 

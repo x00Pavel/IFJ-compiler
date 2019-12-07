@@ -16,7 +16,7 @@ main: ${PROJ}.c
 	gcc ${CFLAGS} -D DEBUG -o ${PROJ} ${PROJ}.c ${SCANNER} ${STRING} ${SCTACK} ${TABLE} ${LINSTACK} ${PARSER} ${CODEGENERATOR} ${PREC_ANALYZE} 
 rel: ${PROJ}.c
 	gcc ${CFLAGS} -o ${PROJ} ${PROJ}.c ${SCANNER} ${STRING} ${SCTACK} ${TABLE} ${LINSTACK} ${PARSER} ${CODEGENERATOR} ${PREC_ANALYZE} 
- 
+	
 v1: 
 	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes ./${PROJ} < test1.txt  
 v2:  
@@ -37,5 +37,5 @@ t4:
 	./${PROJ} < test.txt
 
 test:
-	./${PROJ} < test.txt >  test.out
+	./ifj2019<test1.txt > test.out
 	./ic19int test.out

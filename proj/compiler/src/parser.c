@@ -96,6 +96,7 @@ int func_mb_ret(struct token_s *token, tStack *stack, table_s *hash_table, int *
         if(ret_code != OK){
             return ret_code;
         }
+        pop_retval(str_1);
         // PRECEDENCNI ANALYZA
         break;
 
@@ -171,6 +172,7 @@ int func_cond_mb(struct token_s *token, tStack *stack, int count_of_brackets, ta
             if(ret_code != OK){
                 return ret_code;
             }
+            // pop_retval();
             // printf("IM HERE\n");
             // PRECEDENCNI ANALYZA
         // }
@@ -191,6 +193,8 @@ int func_cond_mb(struct token_s *token, tStack *stack, int count_of_brackets, ta
 int check_next_token(struct token_s *token_for_time, struct token_s *token, tStack *stack, int *count_of_params, table_s *hash_table, bool flag_def, struct dynamic_string *str_1){
     int ret_code = 0;
     ret_code = get_token(token, stack);
+    // printf("inside_next_token   ret_code: %d\n", ret_code);
+    // printf("inside_next_token   token: %d\n", token->type);
     if(ret_code != OK)
         return ret_code;
     if(token->type == TOKEN_COMA){
@@ -203,8 +207,12 @@ int check_next_token(struct token_s *token_for_time, struct token_s *token, tSta
             return ret_code;
     }else if(token->type == TOKEN_R_BRACKET){
         return OK; // WE R OK
+    }else{
+        // printf("IM HERE\n");
+        // printf("ERROR_TOKEN: %d\n", token->type);
+        return ERR_SYNTAX; // ERROR, dostali jsme neco jineho nez "," nebo ")"
     }
-return ERR_SYNTAX; // ERROR, dostali jsme neco jineho nez "," nebo ")"
+return OK;
 }
 
 int func_for_atributes(struct token_s *token_for_time, struct token_s *token, tStack *stack, int *count_of_params, table_s *hash_table, bool flag_def, struct dynamic_string *str_1){
@@ -255,9 +263,13 @@ int func_for_atributes(struct token_s *token_for_time, struct token_s *token, tS
             def_function_call(token, count_of_params, "LF", str_1);
         }else{
             if(token_for_time->type == TOKEN_PRINT){
-                item = htSearch(hash_table, token->attribute.string);
-                if(item){
-                    print_id(token, "LF", str_1);
+                if(hash_table->prev_hash_table){
+                    item = htSearch(hash_table, token->attribute.string);
+                    if(item){
+                        print_id(token, "LF", str_1);
+                    }else{
+                        print_id(token, "GF", str_1);
+                    }
                 }else{
                     print_id(token, "GF", str_1);
                 }
@@ -369,12 +381,21 @@ int func_for_FNC(struct token_s *token, tStack *stack, table_s *hash_table, bool
                 free(token_for_time.attribute.string);
                 return OK; // nastala ")"
             }else if(token_for_time.type == TOKEN_INPUT_I || token_for_time.type == TOKEN_INPUT_S || token_for_time.type == TOKEN_INPUT_F){
+                if(token_for_time.type == TOKEN_INPUT_I){
+                    inputi_call(str_1);
+                }else if(token_for_time.type == TOKEN_INPUT_F){
+                    inputf_call(str_1);
+                }else if(token_for_time.type == TOKEN_INPUT_S){
+                    inputs_call(str_1);
+                }
                 return OK;
             }else if(token_for_time.type == TOKEN_PRINT){
                 return ERR_SYNTAX; // print nesmi byt bez parametru
             }
         }else{
             ret_code = func_for_atributes(&token_for_time, token, stack, count_of_params, hash_table, flag_def, str_1);
+            // printf("retcode: %d\n", ret_code);
+            // printf("token: %d\n", token_for_time.type);
             if(ret_code != OK){
                 if(token_for_time.type == TOKEN_FNC)
                     free(token_for_time.attribute.string);
@@ -385,6 +406,7 @@ int func_for_FNC(struct token_s *token, tStack *stack, table_s *hash_table, bool
                     call_function(&token_for_time, str_1);
                 free(token_for_time.attribute.string);
             }else if(token_for_time.type == TOKEN_PRINT){ // RDY
+                // printf("IM HERE\n");
                 print_end(str_1);
             }else if(token_for_time.type == TOKEN_INPUT_I || token_for_time.type == TOKEN_INPUT_S || token_for_time.type == TOKEN_INPUT_F){
                 return ERR_SYNTAX; // INPUT NESMI MIT PARAMETRY
@@ -439,6 +461,7 @@ int func_for_id(struct token_s *token, tStack *stack, table_s *hash_table, int *
                 free(token_for_time.attribute.string);
                 return ret_code;
             }
+            pop_retval(str_1);
             // printf("GENERACE OPERACI\n"); // ------------------------------------------------ 
             if(hash_table->prev_hash_table){
                 retval_assign_function(&token_for_time, "LF", str_1);
@@ -452,13 +475,13 @@ int func_for_id(struct token_s *token, tStack *stack, table_s *hash_table, int *
             if(ret_code != OK){
                 return ret_code;
             }
+            pop_retval(str_1);
             if(hash_table->prev_hash_table){
                 retval_assign_function(&token_for_time, "LF", str_1);
             }else{
                 retval_assign_function(&token_for_time, "GF", str_1);
             }
             free(token_for_time.attribute.string);
-            free(token->attribute.string); // INSIDE PREC ANALY
             break;
         case TOKEN_FLOAT:
             // PRECEDENCNI ANALYZA
@@ -466,6 +489,7 @@ int func_for_id(struct token_s *token, tStack *stack, table_s *hash_table, int *
             if(ret_code != OK){
                 return ret_code;
             }
+            pop_retval(str_1);
             if(hash_table->prev_hash_table){
                 retval_assign_function(&token_for_time, "LF", str_1);
             }else{
@@ -590,6 +614,7 @@ int func_for_id(struct token_s *token, tStack *stack, table_s *hash_table, int *
                 // printf("IM NE OK   ret_code: %d\n", ret_code);
                 return ret_code;
             }
+            pop_retval(str_1);
             // printf("IM OK\n");
             // PRECEDENCNI ANALYZA
             // printf("JA TUT\n");
@@ -859,6 +884,26 @@ int func_for_id(struct token_s *token, tStack *stack, table_s *hash_table, int *
                 }
                 free(token_for_time.attribute.string);
                 break;
+            case TOKEN_INPUT_I:                
+            case TOKEN_INPUT_S:
+            case TOKEN_INPUT_F:
+                ret_code = func_for_FNC(token, stack, hash_table, false, count_of_params, str_1);
+                if(ret_code != OK)
+                    return ret_code;
+                count_of_params = 0;
+
+                ret_code = get_token(token, stack);
+                if(ret_code != OK)
+                    return ret_code;
+                if(token->type != TOKEN_EOL && token->type != TOKEN_EOF && token->type != TOKEN_DEDEND)
+                    return ERR_SYNTAX; // ERROR MUST BE EOL or EOF or DEDENT
+                if(hash_table->prev_hash_table){
+                    retval_assign_function(&token_for_time, "LF", str_1);
+                }else{
+                    retval_assign_function(&token_for_time, "GF", str_1);
+                }
+                free(token_for_time.attribute.string);
+                break;
         default:
             free(token_for_time.attribute.string);
             return ERR_SYNTAX;
@@ -1045,10 +1090,20 @@ int func_prog(struct token_s *token, tStack *stack, int state, int ret_code, tab
                 if(token->type != TOKEN_EOL && token->type != TOKEN_EOF && token->type != TOKEN_DEDEND)
                     return ERR_SYNTAX; // ERROR MUST BE EOL or EOF or DEDENT
                 break;
-            case TOKEN_INPUT_I:
+            case TOKEN_INPUT_I:                
             case TOKEN_INPUT_S:
             case TOKEN_INPUT_F:
+                flag_def = false;
+                ret_code = func_for_FNC(token, stack, hash_table, flag_def, &count_of_params, str_1);
+                if(ret_code != OK)
+                    return ret_code;
+                count_of_params = 0;
 
+                ret_code = get_token(token, stack);
+                if(ret_code != OK)
+                    return ret_code;
+                if(token->type != TOKEN_EOL && token->type != TOKEN_EOF && token->type != TOKEN_DEDEND)
+                    return ERR_SYNTAX; // ERROR MUST BE EOL or EOF or DEDENT
                 break;
             case TOKEN_LEN: // RDY
                 // GENERACE CILOVEHO KODU
