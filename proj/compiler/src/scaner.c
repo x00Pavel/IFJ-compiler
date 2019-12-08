@@ -41,13 +41,8 @@
 
 typedef struct stack tStack;
 
-// int get_token(FILE *file, struct token_s *token, tStack *stack)
 int get_token(struct token_s *token, tStack *stack)
 {
-
-    // if (!file){
-    //     SLOG("There is no input file.Rerun with file");
-    // }
 
     // string to writing down attribute
     struct dynamic_string *str;
@@ -74,7 +69,7 @@ int get_token(struct token_s *token, tStack *stack)
         else{
             prev_sym = c;
         }
-
+        // printf("***************** state: %d -- char '%c'\n", state, c);
         switch (state){
         case SCANNER_START:
             if (c == -1){   
@@ -632,13 +627,19 @@ int get_token(struct token_s *token, tStack *stack)
             else{
                 str_clean(str);
                 // SLOG("ERROR. Block string must start from '\"\"\"' !");
+                return ERR_OTHER;
             }
             break;
         case SCANNER_COMMENT:
             if (c == '\n'){
+                if(first_token){
+                    state = SCANNER_START;
+                    break;
+                }
                 first_token = true;
-                state = SCANNER_START;
-                break;
+                token->type = TOKEN_EOL;
+                str_clean(str);
+                return OK;
             }
             break;
         case SCANNER_LESS_GREATER:
