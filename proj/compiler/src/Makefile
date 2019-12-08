@@ -39,3 +39,8 @@ t4:
 test:
 	./ifj2019<test1.txt > test.out
 	./ic19int test.out
+
+int: main 
+	./${PROJ} < test.txt > test.out
+	./ic19int test.out
+	
