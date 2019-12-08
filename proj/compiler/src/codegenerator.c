@@ -187,22 +187,10 @@ void create_functions(){
     fprintf(stdout,"RETURN\n");
 
 
-    fprintf(stdout,"DEFVAR GF@res\n");
-    printf("DEFVAR GF@TYPEOFVAR\n");
     fprintf(stdout, "LABEL $$main\n");
-    
-    // printf("#ERRORS\n");
-    // printf("LABEL $INCOMPATIBLE\n");
-    // printf("EXIT 4\n");
 
-    // printf("#CHECK_TYPE_AND_SUM\n");
-    // printf("LABEL $CHECK_TYPE_AND_SUM\n");
-    // printf("");
-    // printf("JUMPIFEQ $CONCATE GF@type_var_1 string@string\n");
-    // printf("JUMP $ADD");
-
-
-    // printf("#FUNC_FOR_CONCATE\n");
+    fprintf(stdout,"DEFVAR GF@res\n");
+    fprintf(stdout,"DEFVAR GF@TYPEOFVAR\n");    
 }
 void end_main(){
     fprintf(stdout,"# End of main scope\n");
@@ -218,7 +206,7 @@ void end_main(){
         if(flag_while == 0)
         {
             fprintf(stdout,"#Function start\n");
-            fprintf(stdout,"JUMP $exit_%s\n", token->attribute.string);//---------------------------------------------------------------------------------------------
+            fprintf(stdout,"JUMP $exit_%s\n", token->attribute.string);
             fprintf(stdout,"LABEL $%s\n", token->attribute.string);
             fprintf(stdout,"PUSHFRAME\n");
         }
@@ -331,9 +319,13 @@ void end_main(){
         }
         else
         {
-            for(unsigned int i = 0; i < strlen("POPFRAME\nRETURN\n"); i++)
+            for(unsigned int i = 0; i < strlen("POPFRAME\nRETURN\nLABEL $exit_"); i++)
             {
-                add_char_to_str(str, "POPFRAME\nRETURN\n"[i]);
+                add_char_to_str(str, "POPFRAME\nRETURN\nLABEL $exit_"[i]);
+            }
+            for(unsigned int i = 0; i < strlen("POPFRAME\n"); i++)
+            {
+                add_char_to_str(str, "POPFRAME\nRETURN\nLABEL $exit_"[i]);
             }
         }
            
@@ -849,7 +841,7 @@ void print_float(struct token_s *token_write,struct dynamic_string *str){
 //принт инта   
 void print_int(struct token_s *token_write,struct dynamic_string *str){
     if(flag_while == 0){
-        fprintf(stdout,"WRITE int@%d",token_write->attribute.int_val);
+        fprintf(stdout,"WRITE int@%d\n",token_write->attribute.int_val);
     }else{
         for(unsigned int i = 0; i < strlen("WRITE int@"); i++){
             add_char_to_str(str, "WRITE int@"[i]);
@@ -859,6 +851,7 @@ void print_int(struct token_s *token_write,struct dynamic_string *str){
         for(unsigned int i = 0; i < strlen(temp); i++){
             add_char_to_str(str, temp[i]);
         }
+        add_char_to_str(str, temp[i]);
     }
 }
 //принт стринга
@@ -1083,7 +1076,7 @@ void print_end(struct dynamic_string *str){
             printf("MOVE GF@res bool@false\n");     
 
             printf("LABEL $skip_for_bool_%d\n", skip_counter);
-            fprintf(stdout,"JUMPIFNEQ $B0DY-EL%d LF@res bool@true\n", *t);
+            fprintf(stdout,"JUMPIFNEQ $B0DY-EL%d GF@res bool@true\n", *t);
             skip_counter++;
       }
       else
@@ -1317,8 +1310,8 @@ void print_end(struct dynamic_string *str){
             for(unsigned int i = 0; i < strlen(temp118); i++){
                 add_char_to_str(str, temp118[i]);
             }
-            for(unsigned int i = 0; i < strlen(" LF@res bool@true\n"); i++){
-                add_char_to_str(str, " LF@res bool@true\n"[i]);
+            for(unsigned int i = 0; i < strlen(" GF@res bool@true\n"); i++){
+                add_char_to_str(str, " GF@res bool@true\n"[i]);
             }
             skip_counter++;
         }
@@ -1362,12 +1355,12 @@ void print_end(struct dynamic_string *str){
     void end_of_if(int *t,struct dynamic_string *str){
         if(flag_while == 0)
         {
-            fprintf(stdout,"LABEL BODY_EL%d\n", *t);
+            fprintf(stdout,"LABEL $BODY_EL%d\n", *t);
         }
         else
         {
-            for(unsigned int i = 0; i < strlen("BODY_EL"); i++){
-                add_char_to_str(str, "BODY_EL"[i]);
+            for(unsigned int i = 0; i < strlen("$BODY_EL"); i++){
+                add_char_to_str(str, "$BODY_EL"[i]);
             } 
             char temp[100];
             sprintf(temp, "%d", *t);
