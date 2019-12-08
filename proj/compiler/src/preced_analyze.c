@@ -293,7 +293,7 @@ int reduce_rule(tDLList *list, int symbol, int top, struct token_s *token, struc
             array_rules[i] = 'E';
             i++;
         #endif
-        prec_an_operand(frame, token, str_for_while);
+        // prec_an_operand(frame, token, str_for_while);
         // if(token->type == TOKEN_STRING || token->type ==  TOKEN_STRING )
         //     free(token->attribute.string);
         break;
@@ -502,19 +502,25 @@ int preced_analyze(struct token_s *token, table_s *hash_table, int* count_of_par
             prev_token->type = TOKEN_ID;
             prev_token->attribute.string = (char *)malloc(sizeof(char) * strlen(token->attribute.string) + 1);
             strcpy(prev_token->attribute.string, token->attribute.string);
+            free(token->attribute.string);
+            prec_an_operand(frame, prev_token, str);
             break;
         case TOKEN_STRING:
             prev_token->type = TOKEN_STRING;
             prev_token->attribute.string = (char *)malloc(sizeof(char) * strlen(token->attribute.string) + 1);
             strcpy(prev_token->attribute.string, token->attribute.string);
+            prec_an_operand(frame, prev_token, str);
+            free(token->attribute.string);
             break;
         case TOKEN_INT:
             prev_token->type = TOKEN_INT;
             prev_token->attribute.int_val = token->attribute.int_val;
+            prec_an_operand(frame, prev_token, str);
             break;
         case TOKEN_FLOAT:
             prev_token->type =  TOKEN_FLOAT; 
             prev_token->attribute.float_val = token->attribute.float_val;
+            prec_an_operand(frame, prev_token, str);
             break;
         // case TOKEN_EOL:
         case TOKEN_EOF:
@@ -532,11 +538,8 @@ int preced_analyze(struct token_s *token, table_s *hash_table, int* count_of_par
         default:
             break;
         }
-        
+
         if (!end_scan){
-            if (token->type == TOKEN_ID || token->type == TOKEN_STRING){
-                free(token->attribute.string);
-            }
             ret_code = get_token(token, scanner_stack);
             if(ret_code != OK){
                 return ret_code;
@@ -624,8 +627,8 @@ int preced_analyze(struct token_s *token, table_s *hash_table, int* count_of_par
                         item->param_count = *count_of_params;
                     }
                 }
-        *count_of_params = 0; // free string inside function
-            }
+            *count_of_params = 0; // free string inside function
+        }
         
     } while (!end);
     
