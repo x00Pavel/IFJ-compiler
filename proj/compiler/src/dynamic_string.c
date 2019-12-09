@@ -51,6 +51,7 @@ int realloc_string(dynamic_string_ptr *str){
 }
 
 bool add_char_to_str(dynamic_string_ptr dst, int src){
+    // printf("%s\n", dst->str);
     assert(src);
     assert(dst);
 

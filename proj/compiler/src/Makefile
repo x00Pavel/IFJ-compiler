@@ -41,6 +41,6 @@ test:
 	./ic19int test.out
 
 int: main 
-	./${PROJ} < test.txt > test.out
+	./${PROJ} < test2.txt > test.out
 	./ic19int test.out
 	

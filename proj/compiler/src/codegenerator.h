@@ -39,7 +39,7 @@ void end_main();
 void define_function_begin(struct token_s *token, struct dynamic_string *str);
 void retval_function(struct dynamic_string *str);
 void def_function_call(struct token_s *token, int *counter, char *s,struct dynamic_string *str);
-void def_function_end(struct dynamic_string *str);
+void def_function_end(struct token_s *token ,struct dynamic_string *str);
 void define_variable_GF(struct token_s *token, char *s, struct dynamic_string *str);
 void assign_to_variable(struct token_s *token,struct token_s *token_a, char *s, struct dynamic_string *str);
 void assign_to_y(struct token_s *token, char *s,struct dynamic_string *str);

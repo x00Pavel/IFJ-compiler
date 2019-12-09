@@ -216,7 +216,7 @@ int reduce_rule(tDLList *list, int symbol, int top, struct token_s *token, struc
             array_rules[i] = '*';
             i++;
         #endif
-        prec_an_operator(TOKEN_SUM, str_for_while);
+        prec_an_operator(TOKEN_MULTIPLY, str_for_while);
         break;
     case DIV:
         if(!check_operand(list)){
@@ -335,7 +335,9 @@ int reduce_rule(tDLList *list, int symbol, int top, struct token_s *token, struc
             array_rules[i] = '<';
             i++;
         #endif
+        // printf("AFTER CALL CODEGEN\n");
         prec_an_operator(TOKEN_LESS, str_for_while);
+        // printf("AFTER CALL CODEGEN\n");
         break;
     case LE:
         if (!check_operand(list)){
@@ -503,7 +505,9 @@ int preced_analyze(struct token_s *token, table_s *hash_table, int* count_of_par
             prev_token->attribute.string = (char *)malloc(sizeof(char) * strlen(token->attribute.string) + 1);
             strcpy(prev_token->attribute.string, token->attribute.string);
             free(token->attribute.string);
+            // printf("INSIDE PREC ANAL\n");
             prec_an_operand(frame, prev_token, str);
+            // printf("AFTER CALL CODEGEN\n");
             break;
         case TOKEN_STRING:
             prev_token->type = TOKEN_STRING;
