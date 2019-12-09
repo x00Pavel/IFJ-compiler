@@ -44,16 +44,12 @@ void create_functions(){
     fprintf(stdout, "DEFVAR LF@%%var\n");
     fprintf(stdout, "DEFVAR LF@%%HELPER\n");
     fprintf(stdout, "READ LF@%%var string\n");//var has yalda\n
-    //fprintf(stdout, "DEFVAR LF@%%symb1\n");//def
-    //fprintf(stdout, "STRLEN LF@%%symb1 LF@%%var\n");//lenght yalda\n = 6
-    //fprintf(stdout, "TYPE LF@$$HELPER LF@%%var");
     fprintf(stdout, "JUMPIFNEQ $exitforinputs LF@%%HELPER string@string\n");//18
-    //fprintf(stdout, "SUB LF@%%symb1 int@1");//symb1 = 5
-    //fprintf(stdout, "DEFVAR LF@%%symb2\n");
-    //fprintf(stdout, "MOVE LF@%%symb2 string@''\n");//''
-    //fprintf(stdout, "SETCHAR LF@%%var LF@%%symb1 LF@%%symb2\n");
     fprintf(stdout, "MOVE GF@retval LF@%%var\n");
-    fprintf(stdout, "LABEL $exitforunputs\n");
+    fprintf(stdout, "JUMP $EXIT_inputs\n");
+    fprintf(stdout, "LABEL $exitforinputs\n");
+    fprintf(stdout, "EXIT int@4\n");
+    fprintf(stdout, "LABEL $EXIT_inputs\n");
     fprintf(stdout, "POPFRAME\n");
     fprintf(stdout, "RETURN\n");
 
@@ -70,7 +66,10 @@ void create_functions(){
     fprintf(stdout, "MOVE LF@intstring string@int\n");//int string now has int
     fprintf(stdout, "JUMPIFNEQ $exitforinputi LF@shouldbeint LF@intstring\n");
     fprintf(stdout, "MOVE GF@retval LF@$$var\n");
+    fprintf(stdout, "JUMP $EXIT_inputi\n");
     fprintf(stdout, "LABEL $exitforinputi\n");
+    fprintf(stdout, "EXIT int@4\n");
+    fprintf(stdout, "LABEL $EXIT_inputi\n");
     fprintf(stdout, "POPFRAME\n");
     fprintf(stdout, "RETURN\n");
 
@@ -86,9 +85,12 @@ void create_functions(){
     fprintf(stdout, "READ LF@$$var float\n");//var has int value now
     fprintf(stdout, "TYPE LF@shouldbefloat LF@$$var\n");//shouldbeint now shouldbeint
     fprintf(stdout, "MOVE LF@floatstring string@float\n");//int string now has int
-    fprintf(stdout, "JUMPIFNEQ $exitforinputi LF@shouldbefloat LF@floatstring\n");
+    fprintf(stdout, "JUMPIFNEQ $exitforinputf LF@shouldbefloat LF@floatstring\n");
     fprintf(stdout, "MOVE GF@retval LF@$$var\n");
+    fprintf(stdout, "JUMP $EXIT_inputf\n");
     fprintf(stdout, "LABEL $exitforinputf\n");
+    fprintf(stdout, "EXIT int@4\n");
+    fprintf(stdout, "LABEL $EXIT_inputf\n");
     fprintf(stdout, "POPFRAME\n");
     fprintf(stdout, "RETURN\n");
 
