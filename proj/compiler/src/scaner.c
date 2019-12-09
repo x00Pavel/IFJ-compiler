@@ -613,6 +613,12 @@ int get_token(struct token_s *token, tStack *stack)
                             add_char_to_str(str, c);
                         }
                     }
+                    else if(c == ' '){
+                        add_char_to_str(str, '\\');
+                        add_char_to_str(str, '0');
+                        add_char_to_str(str, '3');
+                        add_char_to_str(str, '2');
+                    }
                     else if (c == '\n' || c == '\r'){
                         add_char_to_str(str, ' ');
                     }
