@@ -648,12 +648,19 @@ int func_for_id(struct token_s *token, tStack *stack, table_s *hash_table, int *
                     free(token_for_time.attribute.string);
                     return ret_code;
                 }
-                if(token->type != TOKEN_STRING){
+                // printf("token_type: %d \n",token->type);
+                if(token->type != TOKEN_STRING && token->type != TOKEN_ID){
                     free(token_for_time.attribute.string);
                     return ERR_SYNTAX; // MUST BE STRING
                 }
+                
                 tmp_int = 0;
-                function_call(token, &tmp_int, "TF", str_1);
+                function_call_prev(str_1);
+                if(hash_table->prev_hash_table){
+                    function_call(token, &tmp_int, "LF", str_1);
+                }else{
+                    function_call(token, &tmp_int, "GF", str_1);
+                }
                 call_inserted_functions("len", str_1);
                 free(token->attribute.string);
                 ret_code = get_token(token, stack);
@@ -683,6 +690,7 @@ int func_for_id(struct token_s *token, tStack *stack, table_s *hash_table, int *
                 break;
 
             case TOKEN_SUBSTR: // CILOVY KOD BUDE KONTROLOVAT VSECHNO, JA JEN MAM PREDAT TAM VSECHNY PARAMETRY
+                // printf("IM HERE \n");
                 ret_code = get_token(token, stack);
                 if(ret_code != OK){
                     free(token_for_time.attribute.string);
@@ -697,12 +705,17 @@ int func_for_id(struct token_s *token, tStack *stack, table_s *hash_table, int *
                     free(token_for_time.attribute.string);
                     return ret_code;
                 }
-                if(token->type != TOKEN_STRING){
+                if(token->type != TOKEN_STRING && token->type != TOKEN_ID){
                     free(token_for_time.attribute.string);
                     return ERR_SYNTAX; // MUST BE STRING
                 }
                 tmp_int = 0;
-                function_call(token, &tmp_int, "TF", str_1);
+                function_call_prev(str_1);
+                if(hash_table->prev_hash_table){
+                    function_call(token, &tmp_int, "LF", str_1);
+                }else{
+                    function_call(token, &tmp_int, "GF", str_1);
+                }
                 free(token->attribute.string);
                 ret_code = get_token(token, stack);
                 if(ret_code != OK){
@@ -718,12 +731,17 @@ int func_for_id(struct token_s *token, tStack *stack, table_s *hash_table, int *
                     free(token_for_time.attribute.string);
                     return ret_code;
                 }
-                if(token->type != TOKEN_INT){
+                if(token->type != TOKEN_INT && token->type != TOKEN_ID){
                     free(token_for_time.attribute.string);
                     return ERR_SYNTAX; // MUST BE INDEX - ZACATEK RETEZCE (INT)
                 }
                 tmp_int = 1;
-                function_call(token, &tmp_int, "TF", str_1);
+                // function_call_prev(str_1);
+                if(hash_table->prev_hash_table){
+                    function_call(token, &tmp_int, "LF", str_1);
+                }else{
+                    function_call(token, &tmp_int, "GF", str_1);
+                }
                 ret_code = get_token(token, stack);
                 if(ret_code != OK){
                     free(token_for_time.attribute.string);
@@ -738,12 +756,17 @@ int func_for_id(struct token_s *token, tStack *stack, table_s *hash_table, int *
                     free(token_for_time.attribute.string);
                     return ret_code;
                 }
-                if(token->type != TOKEN_INT){
+                if(token->type != TOKEN_INT && token->type != TOKEN_ID){
                     free(token_for_time.attribute.string);
                     return ERR_SYNTAX; // MUST BE RANGE OF NEW STRING
                 }
                 tmp_int = 2;
-                function_call(token, &tmp_int, "TF", str_1);
+                // function_call_prev(str_1);
+                if(hash_table->prev_hash_table){
+                    function_call(token, &tmp_int, "LF", str_1);
+                }else{
+                    function_call(token, &tmp_int, "GF", str_1);
+                }
                 ret_code = get_token(token, stack);
                 if(ret_code != OK){
                     free(token_for_time.attribute.string);
@@ -791,7 +814,12 @@ int func_for_id(struct token_s *token, tStack *stack, table_s *hash_table, int *
                     return ERR_SYNTAX; // MUST BE STRING
                 }
                 tmp_int = 2;
-                function_call(token, &tmp_int, "TF", str_1);
+                function_call_prev(str_1);
+                if(hash_table->prev_hash_table){
+                    function_call(token, &tmp_int, "LF", str_1);
+                }else{
+                    function_call(token, &tmp_int, "GF", str_1);
+                }
                 free(token->attribute.string);
                 ret_code = get_token(token, stack);
                 if(ret_code != OK){
@@ -812,7 +840,12 @@ int func_for_id(struct token_s *token, tStack *stack, table_s *hash_table, int *
                     return ERR_SYNTAX; // MUST BE RANGE OF NEW STRING
                 }
                 tmp_int = 1;
-                function_call(token, &tmp_int, "TF", str_1);
+                // function_call_prev(str_1);
+                if(hash_table->prev_hash_table){
+                    function_call(token, &tmp_int, "LF", str_1);
+                }else{
+                    function_call(token, &tmp_int, "GF", str_1);
+                }
                 call_inserted_functions("ord", str_1);
                 ret_code = get_token(token, stack);
                 if(ret_code != OK){
@@ -861,7 +894,12 @@ int func_for_id(struct token_s *token, tStack *stack, table_s *hash_table, int *
                     return ERR_SYNTAX;
                 }
                 tmp_int = 0;
-                function_call(token, &tmp_int, "TF", str_1);
+                function_call_prev(str_1);
+                if(hash_table->prev_hash_table){
+                    function_call(token, &tmp_int, "LF", str_1);
+                }else{
+                    function_call(token, &tmp_int, "GF", str_1);
+                }
                 call_inserted_functions("chr", str_1);
                 ret_code = get_token(token, stack);
                 if(ret_code != OK){

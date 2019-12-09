@@ -44,6 +44,7 @@ void define_variable_GF(struct token_s *token, char *s, struct dynamic_string *s
 void assign_to_variable(struct token_s *token,struct token_s *token_a, char *s, struct dynamic_string *str);
 void assign_to_y(struct token_s *token, char *s,struct dynamic_string *str);
 void token_function_begin_with_y(struct dynamic_string *str);
+void function_call_prev(struct dynamic_string *str);
 void function_call(struct token_s *token,int *counter, char *s,struct dynamic_string *str);
 void call_function(struct token_s *token,struct dynamic_string *str);
 void call_inserted_functions(char *d,struct dynamic_string *str);

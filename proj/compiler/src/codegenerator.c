@@ -32,7 +32,7 @@ void create_functions(){
     fprintf(stdout,"LABEL $len\n");
     fprintf(stdout,"PUSHFRAME\n");
     fprintf(stdout,"DEFVAR LF@%%retval\n");
-    fprintf(stdout,"STRLEN LF@%%retval LF@%%1\n");
+    fprintf(stdout,"STRLEN LF@%%retval LF@%%0\n");
     printf("MOVE GF@retval LF@%%retval\n");
     fprintf(stdout,"POPFRAME\n");
     fprintf(stdout,"RETURN\n");
@@ -106,35 +106,35 @@ void create_functions(){
     fprintf(stdout,"MOVE LF@%%retval string@\n");
     fprintf(stdout,"DEFVAR LF@length_str\n");
     fprintf(stdout,"CREATEFRAME\n");
-    fprintf(stdout,"DEFVAR TF@%%1\n");
-    fprintf(stdout,"MOVE TF@%%1 LF@%%1\n");
-    fprintf(stdout,"CALL $length\n");
+    fprintf(stdout,"DEFVAR TF@%%0\n");
+    fprintf(stdout,"MOVE TF@%%0 LF@%%0\n");
+    fprintf(stdout,"CALL $len\n");
     fprintf(stdout,"MOVE LF@length_str TF@%%retval\n");
     fprintf(stdout,"DEFVAR LF@ret_cond\n");
     fprintf(stdout,"LT LF@ret_cond LF@length_str int@0\n");
     fprintf(stdout,"JUMPIFEQ $substr$return LF@ret_cond bool@true\n");
     fprintf(stdout,"EQ LF@ret_cond LF@length_str int@0\n");
     fprintf(stdout,"JUMPIFEQ $substr$return LF@ret_cond bool@true\n");
-    fprintf(stdout,"LT LF@ret_cond LF@%%2 int@0\n");
+    fprintf(stdout,"LT LF@ret_cond LF@%%1 int@0\n");
+    fprintf(stdout,"JUMPIFEQ $substr$return LF@ret_cond bool@true\n");
+    fprintf(stdout,"EQ LF@ret_cond LF@%%1 int@0\n");
+    fprintf(stdout,"JUMPIFEQ $substr$return LF@ret_cond bool@true\n");
+    fprintf(stdout,"GT LF@ret_cond LF@%%1 LF@length_str\n");
     fprintf(stdout,"JUMPIFEQ $substr$return LF@ret_cond bool@true\n");
     fprintf(stdout,"EQ LF@ret_cond LF@%%2 int@0\n");
-    fprintf(stdout,"JUMPIFEQ $substr$return LF@ret_cond bool@true\n");
-    fprintf(stdout,"GT LF@ret_cond LF@%%2 LF@length_str\n");
-    fprintf(stdout,"JUMPIFEQ $substr$return LF@ret_cond bool@true\n");
-    fprintf(stdout,"EQ LF@ret_cond LF@%%3 int@0\n");
     fprintf(stdout,"JUMPIFEQ $substr$return LF@ret_cond bool@true\n");
     fprintf(stdout,"DEFVAR LF@max_n\n");
     fprintf(stdout,"MOVE LF@max_n LF@length_str\n");
     fprintf(stdout,"SUB LF@max_n LF@max_n LF@%%2\n");
     fprintf(stdout,"ADD LF@max_n LF@max_n int@1\n");
     fprintf(stdout,"DEFVAR LF@edit_n_cond\n");
-    fprintf(stdout,"LT LF@edit_n_cond LF@%%3 int@0\n");
+    fprintf(stdout,"LT LF@edit_n_cond LF@%%2 int@0\n");
     fprintf(stdout,"JUMPIFEQ $substr$edit_n LF@edit_n_cond bool@true\n");
-    fprintf(stdout,"GT LF@edit_n_cond LF@%%3 LF@max_n\n");
+    fprintf(stdout,"GT LF@edit_n_cond LF@%%2 LF@max_n\n");
     fprintf(stdout,"JUMPIFEQ $substr$edit_n LF@edit_n_cond bool@true\n");
     fprintf(stdout,"JUMP $substr$process\n");
     fprintf(stdout,"LABEL $substr$edit_n\n");
-    fprintf(stdout,"MOVE LF@%%3 LF@max_n\n")                                                                                                                                                                                                                                                    ;
+    fprintf(stdout,"MOVE LF@%%2 LF@max_n\n")                                                                                                                                                                                                                                                    ;
     fprintf(stdout,"LABEL $substr$process\n");
     fprintf(stdout,"DEFVAR LF@index\n");
     fprintf(stdout,"MOVE LF@index LF@%%2\n");
@@ -142,24 +142,24 @@ void create_functions(){
     fprintf(stdout,"DEFVAR LF@char\n");
     fprintf(stdout,"DEFVAR LF@process_loop_cond\n");
     fprintf(stdout,"LABEL $substr$process_loop\n");
-    fprintf(stdout,"GETCHAR LF@char LF@%%1 LF@index\n");                                    
+    fprintf(stdout,"GETCHAR LF@char LF@%%1 LF@index\n");  // what is it ? ---------------------------------------------------                                    
     fprintf(stdout,"CONCAT LF@%%retval LF@%%retval LF@char\n");
     printf("MOVE GF@retval LF@%%retval\n");                        
     fprintf(stdout,"ADD LF@index LF@index int@1\n");                                        
-    fprintf(stdout,"SUB LF@%%3 LF@%%2 int@1\n");                                            
-    fprintf(stdout,"GT LF@process_loop_cond LF@%%3 int@0\n");                           
+    fprintf(stdout,"SUB LF@%%2 LF@%%2 int@1\n");                                            
+    fprintf(stdout,"GT LF@process_loop_cond LF@%%2 int@0\n");                           
     fprintf(stdout,"JUMPIFEQ $substr$process_loop LF@process_loop_cond bool@true\n");   
     fprintf(stdout,"LABEL $substr$return\n");                                       
     fprintf(stdout,"POPFRAME\n");                                                       
     fprintf(stdout,"RETURN\n");
 
-    fprintf(stdout,"#ASCFUNCTION\n");                                                   
+    fprintf(stdout,"#ASCFUNCTION\n");                                               
     fprintf(stdout,"LABEL $ord\n");                                                         
     fprintf(stdout,"PUSHFRAME\n");                                                          
     fprintf(stdout,"DEFVAR LF@%%retval\n");                                                 
     fprintf(stdout,"MOVE LF@%%retval int@0\n");                                             
     fprintf(stdout,"DEFVAR LF@cond_length\n");                                  
-    fprintf(stdout,"LT LF@cond_length LF@%%2 int@1\n");                     
+    fprintf(stdout,"LT LF@cond_length LF@%%2 int@1\n"); // -------------------------- WHY LF%%2 ? not LF@%%0 or 1?                     
     fprintf(stdout,"JUMPIFEQ $asc$return LF@cond_length bool@true\n");
     fprintf(stdout,"DEFVAR LF@length_str\n");                                               
     fprintf(stdout,"CREATEFRAME\n");                                                            
@@ -555,14 +555,24 @@ void assign_to_variable(struct token_s *token,struct token_s *token_a, char *s, 
 
     //Эта функция дефинирует значение и прираживает им ходноту foo(a,b) мы дефинируем параметры
     //1 и 2  а потом посылаем туда значения a и b
-    void function_call(struct token_s *token,int *counter, char *s,struct dynamic_string *str){
+    void function_call_prev(struct dynamic_string *str){
+        if(flag_while == 0){
+            fprintf(stdout, "CREATEFRAME\n");
+        }else{
+            for(unsigned int i = 0; i < strlen("CREATEFRAME\n"); i++){
+                add_char_to_str(str, "CREATEFRAME\n"[i]);
+            }
+        }
+    }
+
+    void function_call(struct token_s *token,int *counter, char *s,struct dynamic_string *str){ // CHANGED ----------------------------------------------------------------------------
         switch (token->type)
         {   
             case TOKEN_INT:
                 if(flag_while == 0)
                 {
-                    fprintf(stdout, "DEFVAR %s@%%%d\n",s, *counter);
-                    fprintf(stdout, "MOVE %s@%%%d int@%d\n",s, *counter, token->attribute.int_val); 
+                    fprintf(stdout, "DEFVAR TF@%%%d\n",*counter);
+                    fprintf(stdout, "MOVE TF@%%%d int@%d\n",*counter, token->attribute.int_val); 
                     break;
                 }
                 else
@@ -784,7 +794,7 @@ void assign_to_variable(struct token_s *token,struct token_s *token_a, char *s, 
         }                              
     }
     //вызов выставене функции
-    void call_inserted_functions(char *d,struct dynamic_string *str){
+    void call_inserted_functions(char *d,struct dynamic_string *str){ // CHANGED ---------------------------------
         if(flag_while == 0)
         {
             fprintf(stdout, "CALL $%s\n", d);
@@ -2399,6 +2409,9 @@ void prec_an_operand(char *s, struct token_s *token, struct dynamic_string *str)
             add_char_to_str(str, 10);
             break;
         }
+    case TOKEN_NONE:
+            printf("PUSHS nil@nil\n");
+            break;
     default:
         break;
     }
@@ -3095,10 +3108,10 @@ void prec_an_operator(token_t type, struct dynamic_string *str){
             printf("EXIT int@4\n");
             printf("LABEL $skip_eq_2_%d\n", skip_counter);
 
-            printf("JUMPIFEQ $EQ_SKIP_%d GF@type_var_1 GF@type_var_2\n", skip_counter);
+            printf("JUMPIFNEQ $skip_eq_int_%d GF@type_var_1 string@int\n", skip_counter);
             printf("INT2FLOAT GF@prec_var_temp_1 GF@prec_var_temp_1\n");
             printf("JUMP $EQ_SKIP_%d\n", skip_counter);
-            printf("LABEL $skip_eq_%d\n", skip_counter);
+            printf("LABEL $skip_eq_int_%d\n", skip_counter);
             printf("INT2FLOAT GF@prec_var_temp_2 GF@prec_var_temp_2\n");
 
             printf("LABEL $EQ_SKIP_%d\n", skip_counter);
@@ -3228,19 +3241,19 @@ void prec_an_operator(token_t type, struct dynamic_string *str){
             printf("EXIT int@4\n");
             printf("LABEL $skip_ne_2_%d\n", skip_counter);
 
-            printf("JUMPIFEQ $NE_SKIP_%d GF@type_var_1 GF@type_var_2\n", skip_counter);
+            printf("JUMPIFNEQ $skip_neq_int_%d GF@type_var_1 string@int\n", skip_counter);
             printf("INT2FLOAT GF@prec_var_temp_1 GF@prec_var_temp_1\n");
             printf("JUMP $NE_SKIP_%d\n", skip_counter);
-            printf("LABEL $skip_ne_%d\n", skip_counter);
+            printf("LABEL $skip_neq_int_%d\n", skip_counter);
             printf("INT2FLOAT GF@prec_var_temp_2 GF@prec_var_temp_2\n");
 
             printf("LABEL $NE_SKIP_%d\n", skip_counter);
 
             printf("JUMPIFNEQ $NOT_EQUAL_%d GF@prec_var_temp_2 GF@prec_var_temp_1\n", skip_counter);
-            printf("PUSH bool@false\n");
+            printf("PUSHS bool@false\n");
             printf("JUMP $END_AFTER_NE_%d\n", skip_counter);
             printf("LABEL $NOT_EQUAL_%d\n", skip_counter);
-            printf("PUSH bool@true\n");
+            printf("PUSHS bool@true\n");
 
             printf("LABEL $END_AFTER_NE_%d\n", skip_counter);
 
@@ -3337,8 +3350,8 @@ void prec_an_operator(token_t type, struct dynamic_string *str){
             for(unsigned int i = 0; i < strlen(tmp80); i++){
                 add_char_to_str(str, tmp80[i]);
             }
-            for(unsigned int i = 0; i < strlen(" GF@prec_var_2 GF@type_var_1\nPUSH bool@false\nJUMP $END_AFTER_NE_"); i++){
-                add_char_to_str(str,   " GF@prec_var_2 GF@type_var_1\nPUSH bool@false\nJUMP $END_AFTER_NE_"[i]);
+            for(unsigned int i = 0; i < strlen(" GF@prec_var_2 GF@type_var_1\nPUSHS bool@false\nJUMP $END_AFTER_NE_"); i++){
+                add_char_to_str(str,   " GF@prec_var_2 GF@type_var_1\nPUSHS bool@false\nJUMP $END_AFTER_NE_"[i]);
             } 
             char tmp81[100];
             sprintf(tmp81, "%d", skip_counter);
@@ -3362,8 +3375,8 @@ void prec_an_operator(token_t type, struct dynamic_string *str){
                 add_char_to_str(str, tmp83[i]);
             } 
 
-            for(unsigned int i = 0; i < strlen("\nPUSH bool@true\nLABEL $END_AFTER_NE_"); i++){
-                add_char_to_str(str,   "\nPUSH bool@true\nLABEL $END_AFTER_NE_"[i]);
+            for(unsigned int i = 0; i < strlen("\nPUSHS bool@true\nLABEL $END_AFTER_NE_"); i++){
+                add_char_to_str(str,   "\nPUSHS bool@true\nLABEL $END_AFTER_NE_"[i]);
             } 
             char tmp84[100];
             sprintf(tmp84, "%d", skip_counter);
