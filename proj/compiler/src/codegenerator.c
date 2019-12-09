@@ -1050,7 +1050,7 @@ void print_end(struct dynamic_string *str){
             
             printf("JUMPIFNEQ $skip_for_NONE_%d GF@TYPEOFVAR nil@nil\n", skip_counter);
             printf("MOVE GF@res bool@false\n");
-            printf("JUMP $skip_for_float_%d\n", skip_counter);
+            printf("JUMP $skip_for_bool_%d\n", skip_counter);
             printf("LABEL $skip_for_NONE_%d\n", skip_counter);
 
             printf("JUMPIFNEQ $skip_for_int_%d GF@TYPEOFVAR string@int\n", skip_counter);
@@ -1100,16 +1100,16 @@ void print_end(struct dynamic_string *str){
             }
 
 
-            for(unsigned int i = 0; i < strlen("GF@TYPEOFVAR string@bool\nJUMPIFNEQ $skip_for_NONE_"); i++){
-                add_char_to_str(str, "GF@TYPEOFVAR string@bool\nJUMPIFNEQ $skip_for_NONE_"[i]);
+            for(unsigned int i = 0; i < strlen(" GF@TYPEOFVAR string@bool\nJUMPIFNEQ $skip_for_NONE_"); i++){
+                add_char_to_str(str, " GF@TYPEOFVAR string@bool\nJUMPIFNEQ $skip_for_NONE_"[i]);
             }
             char temp17[100];
             sprintf(temp17, "%d", skip_counter);
             for(unsigned int i = 0; i < strlen(temp17); i++){
                 add_char_to_str(str, temp17[i]);
             }
-           for(unsigned int i = 0; i < strlen(" GF@TYPEOFVAR nil@nil\nMOVE GF@res bool@false\nJUMP $skip_for_float_"); i++){
-                add_char_to_str(str, " GF@TYPEOFVAR nil@nil\nMOVE GF@res bool@false\nJUMP $skip_for_float_"[i]);
+           for(unsigned int i = 0; i < strlen(" GF@TYPEOFVAR nil@nil\nMOVE GF@res bool@false\nJUMP $skip_for_bool_"); i++){
+                add_char_to_str(str, " GF@TYPEOFVAR nil@nil\nMOVE GF@res bool@false\nJUMP $skip_for_bool_"[i]);
             }
             char temp100[100];
             sprintf(temp100, "%d", skip_counter);
@@ -1136,8 +1136,8 @@ void print_end(struct dynamic_string *str){
             for(unsigned int i = 0; i < strlen(temp102); i++){
                 add_char_to_str(str, temp102[i]);
             }
-            for(unsigned int i = 0; i < strlen("GF@TYPEOFVAR string@int\nJUMPIFEQ $end_int_"); i++){
-                add_char_to_str(str, "GF@TYPEOFVAR string@int\nJUMPIFEQ $end_int_"[i]);
+            for(unsigned int i = 0; i < strlen(" GF@TYPEOFVAR string@int\nJUMPIFEQ $end_int_"); i++){
+                add_char_to_str(str, " GF@TYPEOFVAR string@int\nJUMPIFEQ $end_int_"[i]);
             }
             char temp103[100];
             sprintf(temp103, "%d", skip_counter);
@@ -1172,8 +1172,8 @@ void print_end(struct dynamic_string *str){
             for(unsigned int i = 0; i < strlen(temp106); i++){
                 add_char_to_str(str, temp106[i]);
             }
-            for(unsigned int i = 0; i < strlen("\nGF@TYPEOFVAR string@float\nJUMPIFEQ $end_float_"); i++){
-                add_char_to_str(str, "\nGF@TYPEOFVAR string@float\nJUMPIFEQ $end_float_"[i]);
+            for(unsigned int i = 0; i < strlen(" GF@TYPEOFVAR string@float\nJUMPIFEQ $end_float_"); i++){
+                add_char_to_str(str, " GF@TYPEOFVAR string@float\nJUMPIFEQ $end_float_"[i]);
             }
             char temp107[100];
             sprintf(temp107, "%d", skip_counter);
@@ -1209,8 +1209,8 @@ void print_end(struct dynamic_string *str){
             for(unsigned int i = 0; i < strlen(temp110); i++){
                 add_char_to_str(str, temp110[i]);
             }
-            for(unsigned int i = 0; i < strlen("\nGF@TYPEOFVAR string@string\nJUMPIFEQ $end_string_"); i++){
-                add_char_to_str(str, "\nGF@TYPEOFVAR string@string\nJUMPIFEQ $end_string_"[i]);
+            for(unsigned int i = 0; i < strlen(" GF@TYPEOFVAR string@string\nJUMPIFEQ $end_string_"); i++){
+                add_char_to_str(str, " GF@TYPEOFVAR string@string\nJUMPIFEQ $end_string_"[i]);
             }
             char temp111[100];
             sprintf(temp111, "%d", skip_counter);
@@ -1472,15 +1472,15 @@ void generate_while_head_1(int *t, struct dynamic_string *str){
     if(flag_while == 0)
     {
         fprintf(stdout,"#WHILE CYCLE\n");
-        fprintf(stdout,"LABEL while%d\n", *t);
+        fprintf(stdout,"LABEL $while%d\n", *t);
     }
     else
     {
         for(unsigned int i = 0; i < strlen("#WHILE CYCLE\n"); i++){
             add_char_to_str(str, "#WHILE CYCLE\n"[i]);
         }
-        for(unsigned int i = 0; i < strlen("LABEL while"); i++){
-            add_char_to_str(str, "LABEL while"[i]);
+        for(unsigned int i = 0; i < strlen("LABEL $while"); i++){
+            add_char_to_str(str, "LABEL $while"[i]);
         }
         char temp[100];
         sprintf(temp, "%d", *t);
@@ -1491,40 +1491,287 @@ void generate_while_head_1(int *t, struct dynamic_string *str){
     }
 }
 //Создает тело функции 
-void while_body(int *t,struct dynamic_string *str){
+void while_body(int *t,struct dynamic_string *str){ //---CHANGED--------------------------------------------------------------------------
     if(flag_while == 0){
-        fprintf(stdout,"LF@res LF@retval1 LF@retval2\n");
-        fprintf(stdout,"JUMPIFNEQ $EXIT%d LF@res bool@true\n", *t);  
-    }else
-    {
-        for(unsigned int i = 0; i < strlen("LF@res LF@retval1"); i++){
-            add_char_to_str(str, "LF@res LF@retval1"[i]);
-        }
-       // char temp11[100];
-       //sprintf(temp11, "%d", *t);
-       //  for(unsigned int i = 0; i < strlen(temp11); i++){
-       //    add_char_to_str(str, temp11[i]);
-       // }
-        for(unsigned int i = 0; i < strlen(" LF@retval"); i++){
-            add_char_to_str(str, " LF@retval2"[i]);
-        }
-        //char temp12[100];
-        //sprintf(temp12, "%d", *t);
-        //for(unsigned int i = 0; i < strlen(temp12); i++){
-         //   add_char_to_str(str, temp12[i]);
-        //}
-        add_char_to_str(str, 10);
-        for(unsigned int i = 0; i < strlen("JUMPIFNEQ $EXIT"); i++){
-            add_char_to_str(str, "JUMPIFNEQ $EXIT"[i]);
-        }
-        char temp13[100];
-        sprintf(temp13, "%d", *t);
-        for(unsigned int i = 0; i < strlen(temp13); i++){
-            add_char_to_str(str, temp13[i]);
-        }
-        for(unsigned int i = 0; i < strlen(" LF@res bool@true\n"); i++){
-            add_char_to_str(str, " LF@res bool@true\n"[i]);
-        }
+        
+        printf("POPS GF@res\n");
+        printf("TYPE GF@TYPEOFVAR GF@res\n");
+            
+        printf("JUMPIFEQ $skip_for_bool_%d GF@TYPEOFVAR string@bool\n", skip_counter);
+            
+        printf("JUMPIFNEQ $skip_for_NONE_%d GF@TYPEOFVAR nil@nil\n", skip_counter);
+        printf("MOVE GF@res bool@false\n");
+        printf("JUMP $skip_for_bool_%d\n", skip_counter);
+        printf("LABEL $skip_for_NONE_%d\n", skip_counter);
+
+        printf("JUMPIFNEQ $skip_for_int_%d GF@TYPEOFVAR string@int\n", skip_counter);
+        printf("JUMPIFEQ $end_int_%d GF@res int@0\n", skip_counter);
+        printf("MOVE GF@res bool@true\n");
+        printf("JUMP $skip_for_bool_%d\n", skip_counter);
+        printf("LABEL $skip_for_int_%d\n", skip_counter);
+
+        printf("JUMPIFNEQ $skip_for_float_%d GF@TYPEOFVAR string@float\n", skip_counter);
+        printf("JUMPIFEQ $end_float_%d GF@res float@0x0p+0\n", skip_counter);
+        printf("MOVE GF@res bool@true\n");
+        printf("JUMP $skip_for_bool_%d\n", skip_counter);
+        printf("LABEL $skip_for_float_%d\n", skip_counter);
+
+        printf("JUMPIFNEQ $skip_for_string_%d GF@TYPEOFVAR string@string\n", skip_counter);
+        printf("JUMPIFEQ $end_string_%d GF@res string@''\n", skip_counter);
+        printf("MOVE GF@res bool@true\n");
+        printf("JUMP $skip_for_bool_%d\n", skip_counter);
+        printf("LABEL $skip_for_string_%d\n", skip_counter);
+
+        printf("EXIT int@4\n");
+
+        printf("LABEL $end_string_%d\n", skip_counter);
+        printf("MOVE GF@res bool@false\n");
+        printf("JUMP $skip_for_bool_%d\n", skip_counter);
+            
+        printf("LABEL end_float_%d\n", skip_counter);
+        printf("MOVE GF@res bool@false\n");
+        printf("JUMP $skip_for_bool_%d\n", skip_counter);
+            
+        printf("LABEL $end_int_%d\n", skip_counter);
+        printf("MOVE GF@res bool@false\n");     
+
+        printf("LABEL $skip_for_bool_%d\n", skip_counter);
+        printf("JUMPIFNEQ $EXIT%d GF@res bool@true\n", *t);
+            skip_counter++;
+        }else{
+        for(unsigned int i = 0; i < strlen("POPS GF@res\nTYPE GF@TYPEOFVAR GF@res\nJUMPIFEQ $skip_for_bool_"); i++){
+                add_char_to_str(str, "POPS GF@res\nTYPE GF@TYPEOFVAR GF@res\nJUMPIFEQ $skip_for_bool_"[i]);
+            }
+            char temp16[100];
+            sprintf(temp16, "%d", skip_counter);
+            for(unsigned int i = 0; i < strlen(temp16 ); i++){
+                add_char_to_str(str, temp16 [i]);
+            }
+
+
+            for(unsigned int i = 0; i < strlen(" GF@TYPEOFVAR string@bool\nJUMPIFNEQ $skip_for_NONE_"); i++){
+                add_char_to_str(str, " GF@TYPEOFVAR string@bool\nJUMPIFNEQ $skip_for_NONE_"[i]);
+            }
+            char temp17[100];
+            sprintf(temp17, "%d", skip_counter);
+            for(unsigned int i = 0; i < strlen(temp17); i++){
+                add_char_to_str(str, temp17[i]);
+            }
+           for(unsigned int i = 0; i < strlen(" GF@TYPEOFVAR nil@nil\nMOVE GF@res bool@false\nJUMP $skip_for_bool_"); i++){
+                add_char_to_str(str, " GF@TYPEOFVAR nil@nil\nMOVE GF@res bool@false\nJUMP $skip_for_bool_"[i]);
+            }
+            char temp100[100];
+            sprintf(temp100, "%d", skip_counter);
+            for(unsigned int i = 0; i < strlen(temp100); i++){
+                add_char_to_str(str, temp100[i]);
+            }
+            for(unsigned int i = 0; i < strlen("\nLABEL $skip_for_NONE_"); i++){
+                add_char_to_str(str, "\nLABEL $skip_for_NONE_"[i]);
+            }
+            char temp101[100];
+            sprintf(temp101, "%d", skip_counter);
+            for(unsigned int i = 0; i < strlen(temp101); i++){
+                add_char_to_str(str, temp101[i]);
+            }
+            add_char_to_str(str, 10);
+
+
+            //Int
+            for(unsigned int i = 0; i < strlen("\nJUMPIFNEQ $skip_for_int_"); i++){
+                add_char_to_str(str, "\nJUMPIFNEQ $skip_for_int_"[i]);
+            }
+            char temp102[100];
+            sprintf(temp102, "%d", skip_counter);
+            for(unsigned int i = 0; i < strlen(temp102); i++){
+                add_char_to_str(str, temp102[i]);
+            }
+            for(unsigned int i = 0; i < strlen(" GF@TYPEOFVAR string@int\nJUMPIFEQ $end_int_"); i++){
+                add_char_to_str(str, " GF@TYPEOFVAR string@int\nJUMPIFEQ $end_int_"[i]);
+            }
+            char temp103[100];
+            sprintf(temp103, "%d", skip_counter);
+            for(unsigned int i = 0; i < strlen(temp103); i++){
+                add_char_to_str(str, temp103[i]);
+            }
+            for(unsigned int i = 0; i < strlen(" GF@res int@0\nMOVE GF@res bool@true\nJUMP $skip_for_bool_"); i++){
+                add_char_to_str(str, " GF@res int@0\nMOVE GF@res bool@true\nJUMP $skip_for_bool_"[i]);
+            }
+            char temp104[100];
+            sprintf(temp104, "%d", skip_counter);
+            for(unsigned int i = 0; i < strlen(temp104); i++){
+                add_char_to_str(str, temp104[i]);
+            }
+            for(unsigned int i = 0; i < strlen("\nLABEL $skip_for_int_"); i++){
+                add_char_to_str(str, "\nLABEL $skip_for_int_"[i]);
+            }
+            char temp105[100];
+            sprintf(temp105, "%d", skip_counter);
+            for(unsigned int i = 0; i < strlen(temp105); i++){
+                add_char_to_str(str, temp105[i]);
+            }
+            add_char_to_str(str, 10);
+
+
+            //Float
+            for(unsigned int i = 0; i < strlen("JUMPIFNEQ $skip_for_float_"); i++){
+                add_char_to_str(str, "JUMPIFNEQ $skip_for_float_"[i]);
+            }
+            char temp106[100];
+            sprintf(temp106, "%d", skip_counter);
+            for(unsigned int i = 0; i < strlen(temp106); i++){
+                add_char_to_str(str, temp106[i]);
+            }
+            for(unsigned int i = 0; i < strlen(" GF@TYPEOFVAR string@float\nJUMPIFEQ $end_float_"); i++){
+                add_char_to_str(str, " GF@TYPEOFVAR string@float\nJUMPIFEQ $end_float_"[i]);
+            }
+            char temp107[100];
+            sprintf(temp107, "%d", skip_counter);
+            for(unsigned int i = 0; i < strlen(temp107); i++){
+                add_char_to_str(str, temp107[i]);
+            }
+            for(unsigned int i = 0; i < strlen(" GF@res float@0x0p+0\nMOVE GF@res bool@true\nJUMP $skip_for_bool_"); i++){
+                add_char_to_str(str, " GF@res float@0x0p+0\nMOVE GF@res bool@true\nJUMP $skip_for_bool_"[i]);
+            }
+            char temp108[100];
+            sprintf(temp108, "%d", skip_counter);
+            for(unsigned int i = 0; i < strlen(temp108); i++){
+                add_char_to_str(str, temp108[i]);
+            }
+            for(unsigned int i = 0; i < strlen("\nLABEL $skip_for_float_"); i++){
+                add_char_to_str(str, "\nLABEL $skip_for_float_"[i]);
+            }
+            char temp109[100];
+            sprintf(temp109, "%d", skip_counter);
+            for(unsigned int i = 0; i < strlen(temp109); i++){
+                add_char_to_str(str, temp109[i]);
+            }
+            add_char_to_str(str, 10);
+
+
+
+            //String
+            for(unsigned int i = 0; i < strlen("\nJUMPIFNEQ $skip_for_string_"); i++){
+                add_char_to_str(str, "\nJUMPIFNEQ $skip_for_string_"[i]);
+            }
+            char temp110[100];
+            sprintf(temp110, "%d", skip_counter);
+            for(unsigned int i = 0; i < strlen(temp110); i++){
+                add_char_to_str(str, temp110[i]);
+            }
+            for(unsigned int i = 0; i < strlen(" GF@TYPEOFVAR string@string\nJUMPIFEQ $end_string_"); i++){
+                add_char_to_str(str, " GF@TYPEOFVAR string@string\nJUMPIFEQ $end_string_"[i]);
+            }
+            char temp111[100];
+            sprintf(temp111, "%d", skip_counter);
+            for(unsigned int i = 0; i < strlen(temp111); i++){
+                add_char_to_str(str, temp111[i]);
+            }
+            for(unsigned int i = 0; i < strlen(" GF@res string@''\nMOVE GF@res bool@true\nJUMP $skip_for_bool_"); i++){
+                add_char_to_str(str, " GF@res string@''\nMOVE GF@res bool@true\nJUMP $skip_for_bool_"[i]);
+            }
+            char temp112[100];
+            sprintf(temp112, "%d", skip_counter);
+            for(unsigned int i = 0; i < strlen(temp112); i++){
+                add_char_to_str(str, temp112[i]);
+            }
+            for(unsigned int i = 0; i < strlen("\nLABEL $skip_for_string_"); i++){
+                add_char_to_str(str, "\nLABEL $skip_for_string_"[i]);
+            }
+            char temp113[100];
+            sprintf(temp113, "%d", skip_counter);
+            for(unsigned int i = 0; i < strlen(temp113); i++){
+                add_char_to_str(str, temp113[i]);
+            }
+
+
+
+            for(unsigned int i = 0; i < strlen("\nEXIT int@4\n"); i++){
+                add_char_to_str(str, "\nEXIT int@4\n"[i]);
+            }
+
+
+
+            for(unsigned int i = 0; i < strlen("LABEL end_string_"); i++){
+                add_char_to_str(str, "LABEL end_string_"[i]);
+            }
+            char temp114[100];
+            sprintf(temp114, "%d", skip_counter);
+            for(unsigned int i = 0; i < strlen(temp114); i++){
+                add_char_to_str(str, temp114[i]);
+            }
+            for(unsigned int i = 0; i < strlen("\nMOVE GF@res bool@false\n"); i++){
+                add_char_to_str(str, "\nMOVE GF@res bool@false\n"[i]);
+            }
+            for(unsigned int i = 0; i < strlen("JUMP $skip_for_bool_"); i++){
+                add_char_to_str(str, "JUMP $skip_for_bool_"[i]);
+            }
+            char temp115[100];
+            sprintf(temp115, "%d", skip_counter);
+            for(unsigned int i = 0; i < strlen(temp115); i++){
+                add_char_to_str(str, temp115[i]);
+            }
+            add_char_to_str(str, 10);
+
+
+
+
+            for(unsigned int i = 0; i < strlen("LABEL end_float_"); i++){
+                add_char_to_str(str, "LABEL end_float_"[i]);
+            }
+            char temp1116[100];
+            sprintf(temp1116, "%d", skip_counter);
+            for(unsigned int i = 0; i < strlen(temp1116); i++){
+                add_char_to_str(str, temp1116[i]);
+            }
+            for(unsigned int i = 0; i < strlen("\nMOVE GF@res bool@false\n"); i++){
+                add_char_to_str(str, "\nMOVE GF@res bool@false\n"[i]);
+            }
+            for(unsigned int i = 0; i < strlen("JUMP $skip_for_bool_"); i++){
+                add_char_to_str(str, "JUMP $skip_for_bool_"[i]);
+            }
+            char temp1117[100];
+            sprintf(temp1117, "%d", skip_counter);
+            for(unsigned int i = 0; i < strlen(temp1117); i++){
+                add_char_to_str(str, temp1117[i]);
+            }
+            add_char_to_str(str, 10);
+
+
+
+            for(unsigned int i = 0; i < strlen("LABEL end_int_"); i++){
+                add_char_to_str(str, "LABEL end_int_"[i]);
+            }
+            char temp116[100];
+            sprintf(temp116, "%d", skip_counter);
+            for(unsigned int i = 0; i < strlen(temp116); i++){
+                add_char_to_str(str, temp116[i]);
+            }
+            for(unsigned int i = 0; i < strlen("\nMOVE GF@res bool@false\n"); i++){
+                add_char_to_str(str, "\nMOVE GF@res bool@false\n"[i]);
+            }
+
+
+            for(unsigned int i = 0; i < strlen("LABEL $skip_for_bool_"); i++){
+                add_char_to_str(str, "LABEL $skip_for_bool_"[i]);
+            }
+            char temp117[100];
+            sprintf(temp117, "%d", skip_counter);
+            for(unsigned int i = 0; i < strlen(temp117); i++){
+                add_char_to_str(str, temp117[i]);
+            }
+            add_char_to_str(str, 10);
+            for(unsigned int i = 0; i < strlen("JUMPIFNEQ $EXIT"); i++){
+                add_char_to_str(str, "JUMPIFNEQ $EXIT"[i]);
+            }
+            char temp118[100];
+            sprintf(temp118, "%d", *t);
+            for(unsigned int i = 0; i < strlen(temp118); i++){
+                add_char_to_str(str, temp118[i]);
+            }
+            for(unsigned int i = 0; i < strlen(" GF@res bool@true\n"); i++){
+                add_char_to_str(str, " GF@res bool@true\n"[i]);
+            }
+            skip_counter++;
 
     }
 }
@@ -1532,13 +1779,13 @@ void while_body(int *t,struct dynamic_string *str){
 void generate_while_end(int *t,struct dynamic_string *str){    
     if(flag_while == 0)
     {
-        fprintf(stdout,"JUMP while%d\n", *t);
+        fprintf(stdout,"JUMP $while%d\n", *t);
         fprintf(stdout,"LABEL $EXIT%d\n", *t);
     }
     else
     {
-        for(unsigned int i = 0; i < strlen("JUMP while"); i++){
-            add_char_to_str(str, "JUMP while"[i]);
+        for(unsigned int i = 0; i < strlen("JUMP $while"); i++){
+            add_char_to_str(str, "JUMP $while"[i]);
         } 
         char temp8[100];
         sprintf(temp8, "%d", *t);
@@ -2530,11 +2777,11 @@ void prec_an_operator(token_t type, struct dynamic_string *str){
             for(unsigned int i = 0; i < strlen(" GF@type_var_1 GF@type_var_2\n"); i++){
                 add_char_to_str(str,   " GF@type_var_1 GF@type_var_2\n"[i]);
             } 
-            char tmp32[100];
-            sprintf(tmp32, "%d", skip_counter);
-            for(unsigned int i = 0; i < strlen(tmp32); i++){
-                add_char_to_str(str, tmp32[i]);
-            }
+            // char tmp32[100];
+            // sprintf(tmp32, "%d", skip_counter);
+            // for(unsigned int i = 0; i < strlen(tmp32); i++){
+            //     add_char_to_str(str, tmp32[i]);
+            // }
             for(unsigned int i = 0; i < strlen("\nJUMPIFNEQ $skip_int_"); i++){
                 add_char_to_str(str,    "\nJUMPIFNEQ $skip_int_"[i]);
             }
@@ -2560,8 +2807,8 @@ void prec_an_operator(token_t type, struct dynamic_string *str){
                 add_char_to_str(str, tmp35[i]);
             } 
             add_char_to_str(str, 10);
-            for(unsigned int i = 0; i < strlen("\nINT2FLOAT GT@prec_var_temp_2 GF@prec_var_temp_2\nLABEL $MINUS_SKIP_"); i++){
-                add_char_to_str(str,   "\nINT2FLOAT GT@prec_var_temp_2 GF@prec_var_temp_2\nLABEL $MINUS_SKIP_"[i]);
+            for(unsigned int i = 0; i < strlen("\nINT2FLOAT GF@prec_var_temp_2 GF@prec_var_temp_2\nLABEL $MINUS_SKIP_"); i++){
+                add_char_to_str(str,   "\nINT2FLOAT GF@prec_var_temp_2 GF@prec_var_temp_2\nLABEL $MINUS_SKIP_"[i]);
             }
             char tmp36[100];
             sprintf(tmp36, "%d", skip_counter);
@@ -2783,11 +3030,11 @@ void prec_an_operator(token_t type, struct dynamic_string *str){
             for(unsigned int i = 0; i < strlen(" GF@type_var_1 GF@type_var_2\n"); i++){
                 add_char_to_str(str,   " GF@type_var_1 GF@type_var_2\n"[i]);
             } 
-            char tmp55[100];
-            sprintf(tmp55, "%d", skip_counter);
-            for(unsigned int i = 0; i < strlen(tmp55); i++){
-                add_char_to_str(str, tmp55[i]);
-            } 
+            // char tmp55[100];
+            // sprintf(tmp55, "%d", skip_counter);
+            // for(unsigned int i = 0; i < strlen(tmp55); i++){
+            //     add_char_to_str(str, tmp55[i]);
+            // } 
             for(unsigned int i = 0; i < strlen("\nJUMPIFNEQ $skip_float_"); i++){
                 add_char_to_str(str,   "\nJUMPIFNEQ $skip_float_"[i]);
             } 
@@ -2821,8 +3068,8 @@ void prec_an_operator(token_t type, struct dynamic_string *str){
             for(unsigned int i = 0; i < strlen(tmp59); i++){
                 add_char_to_str(str, tmp59[i]);
             }
-            for(unsigned int i = 0; i < strlen("MUL GF@prec_var_temp_1 GF@rpec_var_temp_2 GF@prec_var_temp_1\nPUSHS GF@prec_var_temp_1\n"); i++){
-                add_char_to_str(str, "MUL GF@prec_var_temp_1 GF@rpec_var_temp_2 GF@prec_var_temp_1\nPUSHS GF@prec_var_temp_1\n"[i]);
+            for(unsigned int i = 0; i < strlen("\nMUL GF@prec_var_temp_1 GF@rpec_var_temp_2 GF@prec_var_temp_1\nPUSHS GF@prec_var_temp_1\n"); i++){
+                add_char_to_str(str, "\nMUL GF@prec_var_temp_1 GF@rpec_var_temp_2 GF@prec_var_temp_1\nPUSHS GF@prec_var_temp_1\n"[i]);
             } 
             skip_counter++;
             break;
@@ -2936,8 +3183,8 @@ void prec_an_operator(token_t type, struct dynamic_string *str){
             for(unsigned int i = 0; i < strlen(tmp67); i++){
                 add_char_to_str(str, tmp67[i]);
             }
-            for(unsigned int i = 0; i < strlen("\nINT2FLOAT GT@prec_var_temp_2 GF@prec_var_temp_2"); i++){
-                add_char_to_str(str,   "\nINT2FLOAT GT@prec_var_temp_2 GF@prec_var_temp_2"[i]);
+            for(unsigned int i = 0; i < strlen("\nINT2FLOAT GF@prec_var_temp_2 GF@prec_var_temp_2"); i++){
+                add_char_to_str(str,   "\nINT2FLOAT GF@prec_var_temp_2 GF@prec_var_temp_2"[i]);
             } 
             char tmp68[100];
             sprintf(tmp68, "%d", skip_counter);
@@ -3066,8 +3313,8 @@ void prec_an_operator(token_t type, struct dynamic_string *str){
             for(unsigned int i = 0; i < strlen(tmp77); i++){
                 add_char_to_str(str, tmp77[i]);
             }
-            for(unsigned int i = 0; i < strlen("\nINT2FLOAT GT@prec_var_temp_2 GF@prec_var_temp_2"); i++){
-                add_char_to_str(str,   "\nINT2FLOAT GT@prec_var_temp_2 GF@prec_var_temp_2"[i]);
+            for(unsigned int i = 0; i < strlen("\nINT2FLOAT GF@prec_var_temp_2 GF@prec_var_temp_2"); i++){
+                add_char_to_str(str,   "\nINT2FLOAT GF@prec_var_temp_2 GF@prec_var_temp_2"[i]);
             } 
             char tmp78[100];
             sprintf(tmp78, "%d", skip_counter);
@@ -3235,8 +3482,8 @@ void prec_an_operator(token_t type, struct dynamic_string *str){
             for(unsigned int i = 0; i < strlen(tmp93); i++){
                 add_char_to_str(str, tmp93[i]);
             }
-            for(unsigned int i = 0; i < strlen("\nINT2FLOAT GT@prec_var_temp_2 GF@prec_var_temp_2"); i++){
-                add_char_to_str(str,   "\nINT2FLOAT GT@prec_var_temp_2 GF@prec_var_temp_2"[i]);
+            for(unsigned int i = 0; i < strlen("\nINT2FLOAT GF@prec_var_temp_2 GF@prec_var_temp_2"); i++){
+                add_char_to_str(str,   "\nINT2FLOAT GF@prec_var_temp_2 GF@prec_var_temp_2"[i]);
             } 
             char tmp94[100];
             sprintf(tmp94, "%d", skip_counter);
@@ -3306,13 +3553,13 @@ void prec_an_operator(token_t type, struct dynamic_string *str){
             for(unsigned int i = 0; i < strlen(" GF@type_var_1 GF@type_var_2\n"); i++){
                 add_char_to_str(str,  " GF@type_var_1 GF@type_var_2\n"[i]);
             } 
-            char tmp97[100];
-            sprintf(tmp97, "%d", skip_counter);
-            for(unsigned int i = 0; i < strlen(tmp97); i++){
-                add_char_to_str(str, tmp97[i]);
-            }
-            for(unsigned int i = 0; i < strlen("\nJUMPIFNEQ $skip_gt"); i++){
-                add_char_to_str(str,   "\nJUMPIFNEQ $skip_gt"[i]);
+            // char tmp97[100];
+            // sprintf(tmp97, "%d", skip_counter);
+            // for(unsigned int i = 0; i < strlen(tmp97); i++){
+            //     add_char_to_str(str, tmp97[i]);
+            // }
+            for(unsigned int i = 0; i < strlen("JUMPIFNEQ $skip_gt"); i++){
+                add_char_to_str(str,   "JUMPIFNEQ $skip_gt"[i]);
             } 
             char tmp98[100];
             sprintf(tmp98, "%d", skip_counter);
@@ -3359,22 +3606,22 @@ void prec_an_operator(token_t type, struct dynamic_string *str){
             for(unsigned int i = 0; i < strlen(tmp103); i++){
                 add_char_to_str(str, tmp103[i]);
             } 
-            for(unsigned int i = 0; i < strlen("\nJLABEL $skip_gt_"); i++){
-                add_char_to_str(str,   "\nJLABEL $skip_gt_"[i]);
+            for(unsigned int i = 0; i < strlen("\nLABEL $skip_gt_"); i++){
+                add_char_to_str(str,   "\nLABEL $skip_gt_"[i]);
             } 
             char tmp104[100];
             sprintf(tmp104, "%d", skip_counter);
             for(unsigned int i = 0; i < strlen(tmp104); i++){
                 add_char_to_str(str, tmp104[i]);
             }
-            for(unsigned int i = 0; i < strlen("\nINT2FLOAT GT@prec_var_temp_2 GF@prec_var_temp_2"); i++){
-                add_char_to_str(str,   "\nINT2FLOAT GT@prec_var_temp_2 GF@prec_var_temp_2"[i]);
+            for(unsigned int i = 0; i < strlen("\nINT2FLOAT GF@prec_var_temp_2 GF@prec_var_temp_2"); i++){
+                add_char_to_str(str,   "\nINT2FLOAT GF@prec_var_temp_2 GF@prec_var_temp_2"[i]);
             } 
-            char tmp105[100];
-            sprintf(tmp105, "%d", skip_counter);
-            for(unsigned int i = 0; i < strlen(tmp105); i++){
-                add_char_to_str(str, tmp105[i]);
-            } 
+            // char tmp105[100];
+            // sprintf(tmp105, "%d", skip_counter);
+            // for(unsigned int i = 0; i < strlen(tmp105); i++){
+            //     add_char_to_str(str, tmp105[i]);
+            // } 
 
             for(unsigned int i = 0; i < strlen("\nLABEL $GT_SKIP_"); i++){
                 add_char_to_str(str,   "\nLABEL $GT_SKIP_"[i]);
@@ -3384,8 +3631,8 @@ void prec_an_operator(token_t type, struct dynamic_string *str){
             for(unsigned int i = 0; i < strlen(tmp106); i++){
                 add_char_to_str(str, tmp106[i]);
             }
-            for(unsigned int i = 0; i < strlen("\nGT GF@prec_var_temp_1 GF@prec_var_temp_2 GF@prec_var_temp_1\nPUSHS GF@prec_var_temp_1"); i++){
-                add_char_to_str(str,  "\nGT GF@prec_var_temp_1 GF@prec_var_temp_2 GF@prec_var_temp_1\nPUSHS GF@prec_var_temp_1"[i]);
+            for(unsigned int i = 0; i < strlen("\nGT GF@prec_var_temp_1 GF@prec_var_temp_2 GF@prec_var_temp_1\nPUSHS GF@prec_var_temp_1\n"); i++){
+                add_char_to_str(str,  "\nGT GF@prec_var_temp_1 GF@prec_var_temp_2 GF@prec_var_temp_1\nPUSHS GF@prec_var_temp_1\n"[i]);
             }             
             skip_counter++;
             break;
@@ -3505,8 +3752,8 @@ void prec_an_operator(token_t type, struct dynamic_string *str){
             for(unsigned int i = 0; i < strlen(tmp115); i++){
                 add_char_to_str(str, tmp115[i]);
             }
-            for(unsigned int i = 0; i < strlen("\nINT2FLOAT GT@prec_var_temp_2 GF@prec_var_temp_2"); i++){
-                add_char_to_str(str,   "\nINT2FLOAT GT@prec_var_temp_2 GF@prec_var_temp_2"[i]);
+            for(unsigned int i = 0; i < strlen("\nINT2FLOAT GF@prec_var_temp_2 GF@prec_var_temp_2"); i++){
+                add_char_to_str(str,   "\nINT2FLOAT GF@prec_var_temp_2 GF@prec_var_temp_2"[i]);
             } 
             char tmp116[100];
             sprintf(tmp116, "%d", skip_counter);
@@ -3659,8 +3906,8 @@ void prec_an_operator(token_t type, struct dynamic_string *str){
             for(unsigned int i = 0; i < strlen(tmp115); i++){
                 add_char_to_str(str, tmp115[i]);
             }
-            for(unsigned int i = 0; i < strlen("\nINT2FLOAT GT@prec_var_temp_2 GF@prec_var_temp_2"); i++){
-                add_char_to_str(str,   "\nINT2FLOAT GT@prec_var_temp_2 GF@prec_var_temp_2"[i]);
+            for(unsigned int i = 0; i < strlen("\nINT2FLOAT GF@prec_var_temp_2 GF@prec_var_temp_2"); i++){
+                add_char_to_str(str,   "\nINT2FLOAT GF@prec_var_temp_2 GF@prec_var_temp_2"[i]);
             } 
             char tmp116[100];
             sprintf(tmp116, "%d", skip_counter);

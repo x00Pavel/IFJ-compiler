@@ -1422,12 +1422,6 @@ int func_prog(struct token_s *token, tStack *stack, int state, int ret_code, tab
                     actual_while = count_of_if;
                     flag_while++;
                     generate_while_head_1(&actual_while, str_1);
-                    // local_hash_table_while = (table_s *) malloc(sizeof(table_s));
-                    // if(!local_hash_table_while)
-                    //     return ERR_INTERNAL;
-                    // htInit(local_hash_table_while);
-
-                    // local_hash_table_while->prev_hash_table = hash_table;
                     
                     count_of_brackets = 0;
                     ret_code = func_cond_mb(token, stack, count_of_brackets, hash_table, &count_of_params, str_1);
@@ -1443,23 +1437,6 @@ int func_prog(struct token_s *token, tStack *stack, int state, int ret_code, tab
                     // printf("TOKEN_TYPE %d \n", token->type);
 
                     count_of_params = 0;
-                    // ret_code = get_token(token, stack);
-                    // if(token->type != TOKEN_DDOT)
-                    //     return -1; // must be :
-                    // ret_code = get_token(token, stack);
-                    // if(ret_code != OK){
-                    //     str_clean(str);
-                    //     htClearAll(local_hash_table_while);
-                    //     free(local_hash_table_while);
-                    //     return ret_code;
-                    // }
-                    
-                    // if(token->type != TOKEN_EOL){
-                    //     str_clean(str);
-                    //     htClearAll(local_hash_table_while);
-                    //     free(local_hash_table_while);
-                    //     return ERR_SYNTAX; // must be end of line
-                    // }
                     ret_code = get_token(token, stack);
                     if(ret_code != OK){
                         str_clean(str);
@@ -1474,16 +1451,8 @@ int func_prog(struct token_s *token, tStack *stack, int state, int ret_code, tab
                         return ERR_SYNTAX; // must be INDENT
                     }
                     while_body(&actual_while, str_1);
-                    // printf("TOKEN_TYPE %d \n", token->type);
-                    
-                    // printf("IM BEFORE WHILE BODY AND FLAG_WHILE = %d\n", flag_while);
+
                     ret_code = func_prog(token, stack, state, ret_code, hash_table, str); // inside while
-                    // printf("IM AFTER WHILE BODY AND FLAG_WHILE = %d\n", flag_while);
-                    // printf("ret_code %d\n", ret_code);
-                    
-                    // printf("-------------------------------------\n");
-                    // printf("%s",str->str);
-                    // printf("-------------------------------------\n");
 
                     if(str->len){
                         for(unsigned int i = 0; i < strlen(str->str); i++){
