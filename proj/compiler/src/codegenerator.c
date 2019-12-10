@@ -3656,10 +3656,10 @@ void prec_an_operator(token_t type, struct dynamic_string *str){
             for(unsigned int i = 0; i < strlen("\nLABEL $SKIP_IN_LSEQ"); i++){
                 add_char_to_str(str,  "\nLABEL $SKIP_IN_LSEQ"[i]);
             }        
-            char tmp11119[100];
-            sprintf(tmp11119, "%d", skip_counter);
-            for(unsigned int i = 0; i < strlen(tmp11119); i++){
-                add_char_to_str(str, tmp11119[i]);
+            char tmp11119a[100];
+            sprintf(tmp11119a, "%d", skip_counter);
+            for(unsigned int i = 0; i < strlen(tmp11119a); i++){
+                add_char_to_str(str, tmp11119a[i]);
             }
             for(unsigned int i = 0; i < strlen("\nLT GF@prec_var_temp_1 GF@prec_var_temp_2 GF@prec_var_temp_1\nLABEL $END_LSEQ"); i++){
                 add_char_to_str(str,  "\nLT GF@prec_var_temp_1 GF@prec_var_temp_2 GF@prec_var_temp_1\nLABEL $END_LSEQ"[i]);
@@ -3891,3 +3891,19 @@ void inputs_call(struct dynamic_string *str){
     }
 
 }
+    void call_inserted_functions(char *d,struct dynamic_string *str){
+        if(flag_while == 0)
+        {
+            fprintf(stdout, "CALL $%s\n", d);
+        }
+        else
+        {
+            for(unsigned int i = 0; i < strlen("CALL $"); i++){
+                add_char_to_str(str, "CALL $"[i]);
+            }
+            for(unsigned int i = 0; i < strlen(d); i++){
+                 add_char_to_str(str, d[i]);
+            }
+            add_char_to_str(str, 10);            
+        }
+    }
