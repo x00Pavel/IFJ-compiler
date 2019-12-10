@@ -2273,7 +2273,8 @@ void prec_an_operand(char *s, struct token_s *token, struct dynamic_string *str)
             }
             for(unsigned int i = 0; i < strlen(token->attribute.string); i++){
                 add_char_to_str(str, token->attribute.string[i]);
-            }  
+            }
+            free(token->attribute.string);
             add_char_to_str(str, 10);
             break;
         }
@@ -2319,6 +2320,7 @@ void prec_an_operand(char *s, struct token_s *token, struct dynamic_string *str)
         if( flag_while == 0)
         {
             printf("PUSHS string@%s\n", token->attribute.string);
+            free(token->attribute.string);
             break;
         }
         else
@@ -2328,7 +2330,8 @@ void prec_an_operand(char *s, struct token_s *token, struct dynamic_string *str)
             } 
             for(unsigned int i = 0; i < strlen(token->attribute.string); i++){
                 add_char_to_str(str, token->attribute.string[i]);
-            }  
+            }
+            free(token->attribute.string);
             add_char_to_str(str, 10);
             break;
         }
