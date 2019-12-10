@@ -105,6 +105,7 @@ int main(int arc, char **argv){
     // generate_main();
     // generate_inserted_functions();
     create_functions(); // generate all inside functions
+    prec_an_def_var(); // generate variables for prec_analyza
 
     // printf("IM HERE\n");
     ret_code = func_prog(token, stack, state, ret_code, hash_table, str);

@@ -91,6 +91,7 @@ tab_symbol token_to_element(struct token_s *token)
 {
     switch (token->type)
     {
+    case TOKEN_NONE:
     case TOKEN_INT:
     case TOKEN_FLOAT:
     case TOKEN_STRING:
@@ -154,7 +155,7 @@ bool check_operand(tDLList *list){
     int i;
     DLCopyLast(list, &i);
     if(i != ID_NT){
-        printf("ERROR. NO OPERANDS\n");
+        // printf("ERROR. NO OPERANDS\n");
         end_scan = true;
         end = true;
         return false;
@@ -216,7 +217,7 @@ int reduce_rule(tDLList *list, int symbol, int top, struct token_s *token, struc
             array_rules[i] = '*';
             i++;
         #endif
-        prec_an_operator(TOKEN_SUM, str_for_while);
+        prec_an_operator(TOKEN_MULTIPLY, str_for_while);
         break;
     case DIV:
         if(!check_operand(list)){
@@ -293,7 +294,9 @@ int reduce_rule(tDLList *list, int symbol, int top, struct token_s *token, struc
             array_rules[i] = 'E';
             i++;
         #endif
-        prec_an_operand(frame, token, str_for_while);
+        // prec_an_operand(frame, token, str_for_while);
+        // if(token->type == TOKEN_STRING || token->type ==  TOKEN_STRING )
+        //     free(token->attribute.string);
         break;
     case RB:
         del_last_3(list);
@@ -333,7 +336,9 @@ int reduce_rule(tDLList *list, int symbol, int top, struct token_s *token, struc
             array_rules[i] = '<';
             i++;
         #endif
+        // printf("AFTER CALL CODEGEN\n");
         prec_an_operator(TOKEN_LESS, str_for_while);
+        // printf("AFTER CALL CODEGEN\n");
         break;
     case LE:
         if (!check_operand(list)){
@@ -435,10 +440,10 @@ int preced_analyze(struct token_s *token, table_s *hash_table, int* count_of_par
                 fprintf(stdout, "Invalid operator\n");
             #endif
             free(scanner_stack);
-            if (prev_token->type == TOKEN_ID || prev_token->type == TOKEN_STRING)
-            {
-                free(prev_token->attribute.string);
-            }
+            // if (prev_token->type == TOKEN_ID || prev_token->type == TOKEN_STRING)
+            // {
+            //     free(prev_token->attribute.string);
+            // }
             free(prev_token);
             DLDisposeList(list);
             free(list);
@@ -494,30 +499,28 @@ int preced_analyze(struct token_s *token, table_s *hash_table, int* count_of_par
             break;
         }
         // Save previous important token
-        if(prev_token->type == TOKEN_STRING || prev_token->type ==  TOKEN_STRING )
-            free(prev_token->attribute.string);
+        
         switch (token->type){
         case TOKEN_ID:
-            prev_token->type = TOKEN_ID;
-            prev_token->attribute.string = (char *)malloc(sizeof(char) * strlen(token->attribute.string) + 1);
-            strcpy(prev_token->attribute.string, token->attribute.string);
-            break;
         case TOKEN_STRING:
-            prev_token->type = TOKEN_STRING;
+            prev_token->type = (token->type == TOKEN_ID) ? TOKEN_ID : TOKEN_STRING;
             prev_token->attribute.string = (char *)malloc(sizeof(char) * strlen(token->attribute.string) + 1);
             strcpy(prev_token->attribute.string, token->attribute.string);
+            free(token->attribute.string);
+            prec_an_operand(frame, prev_token, str);
             break;
         case TOKEN_INT:
             prev_token->type = TOKEN_INT;
             prev_token->attribute.int_val = token->attribute.int_val;
+            prec_an_operand(frame, prev_token, str);
             break;
         case TOKEN_FLOAT:
             prev_token->type =  TOKEN_FLOAT; 
             prev_token->attribute.float_val = token->attribute.float_val;
+            prec_an_operand(frame, prev_token, str);
             break;
         // case TOKEN_EOL:
         case TOKEN_EOF:
-            // printf( "Error in precedence analyzes\n");
             end = true;
             free(scanner_stack);
             if (prev_token->type == TOKEN_ID || prev_token->type == TOKEN_STRING)
@@ -533,9 +536,6 @@ int preced_analyze(struct token_s *token, table_s *hash_table, int* count_of_par
         }
 
         if (!end_scan){
-            if (token->type == TOKEN_ID || token->type == TOKEN_STRING){
-                free(token->attribute.string);
-            }
             ret_code = get_token(token, scanner_stack);
             if(ret_code != OK){
                 return ret_code;
@@ -546,7 +546,7 @@ int preced_analyze(struct token_s *token, table_s *hash_table, int* count_of_par
                     return ret_code;
                 }    
                 if(token->type != TOKEN_EOL){
-                    fprintf(stderr, "ERROR AFTER DDOT - NOT EOL\n");
+                    // fprintf(stderr, "ERROR AFTER DDOT - NOT EOL\n");
                     end_scan = false;
                     free(scanner_stack);
                     if (prev_token->type == TOKEN_ID || prev_token->type == TOKEN_STRING){
@@ -562,13 +562,12 @@ int preced_analyze(struct token_s *token, table_s *hash_table, int* count_of_par
         if(token->type == TOKEN_ID){
             if(!htSearch(hash_table, token->attribute.string)){
                 if (!search_everywhere(hash_table, token->attribute.string)){
-                    fprintf(stderr, "ID is not in hash table\n");
+                    // fprintf(stderr, "ID is not in hash table\n");
                     end_scan = false;
                     free(scanner_stack);
-                    if (prev_token->type == TOKEN_ID || prev_token->type == TOKEN_STRING)
-                        free(prev_token->attribute.string);
+                    // if (token->type == TOKEN_ID || token->type == TOKEN_STRING)
+                    //     free(token->attribute.string);
                     free(prev_token);
-                    free(token->attribute.string);
                     DLDisposeList(list);
                     free(list);
                     return ERR_UNDEF;
@@ -623,8 +622,9 @@ int preced_analyze(struct token_s *token, table_s *hash_table, int* count_of_par
                         item->param_count = *count_of_params;
                     }
                 }
-        *count_of_params = 0; // free string inside function
-            }
+            *count_of_params = 0; // free string inside function
+        }
+        
     } while (!end);
     
     #ifdef DEBUG_PRECED
@@ -635,10 +635,10 @@ int preced_analyze(struct token_s *token, table_s *hash_table, int* count_of_par
     #endif
     end_scan = false;
     free(scanner_stack);
-    if (prev_token->type == TOKEN_ID || prev_token->type == TOKEN_STRING)
-    {
-        free(prev_token->attribute.string);
-    }
+    // if (prev_token->type == TOKEN_ID || prev_token->type == TOKEN_STRING)
+    // {
+    //     free(prev_token->attribute.string);
+    // }
     free(prev_token);
     DLDisposeList(list);
     free(list);
