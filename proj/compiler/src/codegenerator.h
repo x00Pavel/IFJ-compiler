@@ -262,7 +262,7 @@ void prec_an_operator(token_t type, struct dynamic_string *str);
  * This function generates PUSH in the stack
  * \param[in] token_type Input token
  * \param[in] str String for code
- * \return
+ * \retuurn
 */
 void prec_an_operand(char *s, struct token_s *token, struct dynamic_string *str);
 /**
@@ -274,7 +274,7 @@ void prec_an_operand(char *s, struct token_s *token, struct dynamic_string *str)
 */
 void prec_an_def_var();
 /**
- * \brief
+ * \brief 
  * This function generates helping variables for operations with stacks
  * \param[in] str String for code
  * \return

@@ -31,7 +31,9 @@ void create_functions(){
     fprintf(stdout,"#FUNCLEN\n");
     fprintf(stdout,"LABEL $len\n");
     fprintf(stdout,"PUSHFRAME\n");
+    // fprintf(stdout,"DEFVAR LF@%%retval\n");
     fprintf(stdout,"STRLEN GF@retval LF@%%1\n");
+    // printf("MOVE GF@retval LF@%%retval\n");
     fprintf(stdout,"POPFRAME\n");
     fprintf(stdout,"RETURN\n");
 
@@ -52,14 +54,10 @@ void create_functions(){
     fprintf(stdout, "#INPUTI\n");
     fprintf(stdout, "LABEL $inputi\n");
     fprintf(stdout, "PUSHFRAME\n");
-    //fprintf(stdout, "DEFVAR LF@$$var\n");
-    //fprintf(stdout, "DEFVAR LF@%%retval\n");
-    //fprintf(stdout, "DEFVAR LF@shouldbeint\n");
-    fprintf(stdout, "DEFVAR LF@intstring\n");
     fprintf(stdout, "READ GF@prec_var_temp_1 int\n");//var has int value now//67
-    fprintf(stdout, "TYPE GF@type_var_2 GF@prec_var_temp_1\n");//shouldbeint now shouldbeint
-    fprintf(stdout, "MOVE GF@prec_var_temp_1 string@int\n");//int string now has int
-    fprintf(stdout, "JUMPIFNEQ $exitforinputi  GF@type_var_2\n");
+    fprintf(stdout, "TYPE GF@prec_var_temp_2 GF@prec_var_temp_1\n");//shouldbeint now shouldbeint
+    fprintf(stdout, "MOVE GF@type_var_1 string@int\n");//int string now has int
+    fprintf(stdout, "JUMPIFNEQ $exitforinputi GF@prec_var_temp_2 GF@type_var_1\n");
     fprintf(stdout, "MOVE GF@retval GF@prec_var_temp_1\n");
     fprintf(stdout, "JUMP $EXIT_inputi\n");
     fprintf(stdout, "LABEL $exitforinputi\n");
@@ -73,14 +71,10 @@ void create_functions(){
     fprintf(stdout, "#INPUTF\n");
     fprintf(stdout, "LABEL $inputf\n");
     fprintf(stdout, "PUSHFRAME\n");
-    //fprintf(stdout, "DEFVAR LF@$$var\n");
-    //fprintf(stdout, "DEFVAR LF@%%retval\n");
-    //fprintf(stdout, "DEFVAR LF@shouldbefloat\n");
-    //fprintf(stdout, "DEFVAR LF@floatstring\n");
     fprintf(stdout, "READ GF@prec_var_temp_1 float\n");//var has int value now
-    fprintf(stdout, "TYPE GF@type_var_1 GF@prec_var_temp_1\n");//shouldbeint now shouldbeint
-    fprintf(stdout, "MOVE GF@type_var_2 string@float\n");//int string now has int
-    fprintf(stdout, "JUMPIFNEQ $exitforinputf GF@type_var_1 GF@type_var_2\n");
+    fprintf(stdout, "TYPE GF@prec_var_temp_2 GF@prec_var_temp_1\n");//shouldbeint now shouldbeint
+    fprintf(stdout, "MOVE GF@type_var_1 string@float\n");//int string now has int
+    fprintf(stdout, "JUMPIFNEQ $exitforinputf GF@prec_var_temp_2 GF@type_var_1\n");
     fprintf(stdout, "MOVE GF@retval GF@prec_var_temp_1\n");
     fprintf(stdout, "JUMP $EXIT_inputf\n");
     fprintf(stdout, "LABEL $exitforinputf\n");
@@ -163,7 +157,7 @@ void create_functions(){
     fprintf(stdout,"DEFVAR TF@%%1\n");                                                      
     fprintf(stdout,"MOVE TF@%%1 LF@%%1\n");                                                 
     fprintf(stdout,"CALL $len\n");                                                      
-    fprintf(stdout,"MOVE LF@length_str GF@retval\n");                                     
+    fprintf(stdout,"MOVE LF@length_str TF@%%retval\n");                                     
     fprintf(stdout,"GT LF@cond_length LF@%%2 LF@length_str\n");                     
     fprintf(stdout,"JUMPIFEQ $asc$return LF@cond_length bool@true\n");
     fprintf(stdout,"SUB LF@%%2 LF@%%2 int@1\n");                                    
@@ -179,15 +173,15 @@ void create_functions(){
     fprintf(stdout,"#CHRFUNCTION\n");                                                       
     fprintf(stdout,"LABEL $chr\n");                                                         
     fprintf(stdout,"PUSHFRAME\n");                                                          
-    //fprintf(stdout,"DEFVAR LF@%%retval\n");                                                 
-    fprintf(stdout,"MOVE GF@%%retval string@\n");                                           
+    fprintf(stdout,"DEFVAR LF@%%retval\n");                                                 
+    fprintf(stdout,"MOVE LF@%%retval string@\n");                                           
     fprintf(stdout,"DEFVAR LF@cond_range\n");                                   
     fprintf(stdout,"LT LF@cond_range LF@%%1 int@0\n");                  
     fprintf(stdout,"JUMPIFEQ $chr$return LF@cond_range bool@true\n");
     fprintf(stdout,"GT LF@cond_range LF@%%1 int@255\n");                        
     fprintf(stdout,"JUMPIFEQ $chr$return LF@cond_range bool@true\n");
-    fprintf(stdout,"INT2CHAR GF@%%retval LF@%%1\n");
-    //printf("MOVE GF@retval F@%%retval\n");                                            
+    fprintf(stdout,"INT2CHAR LF@%%retval LF@%%1\n");
+    printf("MOVE GF@retval LF@%%retval\n");                                            
     fprintf(stdout,"LABEL $chr$return\n");                                                  
     fprintf(stdout,"POPFRAME\n");                                                       
     fprintf(stdout,"RETURN\n");
@@ -342,6 +336,7 @@ void end_main(){
 */
   void define_variable_GF(struct token_s *token, char *s, struct dynamic_string *str){
   //  if(flag_while == 0)
+        (void)str;
   //  {
         fprintf(stdout, "DEFVAR %s@%s\n",s,token->attribute.string); 
   //  }
@@ -373,6 +368,7 @@ void end_main(){
 void assign_to_variable(struct token_s *token,struct token_s *token_a, char *s, struct dynamic_string *str){
     switch (token->type)
     {  
+        
         case TOKEN_INT:
         if(flag_while == 0){
             fprintf(stdout, "MOVE %s@%%%s int@retval\n",s,token->attribute.string ); 
@@ -1478,7 +1474,7 @@ void while_body(int *t,struct dynamic_string *str){
         printf("MOVE GF@res bool@false\n");
         printf("JUMP $skip_for_bool_%d\n", skip_counter);
             
-        printf("LABEL end_float_%d\n", skip_counter);z
+        printf("LABEL end_float_%d\n", skip_counter);
         printf("MOVE GF@res bool@false\n");
         printf("JUMP $skip_for_bool_%d\n", skip_counter);
             
@@ -3860,12 +3856,13 @@ void pop_retval(struct dynamic_string *str){
 //fixed
 void inputf_call(struct dynamic_string *str){
    if(flag_while == 0)
-    {
+    {   
+        fprintf(stdout, "CREATEFRAME\n");
         printf("CALL $inputf\n");
     }
     else
     {
-        for(unsigned int i = 0; i < strlen("CALL $inputf\n"); i++){
+        for(unsigned int i = 0; i < strlen("CREATEFRAME\nCALL $inputf\n"); i++){
             add_char_to_str(str,  "CALL $inputf\n"[i]);
         } 
     }
@@ -3879,7 +3876,7 @@ void inputi_call(struct dynamic_string *str){
     }
     else
     {
-        for(unsigned int i = 0; i < strlen("CALL $inputi\n"); i++){
+        for(unsigned int i = 0; i < strlen("CREATEFRAME\nCALL $inputi\n"); i++){
             add_char_to_str(str,  "CALL $inputi\n"[i]);
         } 
     }
@@ -3889,11 +3886,12 @@ void inputi_call(struct dynamic_string *str){
 void inputs_call(struct dynamic_string *str){   
     if(flag_while == 0)
     {
+        fprintf(stdout, "CREATEFRAME\n");
         printf("CALL $inputs\n");
     }
     else
     {
-        for(unsigned int i = 0; i < strlen("CALL $inputs\n"); i++){
+        for(unsigned int i = 0; i < strlen("CREATEFRAME\nCALL $inputs\n"); i++){
             add_char_to_str(str,  "CALL $inputs\n"[i]);
         } 
     }
