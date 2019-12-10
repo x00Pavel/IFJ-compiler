@@ -372,7 +372,7 @@ int get_token(struct token_s *token, tStack *stack)
                     token->type = TOKEN_KEY_WORD;
                     token->attribute.key_word = _ELSE_;
                 }
-                else if (strcmp(str->str, "none") == 0)
+                else if (strcmp(str->str, "None") == 0)
                 {
                     token->type = TOKEN_NONE;
                 }

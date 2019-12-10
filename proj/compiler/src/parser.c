@@ -433,24 +433,20 @@ int func_for_id(struct token_s *token, tStack *stack, table_s *hash_table, int *
     struct token_s token_for_time; // token_for_time
     
     token_for_time.type=token->type;
-    token_for_time.attribute=token->attribute;
+    // token_for_time.attribute=token->attribute;
     if(token->type == TOKEN_ID){
         token_for_time.attribute.string = (char *) malloc(sizeof(char) * strlen(token->attribute.string) + 1);
         strcpy(token_for_time.attribute.string, token->attribute.string);
     }
 
-    //printf("T_type: %d\n", token->type);
-    //printf("must be a: %s\n", token_for_time.attribute.string);
-
     free(token->attribute.string);
-    //printf("must be a: %s\n", token_for_time.attribute.string);
+
     ret_code = get_token(token, stack);
     if(ret_code != OK){
         free(token_for_time.attribute.string);
         return ret_code;
     }
     if(token->type == TOKEN_ASSIGN){
-        // printf("SRABOTAL = \n"); 
         ret_code = get_token(token, stack);
         if(ret_code != OK){
             free(token_for_time.attribute.string);
@@ -727,6 +723,7 @@ int func_for_id(struct token_s *token, tStack *stack, table_s *hash_table, int *
                     return ERR_SYNTAX; // MUST BE something , something
                 }
                 ret_code = get_token(token, stack);
+                printf("--------------------------------%s\n",token->attribute.string);
                 if(ret_code != OK){
                     free(token_for_time.attribute.string);
                     return ret_code;
@@ -741,6 +738,9 @@ int func_for_id(struct token_s *token, tStack *stack, table_s *hash_table, int *
                     function_call(token, &tmp_int, "LF", str_1);
                 }else{
                     function_call(token, &tmp_int, "GF", str_1);
+                }
+                if(token->type == TOKEN_ID){
+                    free(token->attribute.string);
                 }
                 ret_code = get_token(token, stack);
                 if(ret_code != OK){
@@ -766,6 +766,9 @@ int func_for_id(struct token_s *token, tStack *stack, table_s *hash_table, int *
                     function_call(token, &tmp_int, "LF", str_1);
                 }else{
                     function_call(token, &tmp_int, "GF", str_1);
+                }
+                if(token->type == TOKEN_ID){
+                    free(token->attribute.string);
                 }
                 ret_code = get_token(token, stack);
                 if(ret_code != OK){

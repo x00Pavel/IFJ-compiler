@@ -91,6 +91,7 @@ tab_symbol token_to_element(struct token_s *token)
 {
     switch (token->type)
     {
+    case TOKEN_NONE:
     case TOKEN_INT:
     case TOKEN_FLOAT:
     case TOKEN_STRING:
@@ -439,10 +440,10 @@ int preced_analyze(struct token_s *token, table_s *hash_table, int* count_of_par
                 fprintf(stdout, "Invalid operator\n");
             #endif
             free(scanner_stack);
-            if (prev_token->type == TOKEN_ID || prev_token->type == TOKEN_STRING)
-            {
-                free(prev_token->attribute.string);
-            }
+            // if (prev_token->type == TOKEN_ID || prev_token->type == TOKEN_STRING)
+            // {
+            //     free(prev_token->attribute.string);
+            // }
             free(prev_token);
             DLDisposeList(list);
             free(list);
@@ -505,9 +506,8 @@ int preced_analyze(struct token_s *token, table_s *hash_table, int* count_of_par
             prev_token->type = (token->type == TOKEN_ID) ? TOKEN_ID : TOKEN_STRING;
             prev_token->attribute.string = (char *)malloc(sizeof(char) * strlen(token->attribute.string) + 1);
             strcpy(prev_token->attribute.string, token->attribute.string);
-            prec_an_operand(frame, prev_token, str);
             free(token->attribute.string);
-            free(prev_token->attribute.string);
+            prec_an_operand(frame, prev_token, str);
             break;
         case TOKEN_INT:
             prev_token->type = TOKEN_INT;
@@ -565,10 +565,9 @@ int preced_analyze(struct token_s *token, table_s *hash_table, int* count_of_par
                     // fprintf(stderr, "ID is not in hash table\n");
                     end_scan = false;
                     free(scanner_stack);
-                    if (prev_token->type == TOKEN_ID || prev_token->type == TOKEN_STRING)
-                        free(prev_token->attribute.string);
+                    // if (token->type == TOKEN_ID || token->type == TOKEN_STRING)
+                    //     free(token->attribute.string);
                     free(prev_token);
-                    free(token->attribute.string);
                     DLDisposeList(list);
                     free(list);
                     return ERR_UNDEF;
