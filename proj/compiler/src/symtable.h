@@ -32,6 +32,8 @@ typedef struct tHTItem{
 	token_t ret_val;		 /*< Type of return value */
 	int param_count;         /*< Count of paramters for functions */
 	bool id_declared;        /*< Flag for declared identeficators */
+	int in_if;
+	int in_else;
 	struct tHTItem* ptrnext; /*< Pointer to next node             */
 } tHTItem;
 

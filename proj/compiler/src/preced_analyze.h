@@ -33,7 +33,6 @@ typedef enum
     INT_NT,
     FLT_NT,
     STR_NT,
-    BOOL_NT,
     NT,      /*< Not terminal   */
     END      /*< End symbol     */
 } tab_symbol;

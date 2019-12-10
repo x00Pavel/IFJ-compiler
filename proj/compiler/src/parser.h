@@ -20,6 +20,8 @@
 // #include "ifj2019_old.h"
 
 int flag_while;
+int flag_if;
+int flag_else;
 // static void my_func(){
 //     (void)flag_while;
 //     // if(flag_while){

@@ -1,0 +1,159 @@
+.IFJcode19
+JUMP $$main
+
+#FUNCLEN
+LABEL $len
+PUSHFRAME
+STRLEN GF@retval LF@%1
+POPFRAME
+RETURN
+#INPUTS
+LABEL $inputs
+PUSHFRAME
+READ GF@prec_var_temp_1 string
+TYPE GF@type_var_1 GF@prec_var_temp_1
+JUMPIFNEQ $exitforinputs GF@type_var_1 string@string
+MOVE GF@retval GF@prec_var_temp_1
+JUMP $EXIT_inputs
+LABEL $exitforinputs
+EXIT int@4
+LABEL $EXIT_inputs
+POPFRAME
+RETURN
+#INPUTI
+LABEL $inputi
+PUSHFRAME
+READ GF@prec_var_temp_1 int
+TYPE GF@prec_var_temp_2 GF@prec_var_temp_1
+MOVE GF@type_var_1 string@int
+JUMPIFNEQ $exitforinputi GF@prec_var_temp_2 GF@type_var_1
+MOVE GF@retval GF@prec_var_temp_1
+JUMP $EXIT_inputi
+LABEL $exitforinputi
+EXIT int@4
+LABEL $EXIT_inputi
+POPFRAME
+RETURN
+#INPUTF
+LABEL $inputf
+PUSHFRAME
+READ GF@prec_var_temp_1 float
+TYPE GF@prec_var_temp_2 GF@prec_var_temp_1
+MOVE GF@type_var_1 string@float
+JUMPIFNEQ $exitforinputf GF@prec_var_temp_2 GF@type_var_1
+MOVE GF@retval GF@prec_var_temp_1
+JUMP $EXIT_inputf
+LABEL $exitforinputf
+EXIT int@4
+LABEL $EXIT_inputf
+POPFRAME
+RETURN
+#SUBSTRFUNCTION
+LABEL $substr
+PUSHFRAME
+DEFVAR LF@%retval
+MOVE LF@%retval string@
+DEFVAR LF@length_str
+CREATEFRAME
+DEFVAR TF@%1
+MOVE TF@%1 LF@%1
+CALL $len
+MOVE LF@length_str GF@retval
+DEFVAR LF@ret_cond
+LT LF@ret_cond LF@length_str int@0
+JUMPIFEQ $substr$return LF@ret_cond bool@true
+EQ LF@ret_cond LF@length_str int@0
+JUMPIFEQ $substr$return LF@ret_cond bool@true
+LT LF@ret_cond LF@%2 int@0
+JUMPIFEQ $substr$return LF@ret_cond bool@true
+EQ LF@ret_cond LF@%2 int@0
+JUMPIFEQ $substr$return LF@ret_cond bool@true
+GT LF@ret_cond LF@%2 LF@length_str
+JUMPIFEQ $substr$return LF@ret_cond bool@true
+EQ LF@ret_cond LF@%3 int@0
+JUMPIFEQ $substr$return LF@ret_cond bool@true
+DEFVAR LF@max_n
+MOVE LF@max_n LF@length_str
+SUB LF@max_n LF@max_n LF@%2
+ADD LF@max_n LF@max_n int@1
+DEFVAR LF@edit_n_cond
+LT LF@edit_n_cond LF@%3 int@0
+JUMPIFEQ $substr$edit_n LF@edit_n_cond bool@true
+GT LF@edit_n_cond LF@%3 LF@max_n
+JUMPIFEQ $substr$edit_n LF@edit_n_cond bool@true
+JUMP $substr$process
+LABEL $substr$edit_n
+MOVE LF@%3 LF@max_n
+LABEL $substr$process
+DEFVAR LF@index
+MOVE LF@index LF@%2
+SUB LF@index LF@index int@1
+DEFVAR LF@char
+DEFVAR LF@process_loop_cond
+LABEL $substr$process_loop
+GETCHAR LF@char LF@%1 LF@index
+CONCAT LF@%retval LF@%retval LF@char
+MOVE GF@retval LF@%retval
+ADD LF@index LF@index int@1
+SUB LF@%3 LF@%3 int@1
+GT LF@process_loop_cond LF@%3 int@0
+JUMPIFEQ $substr$process_loop LF@process_loop_cond bool@true
+LABEL $substr$return
+POPFRAME
+RETURN
+#ORDFUNCTION
+LABEL $ord
+PUSHFRAME
+DEFVAR LF@%retval
+MOVE LF@%retval int@0
+DEFVAR LF@cond_length
+LT LF@cond_length LF@%2 int@1
+JUMPIFEQ $asc$return LF@cond_length bool@true
+DEFVAR LF@length_str
+CREATEFRAME
+DEFVAR TF@%1
+MOVE TF@%1 LF@%1
+CALL $len
+MOVE LF@length_str GF@retval
+GT LF@cond_length LF@%2 LF@length_str
+JUMPIFEQ $asc$return LF@cond_length bool@true
+SUB LF@%2 LF@%2 int@1
+STRI2INT LF@%retval LF@%1 LF@%2
+MOVE GF@retval LF@%retval
+LABEL $asc$return
+POPFRAME
+RETURN
+#CHRFUNCTION
+LABEL $chr
+PUSHFRAME
+DEFVAR LF@%retval
+MOVE LF@%retval string@
+DEFVAR LF@cond_range
+LT LF@cond_range LF@%1 int@0
+JUMPIFEQ $chr$return LF@cond_range bool@true
+GT LF@cond_range LF@%1 int@255
+JUMPIFEQ $chr$return LF@cond_range bool@true
+INT2CHAR LF@%retval LF@%1
+MOVE GF@retval LF@%retval
+LABEL $chr$return
+POPFRAME
+RETURN
+LABEL $$main
+DEFVAR GF@res
+DEFVAR GF@TYPEOFVAR
+DEFVAR GF@type_var_1
+DEFVAR GF@type_var_2
+DEFVAR GF@prec_var_eq
+DEFVAR GF@prec_var_temp_1
+DEFVAR GF@prec_var_temp_2
+DEFVAR GF@retval
+DEFVAR GF@retval1
+DEFVAR GF@retval2
+DEFVAR GF@a
+CREATEFRAME
+DEFVAR TF@%1
+MOVE TF@%1 int@117
+CALL $chr
+MOVE GF@a GF@retval
+WRITE GF@a
+WRITE string@\010
