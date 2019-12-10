@@ -2408,8 +2408,8 @@ void prec_an_operator(token_t type, struct dynamic_string *str){
         }
         else
         {
-            for(unsigned int i = 0; i < strlen("POPS GF@prec_var_temp_1\nTYPE GF@type_var_1 GF@prec_var_temp_1\nPOPS GF@prec_var_temp_2\nPOPS GF@prec_var_temp_2\nJUMPIFEQ $SUM_SKIP_"); i++){
-                add_char_to_str(str, "POPS GF@prec_var_temp_1\nTYPE GF@type_var_1 GF@prec_var_temp_1\nPOPS GF@prec_var_temp_2\nPOPS GF@prec_var_temp_2\nJUMPIFEQ $SUM_SKIP_"[i]);
+            for(unsigned int i = 0; i < strlen("POPS GF@prec_var_temp_1\nTYPE GF@type_var_1 GF@prec_var_temp_1\nPOPS GF@prec_var_temp_2\nTYPE GF@type_var_2 GF@prec_var_temp_2\nJUMPIFEQ $SUM_SKIP_"); i++){
+                add_char_to_str(str, "POPS GF@prec_var_temp_1\nTYPE GF@type_var_1 GF@prec_var_temp_1\nPOPS GF@prec_var_temp_2\nTYPE GF@type_var_2 GF@prec_var_temp_2\nJUMPIFEQ $SUM_SKIP_"[i]);
             }    
             char tmp14[100];
             sprintf(tmp14, "%d", skip_counter);
@@ -2417,7 +2417,7 @@ void prec_an_operator(token_t type, struct dynamic_string *str){
                 add_char_to_str(str, tmp14[i]);
             }
             for(unsigned int i = 0; i < strlen(" GF@type_var_1 GF@type_var_2\nJUMPIFNEQ $skip_string_"); i++){
-                add_char_to_str(str,  "GF@type_var_1 GF@type_var_2\nJUMPIFNEQ $skip_string_"[i]);
+                add_char_to_str(str,  " GF@type_var_1 GF@type_var_2\nJUMPIFNEQ $skip_string_"[i]);
             } 
             char tmp15[100];
             sprintf(tmp15, "%d", skip_counter);
@@ -2457,7 +2457,7 @@ void prec_an_operator(token_t type, struct dynamic_string *str){
                 add_char_to_str(str, tmp19[i]);
             }
             for(unsigned int i = 0; i < strlen(" GF@type_var_1 string@int\nINT2FLOAT GF@prec_var_temp_1 GF@prec_var_temp_1\nJUMP $SUM_SKIP_"); i++){
-                add_char_to_str(str,    "GF@type_var_1 string@int\nINT2FLOAT GF@prec_var_temp_1 GF@prec_var_temp_1\nJUMP $SUM_SKIP_"[i]);
+                add_char_to_str(str,    " GF@type_var_1 string@int\nINT2FLOAT GF@prec_var_temp_1 GF@prec_var_temp_1\nJUMP $SUM_SKIP_"[i]);
             }
             char tmp20[100];
             sprintf(tmp20, "%d", skip_counter);
@@ -2490,10 +2490,10 @@ void prec_an_operator(token_t type, struct dynamic_string *str){
                 add_char_to_str(str, tmp23[i]);
             } 
             for(unsigned int i = 0; i < strlen(" GF@type_var_1 string@string\n"); i++){
-                add_char_to_str(str,   " @type_var_1 string@string\n"[i]);// printf("CONCAT GF@prec_var_temp_1 GF@prec_var_temp_1 GF@prec_var_temp_1\n");
+                add_char_to_str(str,   " GF@type_var_1 string@string\n"[i]);// printf("CONCAT GF@prec_var_temp_1 GF@prec_var_temp_1 GF@prec_var_temp_1\n");
             }
-            for(unsigned int i = 0; i < strlen("CONCAT GF@prec_var_temp_1 GF@prec_var_temp_1 GF@prec_var_temp_1\nJUMP $END_SUM_"); i++){
-                add_char_to_str(str,   "CONCAT GF@prec_var_temp_1 GF@prec_var_temp_1 GF@prec_var_temp_1\nJUMP $END_SUM_"[i]);
+            for(unsigned int i = 0; i < strlen("CONCAT GF@prec_var_temp_1 GF@prec_var_temp_2 GF@prec_var_temp_1\nJUMP $END_SUM_"); i++){
+                add_char_to_str(str,   "CONCAT GF@prec_var_temp_1 GF@prec_var_temp_2 GF@prec_var_temp_1\nJUMP $END_SUM_"[i]);
             }
             char tmp24[100];
             sprintf(tmp24, "%d", skip_counter);
@@ -2508,16 +2508,16 @@ void prec_an_operator(token_t type, struct dynamic_string *str){
             for(unsigned int i = 0; i < strlen(tmp25); i++){
                 add_char_to_str(str, tmp25[i]);
             }
-            for(unsigned int i = 0; i < strlen("\nADD GF@prec_var_temp_1 GF@prec_var_temp_1 GF@prec_var_temp_1\nLABEL $END_SUM_"); i++){
-                add_char_to_str(str,   "\nADD GF@prec_var_temp_1 GF@prec_var_temp_1 GF@prec_var_temp_1\nLABEL $END_SUM_"[i]);
+            for(unsigned int i = 0; i < strlen("\nADD GF@prec_var_temp_1 GF@prec_var_temp_2 GF@prec_var_temp_1\nLABEL $END_SUM_"); i++){
+                add_char_to_str(str,   "\nADD GF@prec_var_temp_1 GF@prec_var_temp_2 GF@prec_var_temp_1\nLABEL $END_SUM_"[i]);
             } 
             char tmp26[100];
             sprintf(tmp26, "%d", skip_counter);
             for(unsigned int i = 0; i < strlen(tmp26); i++){
                 add_char_to_str(str, tmp26[i]);
             }
-            for(unsigned int i = 0; i < strlen("\nPUSHS GF@prec_var_temp_1"); i++){
-                add_char_to_str(str,  "\nPUSHS GF@prec_var_temp_1"[i]);
+            for(unsigned int i = 0; i < strlen("\nPUSHS GF@prec_var_temp_1\n"); i++){
+                add_char_to_str(str,  "\nPUSHS GF@prec_var_temp_1\n"[i]);
             }
             skip_counter++; 
             break;
@@ -3151,8 +3151,8 @@ void prec_an_operator(token_t type, struct dynamic_string *str){
                 add_char_to_str(str, tmp69[i]);
             }
             add_char_to_str(str, 10);
-            for(unsigned int i = 0; i < strlen("EQ GF@prec_var_temp_1 GF@prec_var_temp_2 GF@prec_var_temp_1\nPUSHS GF@prec_var_temp_1"); i++){
-                add_char_to_str(str,  "EQ GF@prec_var_temp_1 GF@prec_var_temp_2 GF@prec_var_temp_1\nPUSHS GF@prec_var_temp_1"[i]);
+            for(unsigned int i = 0; i < strlen("EQ GF@prec_var_temp_1 GF@prec_var_temp_2 GF@prec_var_temp_1\nPUSHS GF@prec_var_temp_1\n"); i++){
+                add_char_to_str(str,  "EQ GF@prec_var_temp_1 GF@prec_var_temp_2 GF@prec_var_temp_1\nPUSHS GF@prec_var_temp_1\n"[i]);
             }             
             skip_counter++;
             break;
@@ -3669,8 +3669,8 @@ void prec_an_operator(token_t type, struct dynamic_string *str){
             for(unsigned int i = 0; i < strlen(tmp1118); i++){
                 add_char_to_str(str, tmp1118[i]);
             }
-            for(unsigned int i = 0; i < strlen(" GF@type_var_temp_1 GF@type_var_temp_2\nMOVE GF@prec_var_temp_1 bool@true\nJUMP $END_LSEQ"); i++){
-                add_char_to_str(str,  " GF@type_var_temp_1 GF@type_var_temp_2\nMOVE GF@prec_var_temp_1 bool@true\nJUMP $END_LSEQ"[i]);
+            for(unsigned int i = 0; i < strlen(" GF@prec_var_temp_1 GF@prec_var_temp_2\nMOVE GF@prec_var_temp_1 bool@true\nJUMP $END_LSEQ"); i++){
+                add_char_to_str(str,  " GF@prec_var_temp_1 GF@prec_var_temp_2\nMOVE GF@prec_var_temp_1 bool@true\nJUMP $END_LSEQ"[i]);
             }   
             char tmpa118[100];
             sprintf(tmpa118, "%d", skip_counter);

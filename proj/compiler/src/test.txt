@@ -1,2 +1,2 @@
-a = chr(117)
-print(a)
+a = 3
+while()
