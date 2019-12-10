@@ -74,13 +74,13 @@ void create_functions(){
     fprintf(stdout, "LABEL $inputf\n");
     fprintf(stdout, "PUSHFRAME\n");
     //fprintf(stdout, "DEFVAR LF@$$var\n");
-    fprintf(stdout, "DEFVAR LF@%%retval\n");
-    fprintf(stdout, "DEFVAR LF@shouldbefloat\n");
-    fprintf(stdout, "DEFVAR LF@floatstring\n");
+    //fprintf(stdout, "DEFVAR LF@%%retval\n");
+    //fprintf(stdout, "DEFVAR LF@shouldbefloat\n");
+    //fprintf(stdout, "DEFVAR LF@floatstring\n");
     fprintf(stdout, "READ GF@prec_var_temp_1 float\n");//var has int value now
-    fprintf(stdout, "TYPE LF@shouldbefloat GF@prec_var_temp_1\n");//shouldbeint now shouldbeint
-    fprintf(stdout, "MOVE LF@floatstring string@float\n");//int string now has int
-    fprintf(stdout, "JUMPIFNEQ $exitforinputf LF@shouldbefloat LF@floatstring\n");
+    fprintf(stdout, "TYPE GF@type_var_1 GF@prec_var_temp_1\n");//shouldbeint now shouldbeint
+    fprintf(stdout, "MOVE GF@type_var_2 string@float\n");//int string now has int
+    fprintf(stdout, "JUMPIFNEQ $exitforinputf GF@type_var_1 GF@type_var_2\n");
     fprintf(stdout, "MOVE GF@retval GF@prec_var_temp_1\n");
     fprintf(stdout, "JUMP $EXIT_inputf\n");
     fprintf(stdout, "LABEL $exitforinputf\n");
@@ -163,7 +163,7 @@ void create_functions(){
     fprintf(stdout,"DEFVAR TF@%%1\n");                                                      
     fprintf(stdout,"MOVE TF@%%1 LF@%%1\n");                                                 
     fprintf(stdout,"CALL $len\n");                                                      
-    fprintf(stdout,"MOVE LF@length_str TF@%%retval\n");                                     
+    fprintf(stdout,"MOVE LF@length_str GF@retval\n");                                     
     fprintf(stdout,"GT LF@cond_length LF@%%2 LF@length_str\n");                     
     fprintf(stdout,"JUMPIFEQ $asc$return LF@cond_length bool@true\n");
     fprintf(stdout,"SUB LF@%%2 LF@%%2 int@1\n");                                    
@@ -179,15 +179,15 @@ void create_functions(){
     fprintf(stdout,"#CHRFUNCTION\n");                                                       
     fprintf(stdout,"LABEL $chr\n");                                                         
     fprintf(stdout,"PUSHFRAME\n");                                                          
-    fprintf(stdout,"DEFVAR LF@%%retval\n");                                                 
-    fprintf(stdout,"MOVE LF@%%retval string@\n");                                           
+    //fprintf(stdout,"DEFVAR LF@%%retval\n");                                                 
+    fprintf(stdout,"MOVE GF@%%retval string@\n");                                           
     fprintf(stdout,"DEFVAR LF@cond_range\n");                                   
     fprintf(stdout,"LT LF@cond_range LF@%%1 int@0\n");                  
     fprintf(stdout,"JUMPIFEQ $chr$return LF@cond_range bool@true\n");
     fprintf(stdout,"GT LF@cond_range LF@%%1 int@255\n");                        
     fprintf(stdout,"JUMPIFEQ $chr$return LF@cond_range bool@true\n");
-    fprintf(stdout,"INT2CHAR LF@%%retval LF@%%1\n");
-    printf("MOVE GF@retval LF@%%retval\n");                                            
+    fprintf(stdout,"INT2CHAR GF@%%retval LF@%%1\n");
+    //printf("MOVE GF@retval F@%%retval\n");                                            
     fprintf(stdout,"LABEL $chr$return\n");                                                  
     fprintf(stdout,"POPFRAME\n");                                                       
     fprintf(stdout,"RETURN\n");
