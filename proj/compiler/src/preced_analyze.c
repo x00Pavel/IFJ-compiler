@@ -501,20 +501,13 @@ int preced_analyze(struct token_s *token, table_s *hash_table, int* count_of_par
         
         switch (token->type){
         case TOKEN_ID:
-            prev_token->type = TOKEN_ID;
-            prev_token->attribute.string = (char *)malloc(sizeof(char) * strlen(token->attribute.string) + 1);
-            strcpy(prev_token->attribute.string, token->attribute.string);
-            free(token->attribute.string);
-            // printf("INSIDE PREC ANAL\n");
-            prec_an_operand(frame, prev_token, str);
-            // printf("AFTER CALL CODEGEN\n");
-            break;
         case TOKEN_STRING:
-            prev_token->type = TOKEN_STRING;
+            prev_token->type = (token->type == TOKEN_ID) ? TOKEN_ID : TOKEN_STRING;
             prev_token->attribute.string = (char *)malloc(sizeof(char) * strlen(token->attribute.string) + 1);
             strcpy(prev_token->attribute.string, token->attribute.string);
             prec_an_operand(frame, prev_token, str);
             free(token->attribute.string);
+            free(prev_token->attribute.string);
             break;
         case TOKEN_INT:
             prev_token->type = TOKEN_INT;
@@ -528,7 +521,6 @@ int preced_analyze(struct token_s *token, table_s *hash_table, int* count_of_par
             break;
         // case TOKEN_EOL:
         case TOKEN_EOF:
-            // printf( "Error in precedence analyzes\n");
             end = true;
             free(scanner_stack);
             if (prev_token->type == TOKEN_ID || prev_token->type == TOKEN_STRING)

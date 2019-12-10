@@ -40,6 +40,106 @@
 
 typedef struct stack tStack;
 
+int convert_num_to_str(struct dynamic_string *str)
+{
+    int c = getchar();
+    // Hexadecimal value
+    if ((c == 'x') || (c == 'X'))
+    {
+        char tmp[4];
+        tmp[0] = '0';
+        tmp[1] = (char)c;
+        for (int i = 2; i < 4; i++)
+        {
+            c = getchar();
+            if (isdigit(c) ||
+                (c == 'A') ||
+                (c == 'a') ||
+                (c == 'B') ||
+                (c == 'b') ||
+                (c == 'C') ||
+                (c == 'c') ||
+                (c == 'D') ||
+                (c == 'd') ||
+                (c == 'E') ||
+                (c == 'e') ||
+                (c == 'F') ||
+                (c == 'f'))
+            {
+                tmp[i] = (char)c;
+            }
+            else
+            {
+                return ERR_LEXER;
+            }
+        }
+        c = getchar();
+        if (isalpha(c) || isdigit(c))
+        {
+            // error in hex value
+            return ERR_LEXER;
+        }
+        ungetc(c, stdin);
+
+        // char hex;
+        long hex = strtol(tmp, NULL, 16);
+        char tmp_1[3];
+        sprintf(tmp_1, "%ld", hex);
+        if (hex < 100)
+        {
+            add_char_to_str(str, '0');
+            add_char_to_str(str, tmp_1[0]);
+            add_char_to_str(str, tmp_1[1]);
+        }
+        else if (hex > 255)
+        {
+            return ERR_LEXER;
+        }
+        else
+        {
+            for (int b = 0; b < 3; b++)
+            {
+                add_char_to_str(str, tmp_1[b]);
+            }
+        }
+    }
+    else if (c == 'n')
+    {
+        add_char_to_str(str, '0');
+        add_char_to_str(str, '1');
+        add_char_to_str(str, '0');
+    }
+    else if (c == 't')
+    {
+        add_char_to_str(str, '0');
+        add_char_to_str(str, '0');
+        add_char_to_str(str, '9');
+    }
+    else if (c == '\\')
+    {
+        add_char_to_str(str, '0');
+        add_char_to_str(str, '9');
+        add_char_to_str(str, '2');
+    }
+    else if (c == '\'')
+    {
+        add_char_to_str(str, '0');
+        add_char_to_str(str, '3');
+        add_char_to_str(str, '9');
+    }
+    else if (c == '\"')
+    {
+        add_char_to_str(str, '0');
+        add_char_to_str(str, '3');
+        add_char_to_str(str, '4');
+    }
+    else
+    {
+        add_char_to_str(str, c);
+    }
+    return OK;
+}
+
 int get_token(struct token_s *token, tStack *stack)
 {
 
@@ -54,6 +154,7 @@ int get_token(struct token_s *token, tStack *stack)
     int c;
     static int prev_sym;
     int space_cnt = 0;
+    int ret_code;
 
     while (state != SCANNER_EOF)
     {
@@ -569,75 +670,10 @@ int get_token(struct token_s *token, tStack *stack)
             else if (c == '\\')
             {
                 add_char_to_str(str, c);
-                c = getchar();
-                // Hexadecimal value
-                if ((c == 'x') || (c == 'X'))
-                {
-                    char tmp[4];
-                    tmp[0] = '0';
-                    tmp[1] = (char)c;
-                    for (int i = 2; i < 4; i++)
-                    {
-                        c = getchar();
-                        if (isdigit(c) ||
-                            (c == 'A') ||
-                            (c == 'a') ||
-                            (c == 'B') ||
-                            (c == 'b') ||
-                            (c == 'C') ||
-                            (c == 'c') ||
-                            (c == 'D') ||
-                            (c == 'd') ||
-                            (c == 'E') ||
-                            (c == 'e') ||
-                            (c == 'F') ||
-                            (c == 'f'))
-                        {
-                            tmp[i] = (char)c;
-                        }
-                        else
-                        {
-                            return ERR_LEXER;
-                        }
-                    }
-
-                    char hex;
-                    sscanf(tmp, "%hhx", &hex);
-                    add_char_to_str(str, hex);
-                }
-                else if (c == 'n')
-                {
-                    add_char_to_str(str, '0');
-                    add_char_to_str(str, '1');
-                    add_char_to_str(str, '0');
-                }
-                else if (c == 't')
-                {
-                    add_char_to_str(str, '0');
-                    add_char_to_str(str, '0');
-                    add_char_to_str(str, '9');
-                }
-                else if (c == '\\')
-                {
-                    add_char_to_str(str, '0');
-                    add_char_to_str(str, '9');
-                    add_char_to_str(str, '2');
-                }
-                else if (c == '\'')
-                {
-                    add_char_to_str(str, '0');
-                    add_char_to_str(str, '3');
-                    add_char_to_str(str, '9');
-                }
-                else if (c == '\"')
-                {
-                    add_char_to_str(str, '0');
-                    add_char_to_str(str, '3');
-                    add_char_to_str(str, '4');
-                }
-                else
-                {
-                    add_char_to_str(str, c);
+                ret_code = convert_num_to_str(str);
+                if(ret_code != OK){
+                    str_clean(str);
+                    return ret_code;
                 }
             }
             else if (c == ' ')
@@ -653,7 +689,6 @@ int get_token(struct token_s *token, tStack *stack)
             }
             else if (c == '\n')
             {
-                str_clean(str);
                 str_clean(str);
                 return ERR_LEXER;
             }
@@ -678,66 +713,12 @@ int get_token(struct token_s *token, tStack *stack)
                 {
                     if (c == '\\')
                     {
-                        c = getchar();
-                        // Hexadecimal value
-                        if ((c == 'x') || (c == 'X'))
+                        add_char_to_str(str, c);
+                        ret_code = convert_num_to_str(str);
+                        if (ret_code != OK)
                         {
-                            char tmp[4];
-                            tmp[0] = '0';
-                            tmp[1] = (char)c;
-                            for (int i = 2; i < 4; i++)
-                            {
-                                c = getchar();
-                                if (isdigit(c) ||
-                                    (c == 'A') ||
-                                    (c == 'a') ||
-                                    (c == 'B') ||
-                                    (c == 'b') ||
-                                    (c == 'C') ||
-                                    (c == 'c') ||
-                                    (c == 'D') ||
-                                    (c == 'd') ||
-                                    (c == 'E') ||
-                                    (c == 'e') ||
-                                    (c == 'F') ||
-                                    (c == 'f'))
-                                {
-                                    tmp[i] = (char)c;
-                                }
-                                else
-                                {
-                                    return ERR_LEXER;
-                                }
-                            }
-                            char hex;
-                            // Convert to hex value
-                            sscanf(tmp, "%hhx", &hex);
-                            add_char_to_str(str, hex);
-                        }
-                        else if (c == 'n')
-                        {
-                            add_char_to_str(str, '\n');
-                        }
-                        else if (c == 't')
-                        {
-                            add_char_to_str(str, '\t');
-                        }
-                        else if (c == '\\')
-                        {
-                            add_char_to_str(str, '\\');
-                        }
-                        else if (c == '\'')
-                        {
-                            add_char_to_str(str, '\\');
-                        }
-                        else if (c == '\"')
-                        {
-                            add_char_to_str(str, '\"');
-                        }
-                        else
-                        {
-                            add_char_to_str(str, '\\');
-                            add_char_to_str(str, c);
+                            str_clean(str);
+                            return ret_code;
                         }
                     }
                     else if (c == ' ')
@@ -747,6 +728,11 @@ int get_token(struct token_s *token, tStack *stack)
                         add_char_to_str(str, '3');
                         add_char_to_str(str, '2');
                     }
+                    else if (c == '\'')
+                    {
+                        add_char_to_str(str, '\'');
+                    }
+                    
                     else if (c == '\n')
                     {
                         add_char_to_str(str, '\\');
