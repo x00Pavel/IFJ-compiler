@@ -4,21 +4,20 @@ JUMP $$main
 #FUNCLEN
 LABEL $len
 PUSHFRAME
-DEFVAR LF@%retval
-STRLEN LF@%retval LF@%1
-MOVE GF@retval LF@%retval
+STRLEN GF@retval LF@%1
 POPFRAME
 RETURN
 #INPUTS
 LABEL $inputs
 PUSHFRAME
-DEFVAR LF@%retval
-DEFVAR LF@%var
-DEFVAR LF@%HELPER
-READ LF@%var string
-JUMPIFNEQ $exitforinputs LF@%HELPER string@string
-MOVE GF@retval LF@%var
-LABEL $exitforunputs
+READ GF@prec_var_temp_1 string
+TYPE GF@type_var_1 GF@prec_var_temp_1
+JUMPIFNEQ $exitforinputs GF@type_var_1 string@string
+MOVE GF@retval GF@prec_var_temp_1
+JUMP $EXIT_inputs
+LABEL $exitforinputs
+EXIT int@4
+LABEL $EXIT_inputs
 POPFRAME
 RETURN
 #INPUTI
@@ -33,7 +32,10 @@ TYPE LF@shouldbeint LF@$$var
 MOVE LF@intstring string@int
 JUMPIFNEQ $exitforinputi LF@shouldbeint LF@intstring
 MOVE GF@retval LF@$$var
+JUMP $EXIT_inputi
 LABEL $exitforinputi
+EXIT int@4
+LABEL $EXIT_inputi
 POPFRAME
 RETURN
 #INPUTF
@@ -46,9 +48,12 @@ DEFVAR LF@floatstring
 READ LF@$$var float
 TYPE LF@shouldbefloat LF@$$var
 MOVE LF@floatstring string@float
-JUMPIFNEQ $exitforinputi LF@shouldbefloat LF@floatstring
+JUMPIFNEQ $exitforinputf LF@shouldbefloat LF@floatstring
 MOVE GF@retval LF@$$var
+JUMP $EXIT_inputf
 LABEL $exitforinputf
+EXIT int@4
+LABEL $EXIT_inputf
 POPFRAME
 RETURN
 #SUBSTRFUNCTION
@@ -60,8 +65,8 @@ DEFVAR LF@length_str
 CREATEFRAME
 DEFVAR TF@%1
 MOVE TF@%1 LF@%1
-CALL $length
-MOVE LF@length_str TF@%retval
+CALL $len
+MOVE LF@length_str GF@retval
 DEFVAR LF@ret_cond
 LT LF@ret_cond LF@length_str int@0
 JUMPIFEQ $substr$return LF@ret_cond bool@true
@@ -98,13 +103,13 @@ GETCHAR LF@char LF@%1 LF@index
 CONCAT LF@%retval LF@%retval LF@char
 MOVE GF@retval LF@%retval
 ADD LF@index LF@index int@1
-SUB LF@%3 LF@%2 int@1
+SUB LF@%3 LF@%3 int@1
 GT LF@process_loop_cond LF@%3 int@0
 JUMPIFEQ $substr$process_loop LF@process_loop_cond bool@true
 LABEL $substr$return
 POPFRAME
 RETURN
-#ASCFUNCTION
+#ORDFUNCTION
 LABEL $ord
 PUSHFRAME
 DEFVAR LF@%retval
@@ -185,7 +190,7 @@ TYPE GF@TYPEOFVAR GF@res
 JUMPIFEQ $skip_for_bool_1 GF@TYPEOFVAR string@bool
 JUMPIFNEQ $skip_for_NONE_1 GF@TYPEOFVAR nil@nil
 MOVE GF@res bool@false
-JUMP $skip_for_float_1
+JUMP $skip_for_bool_1
 LABEL $skip_for_NONE_1
 JUMPIFNEQ $skip_for_int_1 GF@TYPEOFVAR string@int
 JUMPIFEQ $end_int_1 GF@res int@0
@@ -221,57 +226,69 @@ DEFVAR GF@vysl
 PUSHS int@1
 POPS GF@retval
 MOVE GF@vysl GF@retval
+
+
 #WHILE CYCLE
-LABEL while2
+LABEL $while2
 PUSHS GF@a
 PUSHS int@0
 POPS GF@prec_var_temp_1
 TYPE GF@type_var_1 GF@prec_var_temp_1
 POPS GF@prec_var_temp_2
 TYPE GF@type_var_2 GF@prec_var_temp_2
-JUMPIFNEQ $GT_SKIP_2 GF@type_var_1 GF@type_var_2
-2
-JUMPIFNEQ $skip_gt2 GF@type_var_1 string@string
+JUMPIFEQ $GT_SKIP_2 GF@type_var_1 GF@type_var_2
+JUMPIFNEQ $skip_gt_2 GF@type_var_1 string@string
 EXIT int@4
 LABEL $skip_gt_2
-JUMPIFNEQ $skip_gt_22 GF@type_var_2 string@string
+JUMPIFNEQ $skip_gt_2_2 GF@type_var_2 string@string
 EXIT int@4
 LABEL $skip_gt_2_2
-JUMPIFEQ $GT_SKIP_2 GF@type_var_1 GF@type_var_2
+JUMPIFEQ $skip_int_2 GF@type_var_1 string@int
 INT2FLOAT GF@prec_var_temp_1 GF@prec_var_temp_1
 JUMP $GT_SKIP_2
-JLABEL $skip_gt_2
-INT2FLOAT GT@prec_var_temp_2 GF@prec_var_temp_22
+LABEL $skip_int_2
+INT2FLOAT GF@prec_var_temp_2 GF@prec_var_temp_2
 LABEL $GT_SKIP_2
 GT GF@prec_var_temp_1 GF@prec_var_temp_2 GF@prec_var_temp_1
-PUSHS GF@prec_var_temp_1LF@res LF@retval1 LF@retval
-JUMPIFNEQ $EXIT2 LF@res bool@true
+PUSHS GF@prec_var_temp_1
+#START_WHILE_BODY
+POPS GF@res
+TYPE GF@TYPEOFVAR GF@res
+JUMPIFEQ $skip_for_bool_3 GF@TYPEOFVAR string@bool
+JUMPIFNEQ $skip_for_NONE_3 GF@TYPEOFVAR nil@nil
+MOVE GF@res bool@false
+JUMP $skip_for_bool_3
+LABEL $skip_for_NONE_3
+
+JUMPIFNEQ $skip_for_int_3 GF@TYPEOFVAR string@int
+JUMPIFEQ $end_int_3 GF@res int@0
+MOVE GF@res bool@true
+JUMP $skip_for_bool_3
+LABEL $skip_for_int_3
+JUMPIFNEQ $skip_for_float_3 GF@TYPEOFVAR string@float
+JUMPIFEQ $end_float_3 GF@res float@0x0p+0
+MOVE GF@res bool@true
+JUMP $skip_for_bool_3
+LABEL $skip_for_float_3
+
+JUMPIFNEQ $skip_for_string_3 GF@TYPEOFVAR string@string
+JUMPIFEQ $end_string_3 GF@res string@''
+MOVE GF@res bool@true
+JUMP $skip_for_bool_3
+LABEL $skip_for_string_3
+EXIT int@4
+LABEL end_string_3
+MOVE GF@res bool@false
+JUMP $skip_for_bool_3
+LABEL end_float_3
+MOVE GF@res bool@false
+JUMP $skip_for_bool_3
+LABEL end_int_3
+MOVE GF@res bool@false
+LABEL $skip_for_bool_3
+JUMPIFNEQ $EXIT2 GF@res bool@true
 PUSHS GF@vysl
 PUSHS GF@a
-POPS GF@prec_var_temp_1
-TYPE GF@type_var_1 GF@prec_var_temp_1
-POPS GF@prec_var_temp_2
-TYPE GF@type_var_2 GF@prec_var_temp_2
-JUMPIFNEQ $skip_string_3 GF@type_var_1 string@string
-EXIT int@4
-LABEL $skip_string_3
-JUMPIFNEQ $skip_string_2_3 GF@type_var_2 string@string
-EXIT int@4
-LABEL $skip_string_2_3
-JUMPIFEQ $MUL_SKIP_3 GF@type_var_1 GF@type_var_2
-3
-JUMPIFNEQ $skip_float_3 GF@type_var_1 string@int
-INT2FLOAT GF@prec_var_temp_1 GF@prec_var_temp_1
-JUMP MUL_SKIP_3
-LABEL $skip_float_3
-INT2FLOAT GF@prec_var_temp_2 GF@prec_var_temp_2
-LABEL $MUL_SKIP_3MUL GF@prec_var_temp_1 GF@rpec_var_temp_2 GF@prec_var_temp_1
-PUSHS GF@prec_var_temp_1
-POPS GF@retval
-MOVE GF@vysl GF@retval
-DEFVAR GF@a
-PUSHS GF@a
-PUSHS int@1
 POPS GF@prec_var_temp_1
 TYPE GF@type_var_1 GF@prec_var_temp_1
 POPS GF@prec_var_temp_2
@@ -282,26 +299,49 @@ LABEL $skip_string_4
 JUMPIFNEQ $skip_string_2_4 GF@type_var_2 string@string
 EXIT int@4
 LABEL $skip_string_2_4
-JUMPIFNEQ $MINUS_SKIP_4 GF@type_var_1 GF@type_var_2
-4
-JUMPIFNEQ $skip_int_4 GF@type_var_1 string@int
-INT2FLOAT GF@prec_var_temp_1 GF@prec_var_temp_1
-JUMP $MINUS_SKIP_4
-LABEL $skip_int_4
+JUMPIFEQ $MUL_SKIP_4 GF@type_var_1 GF@type_var_2
 
-INT2FLOAT GT@prec_var_temp_2 GF@prec_var_temp_2
-LABEL $MINUS_SKIP_4
-SUB GF@prev_var_temp_1 GF@prec_var_temp_2 GF@prec_var_temp_1
+JUMPIFNEQ $skip_float_4 GF@type_var_1 string@int
+INT2FLOAT GF@prec_var_temp_1 GF@prec_var_temp_1
+JUMP MUL_SKIP_4
+LABEL $skip_float_4
+INT2FLOAT GF@prec_var_temp_2 GF@prec_var_temp_2
+LABEL $MUL_SKIP_4
+MUL GF@prec_var_temp_1 GF@prec_var_temp_2 GF@prec_var_temp_1
+PUSHS GF@prec_var_temp_1
+POPS GF@retval
+MOVE GF@vysl GF@retval
+PUSHS GF@a
+PUSHS int@1
+POPS GF@prec_var_temp_1
+TYPE GF@type_var_1 GF@prec_var_temp_1
+POPS GF@prec_var_temp_2
+TYPE GF@type_var_2 GF@prec_var_temp_2
+JUMPIFNEQ $skip_string_5 GF@type_var_1 string@string
+EXIT int@4
+LABEL $skip_string_5
+JUMPIFNEQ $skip_string_2_5 GF@type_var_2 string@string
+EXIT int@4
+LABEL $skip_string_2_5
+JUMPIFEQ $MINUS_SKIP_5 GF@type_var_1 GF@type_var_2
+
+JUMPIFNEQ $skip_int_5 GF@type_var_1 string@int
+INT2FLOAT GF@prec_var_temp_1 GF@prec_var_temp_1
+JUMP $MINUS_SKIP_5
+LABEL $skip_int_5
+
+INT2FLOAT GF@prec_var_temp_2 GF@prec_var_temp_2
+LABEL $MINUS_SKIP_5
+SUB GF@prec_var_temp_1 GF@prec_var_temp_2 GF@prec_var_temp_1
 PUSHS GF@prec_var_temp_1
 POPS GF@retval
 MOVE GF@a GF@retval
-JUMP while2
+JUMP $while2
 LABEL $EXIT2
 WRITE string@Vysledek\032je:
 WRITE string@\032
 WRITE GF@vysl
 WRITE string@\032
-WRITE string@
-
+WRITE string@\010
 WRITE string@\010
 LABEL $EXIT1
