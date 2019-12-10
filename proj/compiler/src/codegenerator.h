@@ -251,17 +251,61 @@ void generate_while_for_true_end(int *t,struct dynamic_string *str);
 /**
  * \brief
  * This function works with 2 upper elements in stack
- * Perfomrs operatons such as SUM, MUL, SUB, DIV, IDIV,EQUAL,NOT_EQUAL GREATER, LESS, LESS_EQ. TOKEN_GREATER_EQ
+ * Perfomrs operatons such as SUM, MULTIPLY, MINUS, DIVISION, IDIV,EQUAL,NOT_EQUAL GREATER, LESS, LESS_EQ, TOKEN_GREATER_EQ
  * \param[in] token_type Input token
  * \param[in] str String for code
  * \return
 */
 void prec_an_operator(token_t type, struct dynamic_string *str);
+/**
+ * \brief
+ * This function generates PUSH in the stack
+ * \param[in] token_type Input token
+ * \param[in] str String for code
+ * \return
+*/
 void prec_an_operand(char *s, struct token_s *token, struct dynamic_string *str);
+/**
+ * \brief
+ * This function generates helping variables for operations with stacks
+ * \param[in] token_type Input token
+ * \param[in] str String for code
+ * \return
+*/
 void prec_an_def_var();
+/**
+ * \brief
+ * This function generates helping variables for operations with stacks
+ * \param[in] str String for code
+ * \return
+*/
 void pop_retval(struct dynamic_string *str);
+/**
+ * \brief
+ * This function generates the call of inputs function
+ * \param[in] str String for code
+ * \return
+*/
 void inputs_call(struct dynamic_string *str);
+/**
+ * \brief
+ * This function generates the call of inputi function
+ * \param[in] str String for code
+ * \return
+*/
 void inputi_call(struct dynamic_string *str);
+/**
+ * \brief
+ * This function generates the call of inputf function
+ * \param[in] str String for code
+ * \return
+*/
 void inputf_call(struct dynamic_string *str);
+/**
+ * \brief
+ * This function generates the call of all inserted function except inputi(f,s) 
+ * \param[in] str String for code
+ * \return
+*/
 void call_inserted_functions(char *d,struct dynamic_string *str);
 #endif 
