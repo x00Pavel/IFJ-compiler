@@ -2556,7 +2556,7 @@ void prec_an_operator(token_t type, struct dynamic_string *str){
             // printf("LABEL $DIV_SKIP_%d\n", skip_counter);
 
             printf("JUMPIFNEQ $SKIP_EXIT_0_%d GF@prec_var_temp_1 float@0x0p+0\n", skip_counter);
-            printf("EXIT 9\n");
+            printf("EXIT int@9\n");
             printf("LABEL $SKIP_EXIT_0_%d\n", skip_counter);
             printf("DIV GF@prec_var_temp_1 GF@prec_var_temp_2 GF@prec_var_temp_1\n");
 
@@ -2640,8 +2640,8 @@ void prec_an_operator(token_t type, struct dynamic_string *str){
                 add_char_to_str(str, tmp9[i]);
             } 
             add_char_to_str(str, 10);
-            for(unsigned int i = 0; i < strlen("GF@prec_var_temp_1 float0x0\nEXIT 9\nLABEL $SKIP_EXIT_0_"); i++){
-                add_char_to_str(str,   "GF@prec_var_temp_1 float0x0\nEXIT 9\nLABEL $SKIP_EXIT_0_"[i]);
+            for(unsigned int i = 0; i < strlen("GF@prec_var_temp_1 float0x0\nEXIT int@9\nLABEL $SKIP_EXIT_0_"); i++){
+                add_char_to_str(str,   "GF@prec_var_temp_1 float0x0\nEXIT int@9\nLABEL $SKIP_EXIT_0_"[i]);
             }
             char tmp10[100];
             sprintf(tmp10, "%d", skip_counter);
@@ -2684,7 +2684,7 @@ void prec_an_operator(token_t type, struct dynamic_string *str){
             printf("LABEL $MINUS_SKIP_%d\n", skip_counter);
 
             // printf("JUMPIFNEQ $SKIP_EXIT_0_%d GF@prec_var_temp_1 float@0x0\n", skip_counter);
-            // printf("EXIT 9\n");
+            // printf("EXIT int@9\n");
             // printf("LABEL $SKIP_EXIT_0_%d\n", skip_counter);
             printf("SUB GF@prec_var_temp_1 GF@prec_var_temp_2 GF@prec_var_temp_1\n");
 
@@ -2810,7 +2810,7 @@ void prec_an_operator(token_t type, struct dynamic_string *str){
             printf("LABEL $skip_float_2_%d\n", skip_counter);
 
             printf("JUMPIFNEQ $SKIP_EXIT_0_%d GF@prec_var_temp_1 int@0\n", skip_counter);
-            printf("EXIT 9\n");
+            printf("EXIT int@9\n");
             printf("LABEL $SKIP_EXIT_0_%d\n", skip_counter);
             printf("IDIV GF@prec_var_temp_1 GF@prec_var_temp_2 GF@prec_var_temp_1\n");
 
@@ -2893,7 +2893,7 @@ void prec_an_operator(token_t type, struct dynamic_string *str){
             for(unsigned int i = 0; i < strlen(tmp45); i++){
                 add_char_to_str(str, tmp45[i]);
             }
-            for(unsigned int i = 0; i < strlen(" GF@prec_var_temp_1 int@0\nEXIT 9\nLABEL $SKIP_EXIT_0_"); i++){
+            for(unsigned int i = 0; i < strlen(" GF@prec_var_temp_1 int@0\nEXIT int@9\nLABEL $SKIP_EXIT_0_"); i++){
                 add_char_to_str(str,   "GF@type_var_1 GF@type_var_2\n"[i]);
             } 
             char tmp46[100];
