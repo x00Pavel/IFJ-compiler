@@ -386,10 +386,13 @@ int func_for_FNC(struct token_s *token, tStack *stack, table_s *hash_table, bool
                 return OK; // nastala ")"
             }else if(token_for_time.type == TOKEN_INPUT_I || token_for_time.type == TOKEN_INPUT_S || token_for_time.type == TOKEN_INPUT_F){
                 if(token_for_time.type == TOKEN_INPUT_I){
+                    token_function_begin_with_y(str_1);
                     inputi_call(str_1);
                 }else if(token_for_time.type == TOKEN_INPUT_F){
+                    token_function_begin_with_y(str_1);
                     inputf_call(str_1);
                 }else if(token_for_time.type == TOKEN_INPUT_S){
+                    token_function_begin_with_y(str_1);
                     inputs_call(str_1);
                 }
                 return OK;
@@ -1162,6 +1165,7 @@ int func_prog(struct token_s *token, tStack *stack, int state, int ret_code, tab
             case TOKEN_INPUT_I:                
             case TOKEN_INPUT_S:
             case TOKEN_INPUT_F:
+                // token_function_begin_with_y(str_1);
                 flag_def = false;
                 ret_code = func_for_FNC(token, stack, hash_table, flag_def, &count_of_params, str_1);
                 if(ret_code != OK)

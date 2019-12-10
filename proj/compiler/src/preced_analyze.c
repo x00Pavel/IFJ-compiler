@@ -519,6 +519,9 @@ int preced_analyze(struct token_s *token, table_s *hash_table, int* count_of_par
             prev_token->attribute.float_val = token->attribute.float_val;
             prec_an_operand(frame, prev_token, str);
             break;
+        case TOKEN_NONE:
+            prec_an_operand(frame, token, str);
+            break;
         // case TOKEN_EOL:
         case TOKEN_EOF:
             end = true;
