@@ -40,14 +40,7 @@ test:
 	./ifj2019<test1.txt > test.out
 	./ic19int test.out
 
-int1: main 
-	./${PROJ} < test1.txt > test.out
-	./ic19int test.out
-
-int2: main 
+int: main 
 	./${PROJ} < test2.txt > test.out
 	./ic19int test.out
-
-int3: main 
-	./${PROJ} < test3.txt > test.out
-	./ic19int test.out
+	
