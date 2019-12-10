@@ -31,9 +31,7 @@ void create_functions(){
     fprintf(stdout,"#FUNCLEN\n");
     fprintf(stdout,"LABEL $len\n");
     fprintf(stdout,"PUSHFRAME\n");
-    // fprintf(stdout,"DEFVAR LF@%%retval\n");
     fprintf(stdout,"STRLEN GF@retval LF@%%1\n");
-    // printf("MOVE GF@retval LF@%%retval\n");
     fprintf(stdout,"POPFRAME\n");
     fprintf(stdout,"RETURN\n");
 
@@ -54,15 +52,15 @@ void create_functions(){
     fprintf(stdout, "#INPUTI\n");
     fprintf(stdout, "LABEL $inputi\n");
     fprintf(stdout, "PUSHFRAME\n");
-    fprintf(stdout, "DEFVAR LF@$$var\n");
-    fprintf(stdout, "DEFVAR LF@%%retval\n");
-    fprintf(stdout, "DEFVAR LF@shouldbeint\n");
+    //fprintf(stdout, "DEFVAR LF@$$var\n");
+    //fprintf(stdout, "DEFVAR LF@%%retval\n");
+    //fprintf(stdout, "DEFVAR LF@shouldbeint\n");
     fprintf(stdout, "DEFVAR LF@intstring\n");
-    fprintf(stdout, "READ LF@$$var int\n");//var has int value now//67
-    fprintf(stdout, "TYPE LF@shouldbeint LF@$$var\n");//shouldbeint now shouldbeint
-    fprintf(stdout, "MOVE LF@intstring string@int\n");//int string now has int
-    fprintf(stdout, "JUMPIFNEQ $exitforinputi LF@shouldbeint LF@intstring\n");
-    fprintf(stdout, "MOVE GF@retval LF@$$var\n");
+    fprintf(stdout, "READ GF@prec_var_temp_1 int\n");//var has int value now//67
+    fprintf(stdout, "TYPE GF@type_var_2 GF@prec_var_temp_1\n");//shouldbeint now shouldbeint
+    fprintf(stdout, "MOVE GF@prec_var_temp_1 string@int\n");//int string now has int
+    fprintf(stdout, "JUMPIFNEQ $exitforinputi  GF@type_var_2\n");
+    fprintf(stdout, "MOVE GF@retval GF@prec_var_temp_1\n");
     fprintf(stdout, "JUMP $EXIT_inputi\n");
     fprintf(stdout, "LABEL $exitforinputi\n");
     fprintf(stdout, "EXIT int@4\n");
@@ -75,15 +73,15 @@ void create_functions(){
     fprintf(stdout, "#INPUTF\n");
     fprintf(stdout, "LABEL $inputf\n");
     fprintf(stdout, "PUSHFRAME\n");
-    fprintf(stdout, "DEFVAR LF@$$var\n");
+    //fprintf(stdout, "DEFVAR LF@$$var\n");
     fprintf(stdout, "DEFVAR LF@%%retval\n");
     fprintf(stdout, "DEFVAR LF@shouldbefloat\n");
     fprintf(stdout, "DEFVAR LF@floatstring\n");
-    fprintf(stdout, "READ LF@$$var float\n");//var has int value now
-    fprintf(stdout, "TYPE LF@shouldbefloat LF@$$var\n");//shouldbeint now shouldbeint
+    fprintf(stdout, "READ GF@prec_var_temp_1 float\n");//var has int value now
+    fprintf(stdout, "TYPE LF@shouldbefloat GF@prec_var_temp_1\n");//shouldbeint now shouldbeint
     fprintf(stdout, "MOVE LF@floatstring string@float\n");//int string now has int
     fprintf(stdout, "JUMPIFNEQ $exitforinputf LF@shouldbefloat LF@floatstring\n");
-    fprintf(stdout, "MOVE GF@retval LF@$$var\n");
+    fprintf(stdout, "MOVE GF@retval GF@prec_var_temp_1\n");
     fprintf(stdout, "JUMP $EXIT_inputf\n");
     fprintf(stdout, "LABEL $exitforinputf\n");
     fprintf(stdout, "EXIT int@4\n");
@@ -343,30 +341,30 @@ void end_main(){
 * Define variables in all scopes
 */
   void define_variable_GF(struct token_s *token, char *s, struct dynamic_string *str){
-    if(flag_while == 0)
-    {
+  //  if(flag_while == 0)
+  //  {
         fprintf(stdout, "DEFVAR %s@%s\n",s,token->attribute.string); 
-    }
-    else
-    {
-        for(unsigned int i = 0; i < strlen("DEFVAR "); i++)
-        {
-            add_char_to_str(str, "DEFVAR "[i]);
-        }
-        for(unsigned int i = 0; i < strlen(s); i++)
-        {
-            add_char_to_str(str, s[i]);
-        }
-        for(unsigned int i = 0; i < strlen("@"); i++)
-        {
-            add_char_to_str(str, "@"[i]);
-        }
-        for(unsigned int i = 0; i < strlen(token->attribute.string); i++)
-        {
-            add_char_to_str(str, token->attribute.string[i]);
-        }
-        add_char_to_str(str, 10);
-    }
+  //  }
+    // else
+    // {
+    //     for(unsigned int i = 0; i < strlen("DEFVAR "); i++)
+    //     {
+    //         add_char_to_str(str, "DEFVAR "[i]);
+    //     }
+    //     for(unsigned int i = 0; i < strlen(s); i++)
+    //     {
+    //         add_char_to_str(str, s[i]);
+    //     }
+    //     for(unsigned int i = 0; i < strlen("@"); i++)
+    //     {
+    //         add_char_to_str(str, "@"[i]);
+    //     }
+    //     for(unsigned int i = 0; i < strlen(token->attribute.string); i++)
+    //     {
+    //         add_char_to_str(str, token->attribute.string[i]);
+    //     }
+    //     add_char_to_str(str, 10);
+    // }
 }
 /*
  *End define variables in all scopes
@@ -2335,7 +2333,17 @@ void prec_an_operand(char *s, struct token_s *token, struct dynamic_string *str)
             break;
         }
     case TOKEN_NONE:
-            printf("PUSHS nil@nil\n");
+            if(flag_while == 0)
+            {
+                printf("PUSHS nil@nil\n");
+            }
+            else
+            {
+                for(unsigned int i = 0; i < strlen("PUSHS nil@nil\n"); i++){
+                    add_char_to_str(str, "PUSHS nil@nil\n"[i]);
+                } 
+            }
+            
             break;
     default:
         break;
