@@ -183,11 +183,8 @@ void end_main() {
     fprintf(stdout, "POPFRAME\n");
     fprintf(stdout, "CLEARS\n");
 }
-/*
- *
- * START CODE DEFINE FUNCTION
- *
- */
+
+/// START CODE DEFINE FUNCTION
 
 void define_function_begin(struct token_s *token, struct dynamic_string *str) {
     if (flag_while == 0) {

@@ -12,11 +12,10 @@
 #ifndef _HASHTABLE_H_
 #define _HASHTABLE_H_
 
+#include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdbool.h>
 #include "scaner.h"
-
 
 #define MAX_HTSIZE 40
 
@@ -24,27 +23,27 @@
 #define NEW 0
 #define FOUND 1
 
-typedef char* tKey;
+typedef char *tKey;
 
-typedef struct tHTItem{
-	tKey key;				 /*< Key - name of id                 */
-	token_t type;			 /*< Token type                       */
-	token_t ret_val;		 /*< Type of return value */
-	int param_count;         /*< Count of paramters for functions */
-	bool id_declared;        /*< Flag for declared identeficators */
-	int in_if;
-	int in_else;
-	struct tHTItem* ptrnext; /*< Pointer to next node             */
+typedef struct tHTItem {
+    tKey key;         /*< Key - name of id                 */
+    token_t type;     /*< Token type                       */
+    token_t ret_val;  /*< Type of return value */
+    int param_count;  /*< Count of paramters for functions */
+    bool id_declared; /*< Flag for declared identeficators */
+    int in_if;
+    int in_else;
+    struct tHTItem *ptrnext; /*< Pointer to next node             */
 } tHTItem;
 
-typedef struct table{
-	tHTItem * hash_table[MAX_HTSIZE];
-	struct table *prev_hash_table;
+typedef struct table {
+    tHTItem *hash_table[MAX_HTSIZE];
+    struct table *prev_hash_table;
 } table_s;
 
 extern int HTSIZE;
 
-int hashCode ( tKey key );
+int hashCode(tKey key);
 
 void htInit(table_s *ptrht);
 
