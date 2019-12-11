@@ -522,7 +522,6 @@ int get_token(struct token_s *token, tStack *stack) {
                     double_quot = 0;
                     if (count_of_quot < 2) {
                         if (c == '\\') {
-                            add_char_to_str(str, c);
                             ret_code = convert_num_to_str(str);
                             if (ret_code != OK) {
                                 str_clean(str);
