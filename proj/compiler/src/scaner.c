@@ -36,7 +36,7 @@
 #define SCANNER_ASSIGN 26
 #define SCANNER_NOT 27
 #define SCANNER_BRACKET 28
-#define SCANNER_EOF 100 // Scanner read last token
+#define SCANNER_EOF 100 /// Scanner read last token
 
 typedef struct stack tStack;
 
@@ -81,7 +81,6 @@ int convert_num_to_str(struct dynamic_string *str)
         }
         ungetc(c, stdin);
 
-        // char hex;
         long hex = strtol(tmp, NULL, 16);
         char tmp_1[3];
         sprintf(tmp_1, "%ld", hex);
@@ -171,7 +170,6 @@ int get_token(struct token_s *token, tStack *stack)
         {
             prev_sym = c;
         }
-        // printf("***************** state: %d -- char '%c'\n", state, c);
         switch (state)
         {
         case SCANNER_START:
@@ -330,7 +328,7 @@ int get_token(struct token_s *token, tStack *stack)
             else if (c == ':')
             {
                 token->type = TOKEN_DDOT;
-                // first_token = true;
+
                 str_clean(str);
                 return OK;
             }
@@ -351,6 +349,7 @@ int get_token(struct token_s *token, tStack *stack)
             {
                 if (!add_char_to_str(str, c))
                 {
+                    str_clean(str);
                     return ERR_INTERNAL;
                 }
             }
@@ -475,13 +474,13 @@ int get_token(struct token_s *token, tStack *stack)
                 else if (isdigit(c))
                 {
                     str_clean(str);
-                    // SLOG("ERROR. In the begining of number cant be more then one");
+                    return ERR_LEXER;
                 }
                 else
                 {
                     if (isalpha(c))
                     {
-                        //SLOG("Wrong ID");
+                        str_clean(str);
                         return ERR_LEXER;
                     }
                     ungetc(c, stdin);
@@ -514,7 +513,7 @@ int get_token(struct token_s *token, tStack *stack)
             {
                 if (isalpha(c))
                 {
-                    // SLOG("Wrong indetificator");
+                    str_clean(str);
                     return ERR_LEXER;
                 }
                 ungetc(c, stdin);
@@ -539,7 +538,7 @@ int get_token(struct token_s *token, tStack *stack)
             {
                 if (isalpha(c))
                 {
-                    // SLOG("Wrong indetificator");
+                    str_clean(str);
                     return ERR_LEXER;
                 }
 
@@ -563,7 +562,7 @@ int get_token(struct token_s *token, tStack *stack)
             {
                 if (isalpha(c))
                 {
-                    // SLOG("Wrong indetificator");
+                    str_clean(str);
                     return ERR_LEXER;
                 }
 
@@ -671,7 +670,8 @@ int get_token(struct token_s *token, tStack *stack)
             {
                 add_char_to_str(str, c);
                 ret_code = convert_num_to_str(str);
-                if(ret_code != OK){
+                if (ret_code != OK)
+                {
                     str_clean(str);
                     return ret_code;
                 }
@@ -732,7 +732,7 @@ int get_token(struct token_s *token, tStack *stack)
                     {
                         add_char_to_str(str, '\'');
                     }
-                    
+
                     else if (c == '\n')
                     {
                         add_char_to_str(str, '\\');
@@ -760,7 +760,6 @@ int get_token(struct token_s *token, tStack *stack)
             else
             {
                 str_clean(str);
-                // SLOG("ERROR. Block string must start from '\"\"\"' !");
                 return ERR_OTHER;
             }
             break;
@@ -819,21 +818,15 @@ int get_token(struct token_s *token, tStack *stack)
             if (c == '=')
             {
                 token->type = TOKEN_NOT_EQUAL;
-                if (str->str != NULL)
-                {
-                    str_clean(str);
-                }
-                else
-                {
-                    str_clean(str);
-                }
+                str_clean(str);
                 state = SCANNER_START;
                 return OK;
             }
             else
             {
                 str_clean(str);
-                // SLOG("ERROR. After '!' can be only '=' !");
+
+                return ERR_LEXER;
             }
             break;
         case SCANNER_BRACKET:
@@ -864,5 +857,5 @@ int get_token(struct token_s *token, tStack *stack)
     }
 
     str_clean(str);
-    return -1;
+    return ERR_LEXER;
 }

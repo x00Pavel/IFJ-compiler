@@ -4,22 +4,21 @@
  * 
  * \author Yadlouski Pavel (xyadlo00@stud.fit.vutbr.cz)
  * 
- * \note Ispeared by solution from IAL course (du2)
- * 
  * \date 2019
  */
 
 #include <stdbool.h>
 
 #ifndef _DYNAMIC_STRING_H
-    #define _DYNAMIC_STRING_H
+#define _DYNAMIC_STRING_H
 
 #define DEF_STR_SIZE 8
 
 /**
  * Structure representing dynamic string 
 */
-struct dynamic_string{
+struct dynamic_string
+{
     char *str;   /*< String                  */
     size_t len;  /*< Length of string        */
     size_t size; /*< Size of string in bytes */
@@ -64,17 +63,5 @@ void str_clean(dynamic_string_ptr str);
  * \return Pointer to allocated string;
 */
 void str_init(dynamic_string_ptr *str);
-
-/**
- * \brief Inline function for compating string DST with SRC
- * 
- * \param[in] dst 
- * \param[in] src
- *  
- * \return True if strings are the same, else false
-*/
-inline int str_compare(string dst, string src){
-   return (strcmp(dst, src) == 0) ? true : false;
-}
 
 #endif // _DYNAMIC_STRING_H

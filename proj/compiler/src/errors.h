@@ -1,3 +1,12 @@
+/**
+ * \file ./errors.h
+ * \brief All types of errors
+ * 
+ * \author Yadlouski Pavel (xyadlo00@stud.fit.vutbr.cz)
+ * 
+ * \date 2019
+ */
+
 #ifndef _ERROR_H
 #define _ERROR_H
 
