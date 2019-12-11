@@ -291,14 +291,7 @@ void def_function_end(struct token_s *token, struct dynamic_string *str) {
         add_char_to_str(str, 10);
     }
 }
-/*
- *
- * END CODE DEFINE FUNCTION
- *
- *
-/*
-* Define variables in all scopes
-*/
+
 void define_variable_GF(struct token_s *token, char *s,
                         struct dynamic_string *str) {
     (void)str;
