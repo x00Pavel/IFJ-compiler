@@ -118,7 +118,7 @@ int func_mb_ret(struct token_s *token, tStack *stack, table_s *hash_table,
             break;
 
         default:
-            return ERR_SYNTAX;  // something else
+            return ERR_SYNTAX;
             break;
     }
     return OK;
@@ -130,11 +130,9 @@ int func_cond_mb(struct token_s *token, tStack *stack, int count_of_brackets,
     int ret_code = 0;
     (void)count_of_brackets;
     ret_code = get_token(token, stack);
-    // printf("Ttype: %d\n", token->type);
     if (ret_code != OK) return ret_code;
 
     ret_code = preced_analyze(token, hash_table, count_of_params, str_1, stack);
-    // printf("GENERACE OPERACI\n");
     if (ret_code != OK) {
         return ret_code;
     }
