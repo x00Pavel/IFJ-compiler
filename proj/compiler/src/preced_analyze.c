@@ -412,7 +412,8 @@ int preced_analyze(struct token_s *token, table_s *hash_table, int *count_of_par
                 end_scan = false;
                 free(scanner_stack);
                 if (prev_token->type == TOKEN_ID || prev_token->type == TOKEN_STRING) {
-                    free(prev_token->attribute.string);
+                    if (prev_token->attribute.string)
+                        free(prev_token->attribute.string);
                 }
                 free(prev_token);
                 DLDisposeList(list);
@@ -443,7 +444,9 @@ int preced_analyze(struct token_s *token, table_s *hash_table, int *count_of_par
             case TOKEN_NONE:
                 prec_an_operand(frame, token, str);
                 break;
-
+            case TOKEN_L_BRACKET:
+                prev_token->type = TOKEN_L_BRACKET;
+                break;
             case TOKEN_EOF:
                 end = true;
                 free(scanner_stack);
@@ -479,6 +482,12 @@ int preced_analyze(struct token_s *token, table_s *hash_table, int *count_of_par
                     free(list);
                     return ERR_OTHER;
                 }
+            } else if (token->type == TOKEN_R_BRACKET && prev_token->type == TOKEN_L_BRACKET) {
+                free(scanner_stack);
+                free(prev_token);
+                DLDisposeList(list);
+                free(list);
+                return ERR_SYNTAX;
             }
         }
         if (token->type == TOKEN_ID) {
