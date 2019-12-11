@@ -41,14 +41,15 @@
 typedef struct stack tStack;
 
 int convert_num_to_str(struct dynamic_string *str) {
-    int c = getchar();
+    char c = (char)getchar();
+    char *end;
     // Hexadecimal value
     if ((c == 'x') || (c == 'X')) {
         char tmp[4];
         tmp[0] = '0';
         tmp[1] = (char)c;
         for (int i = 2; i < 4; i++) {
-            c = getchar();
+            c = (char)getchar();
             if (isdigit(c) || (c == 'A') || (c == 'a') || (c == 'B') ||
                 (c == 'b') || (c == 'C') || (c == 'c') || (c == 'D') ||
                 (c == 'd') || (c == 'E') || (c == 'e') || (c == 'F') ||
@@ -58,48 +59,59 @@ int convert_num_to_str(struct dynamic_string *str) {
                 return ERR_LEXER;
             }
         }
-        c = getchar();
+        c = (char)getchar();
         if (isalpha(c) || isdigit(c)) {
             // error in hex value
             return ERR_LEXER;
         }
         ungetc(c, stdin);
 
-        long hex = strtol(tmp, NULL, 16);
-        char tmp_1[3];
-        sprintf(tmp_1, "%ld", hex);
-        if (hex < 100) {
+        c = (char)strtol(tmp, &end, 16);
+        if (c == ' ') {
+            add_char_to_str(str, '\\');
             add_char_to_str(str, '0');
-            add_char_to_str(str, tmp_1[0]);
-            add_char_to_str(str, tmp_1[1]);
-        } else if (hex > 255) {
-            return ERR_LEXER;
+            add_char_to_str(str, '3');
+            add_char_to_str(str, '2');
+        } else if (c == '\n') {
+            add_char_to_str(str, '\\');
+            add_char_to_str(str, '0');
+            add_char_to_str(str, '1');
+            add_char_to_str(str, '0');
+        } else if (c == '\t') {
+            add_char_to_str(str, '\\');
+            add_char_to_str(str, '0');
+            add_char_to_str(str, '0');
+            add_char_to_str(str, '9');
         } else {
-            for (int b = 0; b < 3; b++) {
-                add_char_to_str(str, tmp_1[b]);
-            }
+            add_char_to_str(str, c);
         }
     } else if (c == 'n') {
+        add_char_to_str(str, '\\');
         add_char_to_str(str, '0');
         add_char_to_str(str, '1');
         add_char_to_str(str, '0');
     } else if (c == 't') {
+        add_char_to_str(str, '\\');
         add_char_to_str(str, '0');
         add_char_to_str(str, '0');
         add_char_to_str(str, '9');
     } else if (c == '\\') {
+        add_char_to_str(str, '\\');
         add_char_to_str(str, '0');
         add_char_to_str(str, '9');
         add_char_to_str(str, '2');
     } else if (c == '\'') {
+        add_char_to_str(str, '\\');
         add_char_to_str(str, '0');
         add_char_to_str(str, '3');
         add_char_to_str(str, '9');
     } else if (c == '\"') {
+        add_char_to_str(str, '\\');
         add_char_to_str(str, '0');
         add_char_to_str(str, '3');
         add_char_to_str(str, '4');
     } else {
+        add_char_to_str(str, '\\');
         add_char_to_str(str, c);
     }
     return OK;
@@ -480,7 +492,7 @@ int get_token(struct token_s *token, tStack *stack) {
                     state = SCANNER_START;
                     return OK;
                 } else if (c == '\\') {
-                    add_char_to_str(str, c);
+                    // add_char_to_str(str, c);
                     ret_code = convert_num_to_str(str);
                     if (ret_code != OK) {
                         str_clean(str);
