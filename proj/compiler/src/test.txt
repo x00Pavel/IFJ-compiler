@@ -1,2 +1,7 @@
-a = 3
-while()
+def foo(a):
+	print('A jA V FOO', a)
+
+a = 10
+while(a != 0):
+	foo(a)
+	a = a - 1
